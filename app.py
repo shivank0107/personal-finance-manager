@@ -746,78 +746,120 @@ def calculate_credit_card_outstanding(
 # BUDGET CALCULATION
 # =========================================================
 
-def calculate_budget_usage(
-    budget
-):
+def calculate_budget_usage(budget):
 
     spent = 0.0
 
-    category = budget.get(
-        "category",
-        ""
+    # Budget category
+    category = str(
+        budget.get("category", "")
+    ).strip().lower()
+
+    # Budget amount
+    budget_amount = float(
+        budget.get("amount", 0) or 0
     )
 
-    amount = float(
-        budget.get(
-            "amount",
-            0
-        ) or 0
-    )
+    # Budget dates
+    start_date = str(
+        budget.get("start_date", "")
+    ).strip()
 
-    start_date = budget.get(
-        "start_date",
-        ""
-    )
+    end_date = str(
+        budget.get("end_date", "")
+    ).strip()
 
-    end_date = budget.get(
-        "end_date",
-        ""
-    )
 
-    for expense in load_expenses():
+    # -----------------------------------------------------
+    # CHECK ALL EXPENSES
+    # -----------------------------------------------------
 
-        if expense.get(
-            "category"
-        ) != category:
+    expenses_list = load_expenses()
 
+    for expense in expenses_list:
+
+        # Expense category
+        expense_category = str(
+            expense.get("category", "")
+        ).strip().lower()
+
+
+        # Category must match
+        if expense_category != category:
             continue
 
-        expense_date = expense.get(
-            "date",
-            ""
-        )
 
-        if (
-            start_date
-            and expense_date < start_date
+        # Expense date
+        expense_date = str(
+            expense.get("date", "")
+        ).strip()
+
+
+        # Start date check
+        if start_date:
+
+            if not expense_date:
+                continue
+
+            if expense_date < start_date:
+                continue
+
+
+        # End date check
+        if end_date:
+
+            if not expense_date:
+                continue
+
+            if expense_date > end_date:
+                continue
+
+
+        # Add expense amount
+        try:
+
+            expense_amount = float(
+                expense.get(
+                    "amount",
+                    0
+                ) or 0
+            )
+
+        except (
+            ValueError,
+            TypeError
         ):
 
-            continue
+            expense_amount = 0.0
 
-        if (
-            end_date
-            and expense_date > end_date
-        ):
 
-            continue
+        spent += expense_amount
 
-        spent += float(
-            expense.get(
-                "amount",
-                0
-            ) or 0
-        )
 
-    remaining = amount - spent
+    # -----------------------------------------------------
+    # CALCULATIONS
+    # -----------------------------------------------------
 
-    progress = (
-        spent / amount * 100
-        if amount > 0
-        else 0
+    remaining = (
+        budget_amount - spent
     )
+
+
+    if budget_amount > 0:
+
+        progress = (
+            spent / budget_amount
+        ) * 100
+
+    else:
+
+        progress = 0
+
+
+    # Don't show negative remaining
+    # as positive budget balance
 
     return {
-
         "spent": round(
             spent,
             2
@@ -829,12 +871,10 @@ def calculate_budget_usage(
         ),
 
         "progress": round(
-            min(progress, 100),
+            progress,
             2
         )
-
     }
-
 
 # =========================================================
 # LOAN CALCULATION
