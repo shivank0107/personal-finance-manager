@@ -36,7 +36,7 @@ Manage your credit cards, balances and payments
             </span>
 
             <h2>
-                {{ credit_cards|length }}
+                {{ cards|length }}
             </h2>
 
         </div>
@@ -82,7 +82,7 @@ Manage your credit cards, balances and payments
             </span>
 
             <h2>
-                ₹{{ "%.2f"|format(total_balance or 0) }}
+                ₹{{ "%.2f"|format(total_outstanding or 0) }}
             </h2>
 
         </div>
@@ -157,26 +157,16 @@ Manage your credit cards, balances and payments
      CREDIT CARDS
 ====================================================== -->
 
-{% if credit_cards %}
+{% if cards %}
 
 <div class="credit-card-grid">
 
-    {% for card in credit_cards %}
+    {% for card in cards %}
 
-    {% set balance = card.current_balance or 0 %}
+    {% set balance = card.outstanding or 0 %}
     {% set limit = card.credit_limit or 0 %}
 
-    {% if limit > 0 %}
-
-        {% set utilization =
-            (balance / limit) * 100
-        %}
-
-    {% else %}
-
-        {% set utilization = 0 %}
-
-    {% endif %}
+    {% set utilization = card.utilization or 0 %}
 
 
     {% if utilization > 100 %}
@@ -220,24 +210,15 @@ Manage your credit cards, balances and payments
 
             <div class="credit-card-number">
 
-                {% if card.card_number %}
+                {% if card.last_four %}
 
-                    {% if card.card_number|length >= 4 %}
-
-                        **** **** ****
-                        {{ card.card_number[-4:] }}
+                        **** **** **** {{ card.last_four }}
 
                     {% else %}
 
-                        {{ card.card_number }}
+                        **** **** **** ****
 
                     {% endif %}
-
-                {% else %}
-
-                    **** **** **** ****
-
-                {% endif %}
 
             </div>
 
@@ -437,20 +418,20 @@ Manage your credit cards, balances and payments
 
             <!-- DUE INFORMATION -->
 
-            {% if card.due_date or card.minimum_payment %}
+            {% if card.billing_day or card.due_day %}
 
             <div class="card-due-info">
 
-                {% if card.due_date %}
+                {% if card.billing_day %}
 
                 <div>
 
                     <span>
-                        Due Date
+                        Billing Day
                     </span>
 
                     <strong>
-                        {{ card.due_date }}
+                        {{ card.billing_day }}
                     </strong>
 
                 </div>
@@ -458,18 +439,16 @@ Manage your credit cards, balances and payments
                 {% endif %}
 
 
-                {% if card.minimum_payment %}
+                {% if card.due_day %}
 
                 <div>
 
                     <span>
-                        Minimum Payment
+                        Due Day
                     </span>
 
                     <strong>
-                        ₹{{ "%.2f"|format(
-                            card.minimum_payment or 0
-                        ) }}
+                        {{ card.due_day }}
                     </strong>
 
                 </div>
