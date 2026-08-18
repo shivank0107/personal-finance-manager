@@ -7811,107 +7811,202 @@ body {
     }
 
 }
+
 /* =========================================================
-   BUDGETS PAGE
+   CREDIT CARDS - COMPLETE CARD PAGE
+   Fix for credit card cards after Add Credit Card
 ========================================================= */
 
-.budget-grid {
+.credit-card-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
     width: 100%;
+    margin-top: 20px;
 }
 
-.budget-card {
-    position: relative;
-    padding: 20px;
+.credit-card-item {
+    min-width: 0;
+    overflow: hidden;
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    transition: transform var(--transition),
-                box-shadow var(--transition),
-                border-color var(--transition);
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        border-color var(--transition);
 }
 
-.budget-card:hover {
+.credit-card-item:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
     border-color: #cbd5e1;
 }
 
 
-/* =========================
-   BUDGET HEADER
-========================= */
+/* =========================================================
+   CARD VISUAL
+========================================================= */
 
-.budget-card-header {
+.credit-card-visual {
+    position: relative;
+    min-height: 205px;
+    padding: 22px;
+    overflow: hidden;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(
+        135deg,
+        #312e81,
+        #4f46e5
+    );
+    color: #ffffff;
+    box-shadow: var(--shadow);
+}
+
+.credit-card-visual::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    right: -70px;
+    bottom: -85px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+}
+
+.credit-card-top {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.credit-card-brand {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.credit-card-chip {
+    width: 42px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: linear-gradient(
+        135deg,
+        #f8fafc,
+        #cbd5e1
+    );
+
+    color: #475569;
+    font-size: 17px;
+}
+
+.credit-card-visual .credit-card-number {
+    position: relative;
+    z-index: 2;
+
+    margin-top: 38px;
+
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+
+    white-space: nowrap;
+}
+
+.credit-card-bottom {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 18px;
+    z-index: 2;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.credit-card-bottom span {
+    display: block;
+    margin-bottom: 3px;
+
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    opacity: 0.75;
+}
+
+.credit-card-bottom strong {
+    display: block;
+
+    max-width: 180px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   CARD DETAILS
+========================================================= */
+
+.credit-card-details {
+    padding: 18px;
+}
+
+.credit-card-details-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 20px;
+
+    margin-bottom: 18px;
 }
 
-.budget-title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-.budget-icon {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 12px;
-    background: var(--primary-light);
-
-    font-size: 21px;
-}
-
-.budget-title-wrapper h3 {
+.credit-card-details-header h3 {
     margin: 0 0 3px;
 
     font-size: 15px;
     font-weight: 700;
-
     color: var(--text);
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.budget-category {
-    display: inline-block;
+.card-bank {
+    display: block;
 
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 10px;
 }
 
 
-/* =========================
-   BUDGET MENU
-========================= */
+/* =========================================================
+   CARD MENU
+========================================================= */
 
-.budget-menu {
+.card-menu {
     position: relative;
     flex-shrink: 0;
 }
 
-.icon-button {
-    width: 36px;
-    height: 36px;
+.card-menu-button {
+    width: 34px;
+    height: 34px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0;
 
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -7921,16 +8016,14 @@ body {
 
     font-size: 18px;
     line-height: 1;
-
-    cursor: pointer;
 }
 
-.icon-button:hover {
+.card-menu-button:hover {
     background: var(--background);
     color: var(--text);
 }
 
-.budget-menu-dropdown {
+.card-menu-dropdown {
     position: absolute;
 
     top: calc(100% + 6px);
@@ -7938,7 +8031,7 @@ body {
 
     z-index: 1000;
 
-    min-width: 130px;
+    min-width: 125px;
 
     display: none;
 
@@ -7951,12 +8044,12 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
-.budget-menu-dropdown.show {
+.card-menu-dropdown.show {
     display: block;
 }
 
-.budget-menu-dropdown a,
-.budget-menu-dropdown button {
+.card-menu-dropdown a,
+.card-menu-dropdown button {
     width: 100%;
 
     display: block;
@@ -7971,73 +8064,68 @@ body {
     color: var(--text);
 
     text-align: left;
-    font-size: 12px;
+    font-size: 11px;
 
     cursor: pointer;
 }
 
-.budget-menu-dropdown a:hover,
-.budget-menu-dropdown button:hover {
+.card-menu-dropdown a:hover,
+.card-menu-dropdown button:hover {
     background: var(--background);
 }
 
-.budget-menu-dropdown form {
+.card-menu-dropdown form {
     margin: 0;
 }
 
 
-/* =========================
-   BUDGET AMOUNTS
-========================= */
+/* =========================================================
+   BALANCE / LIMIT
+========================================================= */
 
-.budget-amount-row {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    gap: 20px;
+.card-balance-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 
     margin-bottom: 18px;
 }
 
-.budget-amount-row > div {
-    min-width: 0;
+.card-balance-row > div:last-child {
+    text-align: right;
 }
 
-.budget-label {
+.card-label {
     display: block;
 
     margin-bottom: 4px;
 
     color: var(--text-secondary);
-
-    font-size: 11px;
+    font-size: 10px;
 }
 
-.budget-spent,
-.budget-limit strong {
-    font-size: 17px;
+.card-balance-row strong {
+    display: block;
+
+    color: var(--text);
+    font-size: 16px;
     font-weight: 700;
 }
 
-.budget-spent {
-    color: var(--text);
-}
-
-.budget-limit {
-    text-align: right;
+.card-balance {
+    font-size: 17px !important;
 }
 
 
-/* =========================
-   BUDGET PROGRESS
-========================= */
+/* =========================================================
+   UTILIZATION
+========================================================= */
 
-.budget-progress-section {
-    margin-bottom: 16px;
+.card-utilization {
+    margin-bottom: 15px;
 }
 
-.budget-progress-header {
+.card-utilization-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -8045,16 +8133,15 @@ body {
     margin-bottom: 7px;
 
     color: var(--text-secondary);
-
-    font-size: 11px;
+    font-size: 10px;
 }
 
-.budget-progress-header strong {
+.card-utilization-header strong {
     color: var(--text);
-    font-size: 11px;
+    font-size: 10px;
 }
 
-.budget-progress-section .progress-bar {
+.card-utilization .progress-bar {
     width: 100%;
     height: 8px;
 
@@ -8065,7 +8152,7 @@ body {
     background: var(--border-light);
 }
 
-.budget-progress-fill {
+.card-utilization .credit-progress-fill {
     width: 0;
     height: 100%;
 
@@ -8077,11 +8164,11 @@ body {
 }
 
 
-/* =========================
-   REMAINING
-========================= */
+/* =========================================================
+   AVAILABLE CREDIT
+========================================================= */
 
-.budget-remaining {
+.card-available {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -8094,160 +8181,248 @@ body {
     border-bottom: 1px solid var(--border);
 
     color: var(--text-secondary);
-
-    font-size: 11px;
+    font-size: 10px;
 }
 
-.budget-remaining strong {
+.card-available strong {
     color: var(--text);
     font-size: 12px;
 }
 
-.budget-over {
-    color: var(--danger);
-    font-weight: 600;
+
+/* =========================================================
+   DUE INFORMATION
+========================================================= */
+
+.card-due-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    margin-top: 14px;
 }
 
+.card-due-info > div {
+    min-width: 0;
+}
 
-/* =========================
-   DATE
-========================= */
+.card-due-info span {
+    display: block;
 
-.budget-date {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 5px;
-
-    margin-top: 13px;
+    margin-bottom: 3px;
 
     color: var(--text-muted);
+    font-size: 9px;
+}
+
+.card-due-info strong {
+    display: block;
+
+    color: var(--text);
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.credit-card-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+
+    margin-top: 17px;
+}
+
+.credit-card-actions .primary-button,
+.credit-card-actions .secondary-button,
+.credit-card-actions .edit-button {
+    min-width: 0;
+    min-height: 34px;
+
+    padding: 7px 8px;
 
     font-size: 10px;
+    white-space: nowrap;
 }
 
-
-/* =========================
-   ACTIONS
-========================= */
-
-.budget-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 8px;
-
-    margin-top: 16px;
-}
-
-.budget-actions form {
-    margin: 0;
-    padding: 0;
-}
-
-.budget-actions .edit-button,
-.budget-actions .delete-button {
-    min-height: 32px;
-
+.credit-card-actions .edit-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    padding: 6px 11px;
-
-    border-radius: 7px;
-
-    font-size: 11px;
-    font-weight: 600;
-
-    cursor: pointer;
-    text-decoration: none;
-
-    box-sizing: border-box;
-}
-
-.budget-actions .edit-button {
     border: 1px solid #c7d2fe;
-    background: #eef2ff;
-    color: #4338ca;
+    border-radius: var(--radius);
+
+    background: var(--primary-light);
+    color: var(--primary-dark);
+
+    font-weight: 600;
 }
 
-.budget-actions .edit-button:hover {
+.credit-card-actions .edit-button:hover {
     background: #e0e7ff;
 }
 
-.budget-actions .delete-button {
-    border: 1px solid #fecaca;
-    background: #fef2f2;
-    color: #dc2626;
+
+/* =========================================================
+   CREDIT CARD EMPTY STATE
+========================================================= */
+
+.credit-card-empty {
+    width: 100%;
+    padding: 60px 20px;
+
+    text-align: center;
+
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
 }
 
-.budget-actions .delete-button:hover {
-    background: #fee2e2;
-}
-
-
-/* =========================
-   SUMMARY ICON
-========================= */
-
-.summary-icon {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
+.credit-card-empty-icon {
+    width: 58px;
+    height: 58px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 12px;
+    margin: 0 auto 15px;
+
+    border-radius: 15px;
 
     background: var(--primary-light);
 
-    font-size: 20px;
+    font-size: 27px;
+}
+
+.credit-card-empty h3 {
+    margin: 0 0 7px;
+
+    font-size: 17px;
+}
+
+.credit-card-empty p {
+    max-width: 520px;
+
+    margin: 0 auto 18px;
+
+    color: var(--text-secondary);
+    font-size: 11px;
 }
 
 
-/* =========================
-   MOBILE
-========================= */
+/* =========================================================
+   CREDIT CARD RESPONSIVE
+========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
 
-    .budget-grid {
+    .credit-card-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
 }
 
-@media (max-width: 700px) {
 
-    .budget-grid {
+@media (max-width: 760px) {
+
+    .credit-card-grid {
         grid-template-columns: 1fr;
         gap: 14px;
     }
 
-    .budget-card {
+    .credit-card-visual {
+        min-height: 190px;
+        padding: 19px;
+    }
+
+    .credit-card-visual .credit-card-number {
+        margin-top: 34px;
+        font-size: 17px;
+    }
+
+    .credit-card-bottom {
+        left: 19px;
+        right: 19px;
+        bottom: 16px;
+    }
+
+    .credit-card-details {
         padding: 16px;
     }
 
-    .budget-card-header {
-        margin-bottom: 16px;
+}
+
+
+@media (max-width: 480px) {
+
+    .credit-card-grid {
+        gap: 12px;
     }
 
-    .budget-amount-row {
-        gap: 15px;
+    .credit-card-visual {
+        min-height: 175px;
+        padding: 16px;
     }
 
-    .budget-actions {
-        justify-content: stretch;
+    .credit-card-brand {
+        font-size: 11px;
     }
 
-    .budget-actions .edit-button,
-    .budget-actions .delete-button {
-        flex: 1;
+    .credit-card-chip {
+        width: 37px;
+        height: 27px;
+        font-size: 14px;
+    }
+
+    .credit-card-visual .credit-card-number {
+        margin-top: 30px;
+        font-size: 15px;
+        letter-spacing: 0.09em;
+    }
+
+    .credit-card-bottom {
+        left: 16px;
+        right: 16px;
+        bottom: 14px;
+    }
+
+    .credit-card-bottom span {
+        font-size: 7px;
+    }
+
+    .credit-card-bottom strong {
+        max-width: 135px;
+        font-size: 9px;
+    }
+
+    .credit-card-details {
+        padding: 14px;
+    }
+
+    .credit-card-details-header h3 {
+        font-size: 14px;
+    }
+
+    .card-balance-row {
+        gap: 10px;
+    }
+
+    .card-balance-row strong {
+        font-size: 14px;
+    }
+
+    .credit-card-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .credit-card-actions .primary-button,
+    .credit-card-actions .secondary-button,
+    .credit-card-actions .edit-button {
+        width: 100%;
     }
 
 }
