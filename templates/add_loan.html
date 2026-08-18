@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Loan
+{% endblock %}
+
+{% block page_title %}
+Add Loan / EMI
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <div class="form-header">
+
+        <h2>
+            Add New Loan
+        </h2>
+
+        <p>
+            Enter loan details and calculate EMI
+        </p>
+
+    </div>
+
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+
+            <!-- LOAN NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Loan Name
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="e.g. Home Loan"
+                    required
+                >
+
+            </div>
+
+
+            <!-- LENDER -->
+
+            <div class="form-group">
+
+                <label>
+                    Lender
+                </label>
+
+                <input
+                    type="text"
+                    name="lender"
+                    placeholder="e.g. LIC HFL"
+                    required
+                >
+
+            </div>
+
+
+            <!-- LOAN TYPE -->
+
+            <div class="form-group">
+
+                <label>
+                    Loan Type
+                </label>
+
+                <select
+                    name="loan_type"
+                    required
+                >
+
+                    <option value="">
+                        Select Loan Type
+                    </option>
+
+                    <option value="Home Loan">
+                        Home Loan
+                    </option>
+
+                    <option value="Personal Loan">
+                        Personal Loan
+                    </option>
+
+                    <option value="Car Loan">
+                        Car Loan
+                    </option>
+
+                    <option value="Education Loan">
+                        Education Loan
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- LOAN AMOUNT -->
+
+            <div class="form-group">
+
+                <label>
+                    Loan Amount
+                </label>
+
+                <input
+                    type="number"
+                    name="loan_amount"
+                    id="loanAmount"
+                    step="0.01"
+                    min="0"
+                    placeholder="₹50,00,000"
+                    required
+                >
+
+            </div>
+
+
+            <!-- INTEREST -->
+
+            <div class="form-group">
+
+                <label>
+                    Interest Rate (%)
+                </label>
+
+                <input
+                    type="number"
+                    name="interest_rate"
+                    id="interestRate"
+                    step="0.01"
+                    min="0"
+                    placeholder="e.g. 7.40"
+                    required
+                >
+
+            </div>
+
+
+            <!-- TENURE -->
+
+            <div class="form-group">
+
+                <label>
+                    Tenure (Months)
+                </label>
+
+                <input
+                    type="number"
+                    name="tenure"
+                    id="tenure"
+                    min="1"
+                    placeholder="e.g. 240"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EMI -->
+
+            <div class="form-group">
+
+                <label>
+                    Monthly EMI
+                </label>
+
+                <input
+                    type="number"
+                    name="emi"
+                    id="emi"
+                    step="0.01"
+                    min="0"
+                    placeholder="₹0.00"
+                    required
+                >
+
+                <small
+                    id="emiHint"
+                    style="
+                        display:block;
+                        margin-top:5px;
+                        color:#64748b;
+                        font-size:11px;
+                    "
+                >
+                    EMI will be calculated automatically.
+                </small>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label>
+                    Loan Start Date
+                </label>
+
+                <input
+                    type="date"
+                    name="start_date"
+                    id="startDate"
+                    required
+                >
+
+            </div>
+
+
+            <!-- NEXT EMI -->
+
+            <div class="form-group">
+
+                <label>
+                    Next EMI Date
+                </label>
+
+                <input
+                    type="date"
+                    name="next_emi_date"
+                    id="nextEmiDate"
+                    required
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <!-- EMI CALCULATOR -->
+
+        <div
+            id="emiSummary"
+            style="
+                display:none;
+                margin-top:20px;
+                padding:18px;
+                border:1px solid #e2e8f0;
+                border-radius:10px;
+                background:#f8fafc;
+            "
+        >
+
+            <h3
+                style="
+                    margin:0 0 15px;
+                    font-size:15px;
+                "
+            >
+                EMI Summary
+            </h3>
+
+
+            <div
+                style="
+                    display:grid;
+                    grid-template-columns:
+                        repeat(3, 1fr);
+                    gap:12px;
+                "
+            >
+
+                <div>
+
+                    <span
+                        style="
+                            display:block;
+                            font-size:11px;
+                            color:#64748b;
+                        "
+                    >
+                        Monthly EMI
+                    </span>
+
+                    <strong
+                        id="summaryEmi"
+                        style="
+                            display:block;
+                            margin-top:4px;
+                            font-size:18px;
+                        "
+                    >
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span
+                        style="
+                            display:block;
+                            font-size:11px;
+                            color:#64748b;
+                        "
+                    >
+                        Total Interest
+                    </span>
+
+                    <strong
+                        id="summaryInterest"
+                        style="
+                            display:block;
+                            margin-top:4px;
+                            font-size:18px;
+                        "
+                    >
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span
+                        style="
+                            display:block;
+                            font-size:11px;
+                            color:#64748b;
+                        "
+                    >
+                        Total Payment
+                    </span>
+
+                    <strong
+                        id="summaryPayment"
+                        style="
+                            display:block;
+                            margin-top:4px;
+                            font-size:18px;
+                        "
+                    >
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('loans') }}"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Save Loan
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const loanAmount =
+            document.getElementById(
+                "loanAmount"
+            );
+
+        const interestRate =
+            document.getElementById(
+                "interestRate"
+            );
+
+        const tenure =
+            document.getElementById(
+                "tenure"
+            );
+
+        const emi =
+            document.getElementById(
+                "emi"
+            );
+
+        const emiSummary =
+            document.getElementById(
+                "emiSummary"
+            );
+
+        const summaryEmi =
+            document.getElementById(
+                "summaryEmi"
+            );
+
+        const summaryInterest =
+            document.getElementById(
+                "summaryInterest"
+            );
+
+        const summaryPayment =
+            document.getElementById(
+                "summaryPayment"
+            );
+
+        const emiHint =
+            document.getElementById(
+                "emiHint"
+            );
+
+
+        function calculateEMI() {
+
+            const principal =
+                parseFloat(
+                    loanAmount.value
+                );
+
+            const annualRate =
+                parseFloat(
+                    interestRate.value
+                );
+
+            const months =
+                parseInt(
+                    tenure.value
+                );
+
+
+            if (
+                !principal ||
+                principal <= 0 ||
+                !months ||
+                months <= 0
+            ) {
+
+                emiSummary.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            let monthlyRate =
+                0;
+
+            if (
+                annualRate &&
+                annualRate > 0
+            ) {
+
+                monthlyRate =
+                    annualRate / 12 / 100;
+
+            }
+
+
+            let monthlyEMI;
+
+
+            /*
+             * Interest-free loan
+             */
+
+            if (
+                monthlyRate === 0
+            ) {
+
+                monthlyEMI =
+                    principal / months;
+
+            }
+
+
+            /*
+             * Normal EMI
+             */
+
+            else {
+
+                monthlyEMI =
+                    principal
+                    *
+                    monthlyRate
+                    *
+                    Math.pow(
+                        1 + monthlyRate,
+                        months
+                    )
+                    /
+                    (
+                        Math.pow(
+                            1 + monthlyRate,
+                            months
+                        ) - 1
+                    );
+
+            }
+
+
+            monthlyEMI =
+                Math.round(
+                    monthlyEMI * 100
+                ) / 100;
+
+
+            const totalPayment =
+                monthlyEMI * months;
+
+
+            const totalInterest =
+                totalPayment - principal;
+
+
+            /*
+             * Put EMI into form field
+             */
+
+            emi.value =
+                monthlyEMI.toFixed(2);
+
+
+            /*
+             * Summary
+             */
+
+            summaryEmi.textContent =
+                "₹" +
+                monthlyEMI.toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+
+            summaryInterest.textContent =
+                "₹" +
+                totalInterest.toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+
+            summaryPayment.textContent =
+                "₹" +
+                totalPayment.toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+
+            emiSummary.style.display =
+                "block";
+
+
+            emiHint.textContent =
+                "EMI calculated automatically.";
+
+        }
+
+
+        loanAmount.addEventListener(
+            "input",
+            calculateEMI
+        );
+
+        interestRate.addEventListener(
+            "input",
+            calculateEMI
+        );
+
+        tenure.addEventListener(
+            "input",
+            calculateEMI
+        );
+
+
+        /*
+         * Today's date
+         */
+
+        const today =
+            new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+        const startDate =
+            document.getElementById(
+                "startDate"
+            );
+
+        if (startDate) {
+
+            startDate.value =
+                today;
+
+        }
+
+
+        /*
+         * Default next EMI date
+         * = today + 1 month
+         */
+
+        const nextDate =
+            new Date();
+
+        nextDate.setMonth(
+            nextDate.getMonth() + 1
+        );
+
+
+        const nextDateString =
+            nextDate
+            .toISOString()
+            .split("T")[0];
+
+
+        const nextEmiDate =
+            document.getElementById(
+                "nextEmiDate"
+            );
+
+        if (nextEmiDate) {
+
+            nextEmiDate.value =
+                nextDateString;
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

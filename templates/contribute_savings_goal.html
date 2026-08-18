@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block title %}
+Contribute to Savings Goal - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Contribute to Savings Goal
+{% endblock %}
+
+{% block page_subtitle %}
+Add money to an existing savings goal
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         GOAL INFORMATION
+    ====================================================== -->
+
+    {% if goal %}
+
+    {% set target = goal.target_amount or 0 %}
+    {% set saved = goal.saved_amount or 0 %}
+
+    {% if target > 0 %}
+        {% set progress = (saved / target) * 100 %}
+    {% else %}
+        {% set progress = 0 %}
+    {% endif %}
+
+    {% if progress > 100 %}
+        {% set display_progress = 100 %}
+    {% elif progress < 0 %}
+        {% set display_progress = 0 %}
+    {% else %}
+        {% set display_progress = progress %}
+    {% endif %}
+
+
+    <!-- Hidden data container.
+         Jinja is kept outside JavaScript. -->
+
+    <div
+        id="goalData"
+        data-target="{{ target }}"
+        data-saved="{{ saved }}"
+        data-progress="{{ display_progress }}"
+    ></div>
+
+
+    <!-- GOAL CARD -->
+
+    <div class="form-notice goal-contribution-info">
+
+        <div>
+
+            <strong>
+                {{ goal.name }}
+            </strong>
+
+            <p>
+
+                Saved:
+                ₹{{ "%.2f"|format(saved) }}
+
+                &nbsp; | &nbsp;
+
+                Target:
+                ₹{{ "%.2f"|format(target) }}
+
+            </p>
+
+        </div>
+
+
+        <div class="contribution-progress">
+
+            <div class="progress-bar">
+
+                <div
+                    class="progress-fill"
+                    data-progress="{{ display_progress }}"
+                ></div>
+
+            </div>
+
+            <span>
+                {{ "%.1f"|format(progress) }}% completed
+            </span>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <!-- =================================================
+         NO GOAL
+    ================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            🎯
+        </div>
+
+        <h2>
+            Savings Goal Not Found
+        </h2>
+
+        <p>
+            The requested savings goal could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('savings_goals') }}"
+            class="primary-button"
+        >
+            Back to Savings Goals
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if goal %}
+
+    <!-- =====================================================
+         CONTRIBUTION FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'contribute_savings_goal',
+            goal_id=goal.id
+        ) }}"
+        id="contributionForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- CONTRIBUTION AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Contribution Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter the amount you want to add to this goal.
+                </small>
+
+            </div>
+
+
+            <!-- CONTRIBUTION DATE -->
+
+            <div class="form-group">
+
+                <label for="date">
+
+                    Contribution Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="UPI">
+                        UPI
+                    </option>
+
+                    <option value="Bank Transfer">
+                        Bank Transfer
+                    </option>
+
+                    <option value="Debit Card">
+                        Debit Card
+                    </option>
+
+                    <option value="Net Banking">
+                        Net Banking
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this contribution..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTRIBUTION PREVIEW
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="contributionPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Contribution Summary
+                </strong>
+
+                <p id="contributionSummaryText">
+                    Enter an amount to see the updated goal progress.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Contribution
+
+            </button>
+
+        </div>
+
+    </form>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           GET ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "contributionForm"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const date =
+            document.getElementById(
+                "date"
+            );
+
+        const summary =
+            document.getElementById(
+                "contributionSummaryText"
+            );
+
+        const goalData =
+            document.getElementById(
+                "goalData"
+            );
+
+
+        /*
+         * Stop if the goal/form does not exist.
+         */
+
+        if (
+            !form ||
+            !amount ||
+            !date ||
+            !summary ||
+            !goalData
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           READ GOAL DATA
+        ================================================= */
+
+        const goalTarget =
+            parseFloat(
+                goalData.dataset.target || "0"
+            ) || 0;
+
+
+        const goalSaved =
+            parseFloat(
+                goalData.dataset.saved || "0"
+            ) || 0;
+
+
+        const existingProgress =
+            parseFloat(
+                goalData.dataset.progress || "0"
+            ) || 0;
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!date.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            date.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           PROGRESS BAR
+        ================================================= */
+
+        const progressBars =
+            document.querySelectorAll(
+                ".progress-fill"
+            );
+
+
+        progressBars.forEach(
+            function (bar) {
+
+                let progress =
+                    parseFloat(
+                        bar.dataset.progress
+                    ) || 0;
+
+
+                progress =
+                    Math.max(
+                        0,
+                        Math.min(
+                            progress,
+                            100
+                        )
+                    );
+
+
+                bar.style.width =
+                    progress + "%";
+
+            }
+        );
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const contribution =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            if (
+                contribution <= 0
+            ) {
+
+                summary.textContent =
+                    "Enter an amount to see the updated goal progress.";
+
+                return;
+
+            }
+
+
+            const newSaved =
+                goalSaved +
+                contribution;
+
+
+            const remaining =
+                Math.max(
+                    goalTarget -
+                    newSaved,
+                    0
+                );
+
+
+            let newProgress =
+                0;
+
+
+            if (
+                goalTarget > 0
+            ) {
+
+                newProgress =
+                    (
+                        newSaved /
+                        goalTarget
+                    ) *
+                    100;
+
+            }
+
+
+            summary.textContent =
+                "New Saved Amount: ₹" +
+                newSaved.toFixed(2) +
+                " | Remaining: ₹" +
+                remaining.toFixed(2) +
+                " | Progress: " +
+                newProgress.toFixed(1) +
+                "%";
+
+
+            /*
+             * If goal is already complete,
+             * show a clear message.
+             */
+
+            if (
+                goalTarget > 0 &&
+                newSaved >= goalTarget
+            ) {
+
+                summary.textContent =
+                    "Goal will be achieved! " +
+                    "Saved: ₹" +
+                    newSaved.toFixed(2) +
+                    " | Target: ₹" +
+                    goalTarget.toFixed(2) +
+                    " | Progress: 100%";
+
+            }
+
+        }
+
+
+        /* =================================================
+           AMOUNT EVENT
+        ================================================= */
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const contribution =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (
+                    Number.isNaN(
+                        contribution
+                    ) ||
+                    contribution <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid contribution amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                if (!date.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the contribution date."
+                    );
+
+                    date.focus();
+
+                    return;
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+
+        /*
+         * Keep this variable referenced so
+         * VS Code/linter does not complain.
+         */
+
+        void existingProgress;
+
+    }
+);
+
+</script>
+
+{% endblock %}

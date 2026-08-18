@@ -1,0 +1,1200 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Recurring Payment - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Recurring Payment
+{% endblock %}
+
+{% block page_subtitle %}
+Update your recurring payment details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Recurring Payment
+            </h2>
+
+            <p>
+                Update the details of your recurring payment.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if payment %}
+
+    <!-- =====================================================
+         PAYMENT DATA
+    ====================================================== -->
+
+    <div
+        id="paymentData"
+        data-payment-id="{{ payment.id }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_recurring_payment',
+            payment_id=payment.id
+        ) }}"
+        id="editRecurringPaymentForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- PAYMENT NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+
+                    Payment Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ payment.name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Netflix Subscription"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        value="{{ payment.amount or 0 }}"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option
+                        value="Bills"
+                        {% if payment.category == "Bills" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bills
+                    </option>
+
+                    <option
+                        value="Subscription"
+                        {% if payment.category == "Subscription" %}
+                            selected
+                        {% endif %}
+                    >
+                        Subscription
+                    </option>
+
+                    <option
+                        value="Rent"
+                        {% if payment.category == "Rent" %}
+                            selected
+                        {% endif %}
+                    >
+                        Rent
+                    </option>
+
+                    <option
+                        value="Utilities"
+                        {% if payment.category == "Utilities" %}
+                            selected
+                        {% endif %}
+                    >
+                        Utilities
+                    </option>
+
+                    <option
+                        value="Insurance"
+                        {% if payment.category == "Insurance" %}
+                            selected
+                        {% endif %}
+                    >
+                        Insurance
+                    </option>
+
+                    <option
+                        value="Loan"
+                        {% if payment.category == "Loan" %}
+                            selected
+                        {% endif %}
+                    >
+                        Loan
+                    </option>
+
+                    <option
+                        value="Entertainment"
+                        {% if payment.category == "Entertainment" %}
+                            selected
+                        {% endif %}
+                    >
+                        Entertainment
+                    </option>
+
+                    <option
+                        value="Education"
+                        {% if payment.category == "Education" %}
+                            selected
+                        {% endif %}
+                    >
+                        Education
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if payment.category == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- FREQUENCY -->
+
+            <div class="form-group">
+
+                <label for="frequency">
+
+                    Frequency
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <select
+                    id="frequency"
+                    name="frequency"
+                    required
+                >
+
+                    <option
+                        value="Daily"
+                        {% if payment.frequency == "Daily" %}
+                            selected
+                        {% endif %}
+                    >
+                        Daily
+                    </option>
+
+                    <option
+                        value="Weekly"
+                        {% if payment.frequency == "Weekly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Weekly
+                    </option>
+
+                    <option
+                        value="Monthly"
+                        {% if payment.frequency == "Monthly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Monthly
+                    </option>
+
+                    <option
+                        value="Quarterly"
+                        {% if payment.frequency == "Quarterly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Quarterly
+                    </option>
+
+                    <option
+                        value="Yearly"
+                        {% if payment.frequency == "Yearly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Yearly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label for="start_date">
+
+                    Start Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ payment.start_date or '' }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- NEXT PAYMENT DATE -->
+
+            <div class="form-group">
+
+                <label for="next_payment_date">
+
+                    Next Payment Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="next_payment_date"
+                    name="next_payment_date"
+                    value="{{ payment.next_payment_date or payment.next_date or '' }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- END DATE -->
+
+            <div class="form-group">
+
+                <label for="end_date">
+                    End Date
+                </label>
+
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ payment.end_date or '' }}"
+                >
+
+                <small class="form-help">
+                    Leave blank if this payment has no end date.
+                </small>
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                        {% if payment.account_id == account.id %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option
+                        value="Cash"
+                        {% if payment.payment_method == "Cash" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cash
+                    </option>
+
+                    <option
+                        value="UPI"
+                        {% if payment.payment_method == "UPI" %}
+                            selected
+                        {% endif %}
+                    >
+                        UPI
+                    </option>
+
+                    <option
+                        value="Debit Card"
+                        {% if payment.payment_method == "Debit Card" %}
+                            selected
+                        {% endif %}
+                    >
+                        Debit Card
+                    </option>
+
+                    <option
+                        value="Credit Card"
+                        {% if payment.payment_method == "Credit Card" %}
+                            selected
+                        {% endif %}
+                    >
+                        Credit Card
+                    </option>
+
+                    <option
+                        value="Bank Transfer"
+                        {% if payment.payment_method == "Bank Transfer" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bank Transfer
+                    </option>
+
+                    <option
+                        value="Auto Debit"
+                        {% if payment.payment_method == "Auto Debit" %}
+                            selected
+                        {% endif %}
+                    >
+                        Auto Debit
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if payment.payment_method == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- REMINDER DAYS -->
+
+            <div class="form-group">
+
+                <label for="reminder_days">
+                    Reminder Days Before
+                </label>
+
+                <input
+                    type="number"
+                    id="reminder_days"
+                    name="reminder_days"
+                    value="{{ payment.reminder_days or 0 }}"
+                    min="0"
+                    max="365"
+                    step="1"
+                    placeholder="e.g. 3"
+                >
+
+                <small class="form-help">
+                    Number of days before the payment date to remind you.
+                </small>
+
+            </div>
+
+
+            <!-- AUTO PAY -->
+
+            <div class="form-group">
+
+                <label for="auto_pay">
+                    Auto Pay
+                </label>
+
+                <select
+                    id="auto_pay"
+                    name="auto_pay"
+                >
+
+                    <option
+                        value="0"
+                        {% if payment.auto_pay is not defined or not payment.auto_pay %}
+                            selected
+                        {% endif %}
+                    >
+                        No
+                    </option>
+
+                    <option
+                        value="1"
+                        {% if payment.auto_pay is defined and payment.auto_pay %}
+                            selected
+                        {% endif %}
+                    >
+                        Yes
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="is_active">
+                    Status
+                </label>
+
+                <select
+                    id="is_active"
+                    name="is_active"
+                >
+
+                    <option
+                        value="1"
+                        {% if payment.is_active is not defined or payment.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="0"
+                        {% if payment.is_active is defined and not payment.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ payment.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="paymentPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Recurring Payment Summary
+                </strong>
+
+                <p id="paymentSummaryText">
+                    Review the payment details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('recurring_payments') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         PAYMENT NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            🔄
+        </div>
+
+        <h2>
+            Recurring Payment Not Found
+        </h2>
+
+        <p>
+            The requested recurring payment could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('recurring_payments') }}"
+            class="primary-button"
+        >
+            Back to Recurring Payments
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editRecurringPaymentForm"
+            );
+
+        const name =
+            document.getElementById(
+                "name"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const frequency =
+            document.getElementById(
+                "frequency"
+            );
+
+        const startDate =
+            document.getElementById(
+                "start_date"
+            );
+
+        const nextPaymentDate =
+            document.getElementById(
+                "next_payment_date"
+            );
+
+        const endDate =
+            document.getElementById(
+                "end_date"
+            );
+
+        const reminderDays =
+            document.getElementById(
+                "reminder_days"
+            );
+
+        const summary =
+            document.getElementById(
+                "paymentSummaryText"
+            );
+
+
+        /*
+         * Stop if form is unavailable.
+         */
+
+        if (
+            !form ||
+            !name ||
+            !amount ||
+            !frequency ||
+            !startDate ||
+            !nextPaymentDate ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const paymentAmount =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            const paymentName =
+                name.value.trim();
+
+
+            const selectedFrequency =
+                frequency.value ||
+                "Recurring";
+
+
+            let text =
+                "Amount: ₹" +
+                paymentAmount.toFixed(2) +
+                " | Frequency: " +
+                selectedFrequency;
+
+
+            if (
+                paymentName
+            ) {
+
+                text =
+                    paymentName +
+                    " • " +
+                    text;
+
+            }
+
+
+            if (
+                nextPaymentDate.value
+            ) {
+
+                text +=
+                    " | Next Payment: " +
+                    nextPaymentDate.value;
+
+            }
+
+
+            if (
+                category &&
+                category.value
+            ) {
+
+                text +=
+                    " | Category: " +
+                    category.value;
+
+            }
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        name.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        frequency.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        startDate.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        nextPaymentDate.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        if (category) {
+
+            category.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        if (endDate) {
+
+            endDate.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        if (reminderDays) {
+
+            reminderDays.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           DATE VALIDATION
+        ================================================= */
+
+        function validateDates() {
+
+            if (
+                !startDate.value ||
+                !nextPaymentDate.value
+            ) {
+
+                return true;
+
+            }
+
+
+            const start =
+                new Date(
+                    startDate.value
+                );
+
+            const next =
+                new Date(
+                    nextPaymentDate.value
+                );
+
+
+            if (
+                next < start
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                endDate &&
+                endDate.value
+            ) {
+
+                const end =
+                    new Date(
+                        endDate.value
+                    );
+
+
+                if (
+                    end < start
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    end < next
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const paymentName =
+                    name.value.trim();
+
+
+                const paymentAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                /* -----------------------------------------
+                   NAME
+                ------------------------------------------ */
+
+                if (
+                    !paymentName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a payment name."
+                    );
+
+                    name.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   AMOUNT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(
+                        paymentAmount
+                    ) ||
+                    paymentAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid payment amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   FREQUENCY
+                ------------------------------------------ */
+
+                if (
+                    !frequency.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a payment frequency."
+                    );
+
+                    frequency.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   START DATE
+                ------------------------------------------ */
+
+                if (
+                    !startDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the start date."
+                    );
+
+                    startDate.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   NEXT PAYMENT DATE
+                ------------------------------------------ */
+
+                if (
+                    !nextPaymentDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the next payment date."
+                    );
+
+                    nextPaymentDate.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   DATE RELATION
+                ------------------------------------------ */
+
+                if (
+                    !validateDates()
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please check the payment dates. Next payment and end date cannot be before the start date."
+                    );
+
+                    nextPaymentDate.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   REMINDER DAYS
+                ------------------------------------------ */
+
+                if (
+                    reminderDays &&
+                    reminderDays.value
+                ) {
+
+                    const days =
+                        parseInt(
+                            reminderDays.value,
+                            10
+                        );
+
+
+                    if (
+                        Number.isNaN(days) ||
+                        days < 0 ||
+                        days > 365
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Reminder days must be between 0 and 365."
+                        );
+
+                        reminderDays.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

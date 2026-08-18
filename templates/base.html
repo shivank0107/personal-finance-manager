@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Personal Finance Manager"
+    >
+
+    <title>
+        {% block title %}
+        Personal Finance Manager
+        {% endblock %}
+    </title>
+
+
+    <!-- =====================================================
+         GLOBAL CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+
+    <!-- =====================================================
+         PAGE SPECIFIC CSS
+    ====================================================== -->
+
+    {% block styles %}
+    {% endblock %}
+
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     APPLICATION WRAPPER
+========================================================= -->
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+
+        <div class="sidebar-logo">
+
+            <div class="logo-icon">
+                ₹
+            </div>
+
+            <div>
+
+                <h2>
+                    Finance<br>
+                    Manager
+                </h2>
+
+                <span>
+                    Personal Finance
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <nav class="sidebar-nav">
+
+
+            <!-- =========================
+                 MAIN
+            ========================== -->
+
+            <div class="menu-title">
+                Personal Finance
+            </div>
+
+
+            <!-- Dashboard -->
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏠
+                </span>
+
+                <span class="nav-text">
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- Income -->
+
+            <a
+                href="{{ url_for('income') }}"
+                class="nav-item {% if request.endpoint == 'income' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    💰
+                </span>
+
+                <span class="nav-text">
+                    Income
+                </span>
+
+            </a>
+
+
+            <!-- Expenses -->
+
+            <a
+                href="{{ url_for('expenses') }}"
+                class="nav-item {% if request.endpoint == 'expenses' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    💸
+                </span>
+
+                <span class="nav-text">
+                    Expenses
+                </span>
+
+            </a>
+
+
+            <!-- Accounts -->
+
+            <a
+                href="{{ url_for('accounts') }}"
+                class="nav-item {% if request.endpoint == 'accounts' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏦
+                </span>
+
+                <span class="nav-text">
+                    Accounts
+                </span>
+
+            </a>
+
+
+            <!-- Budgets -->
+
+            <a
+                href="{{ url_for('budgets') }}"
+                class="nav-item {% if request.endpoint == 'budgets' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🎯
+                </span>
+
+                <span class="nav-text">
+                    Budgets
+                </span>
+
+            </a>
+
+
+            <!-- =========================
+                 CARDS / LOANS
+            ========================== -->
+
+            <div class="menu-title">
+                Credit & Loans
+            </div>
+
+
+            <!-- Credit Cards -->
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="nav-item {% if request.endpoint == 'credit_cards' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    💳
+                </span>
+
+                <span class="nav-text">
+                    Credit Cards
+                </span>
+
+            </a>
+
+
+            <!-- Loans -->
+
+            <a
+                href="{{ url_for('loans') }}"
+                class="nav-item {% if request.endpoint == 'loans' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🏠
+                </span>
+
+                <span class="nav-text">
+                    Loans / EMI
+                </span>
+
+            </a>
+
+
+            <!-- =========================
+                 INVESTMENTS
+            ========================== -->
+
+            <div class="menu-title">
+                Investments
+            </div>
+
+
+            <!-- Investments -->
+
+            <a
+                href="{{ url_for('investments') }}"
+                class="nav-item {% if request.endpoint == 'investments' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📈
+                </span>
+
+                <span class="nav-text">
+                    Investments
+                </span>
+
+            </a>
+
+
+            <!-- Savings Goals -->
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="nav-item {% if request.endpoint == 'savings_goals' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🎯
+                </span>
+
+                <span class="nav-text">
+                    Savings Goals
+                </span>
+
+            </a>
+
+
+            <!-- Recurring Payments -->
+
+            <a
+                href="{{ url_for('recurring_payments') }}"
+                class="nav-item {% if request.endpoint == 'recurring_payments' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🔄
+                </span>
+
+                <span class="nav-text">
+                    Recurring Payments
+                </span>
+
+            </a>
+
+
+            <!-- =========================
+                 ANALYTICS
+            ========================== -->
+
+            <div class="menu-title">
+                Analytics
+            </div>
+
+
+            <!-- Reports -->
+
+            <a
+                href="{{ url_for('reports') }}"
+                class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📊
+                </span>
+
+                <span class="nav-text">
+                    Reports
+                </span>
+
+            </a>
+
+
+            <!-- Financial Calendar -->
+
+            <a
+                href="{{ url_for('financial_calendar') }}"
+                class="nav-item {% if request.endpoint == 'financial_calendar' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    📅
+                </span>
+
+                <span class="nav-text">
+                    Financial Calendar
+                </span>
+
+            </a>
+
+
+            <!-- Calculators -->
+
+            <a
+                href="{{ url_for('calculators') }}"
+                class="nav-item {% if request.endpoint == 'calculators' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🧮
+                </span>
+
+                <span class="nav-text">
+                    Calculators
+                </span>
+
+            </a>
+
+
+            <!-- Tax Planner -->
+
+            <a
+                href="{{ url_for('tax_planner') }}"
+                class="nav-item {% if request.endpoint == 'tax_planner' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    🧾
+                </span>
+
+                <span class="nav-text">
+                    Tax Planner
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- =================================================
+             SIDEBAR FOOTER
+        ================================================== -->
+
+        <div class="sidebar-bottom">
+
+            <a
+                href="{{ url_for('settings') }}"
+                class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}"
+            >
+
+                <span class="nav-icon">
+                    ⚙️
+                </span>
+
+                <span class="nav-text">
+                    Settings
+                </span>
+
+            </a>
+
+
+            <div class="security-info">
+
+                <span class="security-icon">
+                    🔒
+                </span>
+
+                <div>
+
+                    <strong>
+                        Secure Finance
+                    </strong>
+
+                    <small>
+                        Your data stays local
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+
+            <div class="topbar-left">
+
+
+                <!-- Mobile menu -->
+
+                <button
+                    type="button"
+                    class="mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
+
+
+                <div class="topbar-title">
+
+                    <h1>
+
+                        {% block page_title %}
+                        Personal Finance
+                        {% endblock %}
+
+                    </h1>
+
+
+                    {% block page_subtitle %}
+
+                    <p class="subtitle">
+                        Manage your finances smarter
+                    </p>
+
+                    {% endblock %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 HEADER RIGHT
+            ================================================== -->
+
+            <div class="topbar-right">
+
+
+                <!-- Current date -->
+
+                <div
+                    class="current-date"
+                    id="currentDate"
+                ></div>
+
+
+                <!-- User -->
+
+                <div class="profile">
+
+                    <div class="avatar">
+
+                        {% if session.get('user_name') %}
+
+                            {{ session.get('user_name')[0]|upper }}
+
+                        {% else %}
+
+                            U
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="profile-info">
+
+                        <strong>
+
+                            {{ session.get('user_name', 'User') }}
+
+                        </strong>
+
+                        <small>
+                            Personal Account
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <section class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="footer">
+
+            <span>
+                © {{ current_year|default(2026) }}
+                Personal Finance Manager
+            </span>
+
+        </footer>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     MOBILE OVERLAY
+========================================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+
+<!-- =========================================================
+     GLOBAL JAVASCRIPT
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           MOBILE SIDEBAR
+        ================================================= */
+
+        const sidebar =
+            document.getElementById(
+                "sidebar"
+            );
+
+
+        const mobileButton =
+            document.getElementById(
+                "mobileMenuButton"
+            );
+
+
+        const overlay =
+            document.getElementById(
+                "sidebarOverlay"
+            );
+
+
+        function openSidebar() {
+
+            if (!sidebar) {
+                return;
+            }
+
+            sidebar.classList.add(
+                "mobile-open"
+            );
+
+            if (overlay) {
+
+                overlay.classList.add(
+                    "show"
+                );
+
+            }
+
+        }
+
+
+        function closeSidebar() {
+
+            if (!sidebar) {
+                return;
+            }
+
+            sidebar.classList.remove(
+                "mobile-open"
+            );
+
+            if (overlay) {
+
+                overlay.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+
+
+        if (mobileButton) {
+
+            mobileButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        sidebar &&
+                        sidebar.classList.contains(
+                            "mobile-open"
+                        )
+                    ) {
+
+                        closeSidebar();
+
+                    } else {
+
+                        openSidebar();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (overlay) {
+
+            overlay.addEventListener(
+                "click",
+                closeSidebar
+            );
+
+        }
+
+
+        /* =================================================
+           CLOSE MOBILE SIDEBAR AFTER LINK CLICK
+        ================================================= */
+
+        const navLinks =
+            document.querySelectorAll(
+                ".nav-item"
+            );
+
+
+        navLinks.forEach(
+            function (link) {
+
+                link.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            window.innerWidth <= 700
+                        ) {
+
+                            closeSidebar();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           CURRENT DATE
+        ================================================= */
+
+        const dateElement =
+            document.getElementById(
+                "currentDate"
+            );
+
+
+        if (dateElement) {
+
+            const now =
+                new Date();
+
+
+            const options = {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            };
+
+
+            dateElement.textContent =
+                now.toLocaleDateString(
+                    "en-IN",
+                    options
+                );
+
+        }
+
+
+        /* =================================================
+           ESC KEY
+        ================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeSidebar();
+
+                }
+
+            }
+        );
+
+
+    }
+);
+
+</script>
+
+
+
+<!-- =========================================================
+     PAGE SPECIFIC JAVASCRIPT
+========================================================= -->
+
+{% block scripts %}
+{% endblock %}
+
+
+
+<!-- =========================================================
+     BASE PAGE CSS
+     This fixes sidebar structure even if old CSS exists.
+========================================================= -->
+
+<style>
+
+/* =========================================================
+   BASE LAYOUT
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+    overflow-x: hidden;
+
+    background: #f5f7fb;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+    width: 100%;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+
+    height: 100vh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: #111827 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    z-index: 1000 !important;
+}
+
+
+/* =========================================================
+   SIDEBAR NAV
+========================================================= */
+
+.sidebar-nav {
+    flex: 1 !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 3px !important;
+
+    padding: 12px 10px !important;
+}
+
+
+/* =========================================================
+   NAV ITEM
+========================================================= */
+
+.nav-item {
+    width: 100% !important;
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    gap: 10px !important;
+
+    padding: 0 12px !important;
+    margin: 0 !important;
+
+    border-radius: 9px !important;
+
+    color: #d1d5db !important;
+
+    text-decoration: none !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    line-height: 1 !important;
+
+    font-size: 13px !important;
+}
+
+
+.nav-item:hover {
+    background: #1f2937 !important;
+
+    color: #ffffff !important;
+}
+
+
+.nav-item.active {
+    background: #4f46e5 !important;
+
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   NAV ICON
+========================================================= */
+
+.nav-icon {
+    width: 22px !important;
+    min-width: 22px !important;
+
+    height: 22px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex-shrink: 0 !important;
+
+    font-size: 15px !important;
+
+    line-height: 1 !important;
+}
+
+
+/* =========================================================
+   NAV TEXT
+========================================================= */
+
+.nav-text {
+    flex: 1 !important;
+
+    min-width: 0 !important;
+
+    display: block !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+
+    white-space: nowrap !important;
+
+    line-height: 40px !important;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main {
+    width: calc(100% - 250px) !important;
+
+    min-height: 100vh !important;
+
+    margin-left: 250px !important;
+
+    min-width: 0 !important;
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar {
+    width: 100%;
+
+    min-height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 0 25px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.topbar-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.topbar-title {
+    min-width: 0;
+}
+
+
+.topbar-title h1 {
+    margin: 0;
+
+    font-size: 20px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    color: #111827;
+}
+
+
+.subtitle {
+    margin: 4px 0 0;
+
+    color: #6b7280;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+    width: 100%;
+
+    min-width: 0;
+
+    padding: 28px;
+}
+
+
+/* =========================================================
+   TOPBAR RIGHT
+========================================================= */
+
+.topbar-right {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+
+.current-date {
+    color: #6b7280;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+
+.profile {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+.avatar {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #4f46e5;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.profile-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 1px;
+}
+
+
+.profile-info strong {
+    color: #111827;
+
+    font-size: 12px;
+}
+
+
+.profile-info small {
+    color: #9ca3af;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   SECURITY INFO
+========================================================= */
+
+.security-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 12px 8px;
+
+    color: #9ca3af;
+}
+
+
+.security-icon {
+    font-size: 14px;
+}
+
+
+.security-info strong {
+    display: block;
+
+    color: #d1d5db;
+
+    font-size: 10px;
+}
+
+
+.security-info small {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    padding: 16px 28px;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE BUTTON
+========================================================= */
+
+.mobile-menu-button {
+    width: 38px;
+    height: 38px;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.sidebar-overlay {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.5);
+
+    z-index: 999;
+}
+
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .mobile-menu-button {
+        display: flex;
+    }
+
+
+    .sidebar {
+        width: 250px !important;
+
+        min-width: 250px !important;
+
+        max-width: 250px !important;
+
+        transform: translateX(-100%) !important;
+
+        transition:
+            transform 0.25s ease;
+    }
+
+
+    .sidebar.mobile-open {
+        transform: translateX(0) !important;
+    }
+
+
+    .main {
+        width: 100% !important;
+
+        margin-left: 0 !important;
+    }
+
+
+    .content {
+        padding: 18px;
+    }
+
+
+    .topbar {
+        padding: 0 16px;
+    }
+
+
+    .current-date {
+        display: none;
+    }
+
+
+    .profile-info {
+        display: none;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
+@media (max-width: 450px) {
+
+    .content {
+        padding: 14px;
+    }
+
+
+    .topbar-title h1 {
+        font-size: 17px;
+    }
+
+}
+
+</style>
+
+
+</body>
+
+</html>

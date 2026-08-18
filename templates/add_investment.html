@@ -1,0 +1,790 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Investment - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Investment
+{% endblock %}
+
+{% block page_subtitle %}
+Add a new investment to your portfolio
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add New Investment
+            </h2>
+
+            <p>
+                Enter the details of your investment below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INVESTMENT FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_investment') }}"
+        id="investmentForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- INVESTMENT NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Investment Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. HDFC Nifty 50 ETF"
+                    maxlength="150"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- INVESTMENT TYPE -->
+
+            <div class="form-group">
+
+                <label for="investment_type">
+                    Investment Type
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="investment_type"
+                    name="investment_type"
+                    required
+                >
+
+                    <option value="">
+                        Select investment type
+                    </option>
+
+                    <option value="Stocks">
+                        Stocks
+                    </option>
+
+                    <option value="Mutual Fund">
+                        Mutual Fund
+                    </option>
+
+                    <option value="ETF">
+                        ETF
+                    </option>
+
+                    <option value="FD">
+                        Fixed Deposit
+                    </option>
+
+                    <option value="RD">
+                        Recurring Deposit
+                    </option>
+
+                    <option value="PPF">
+                        PPF
+                    </option>
+
+                    <option value="NPS">
+                        NPS
+                    </option>
+
+                    <option value="Bonds">
+                        Bonds
+                    </option>
+
+                    <option value="Gold">
+                        Gold
+                    </option>
+
+                    <option value="Real Estate">
+                        Real Estate
+                    </option>
+
+                    <option value="Crypto">
+                        Crypto
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- INVESTMENT PLATFORM -->
+
+            <div class="form-group">
+
+                <label for="platform">
+                    Platform / Broker
+                </label>
+
+                <input
+                    type="text"
+                    id="platform"
+                    name="platform"
+                    placeholder="e.g. Zerodha, Groww, Bank"
+                    maxlength="100"
+                    autocomplete="organization"
+                >
+
+            </div>
+
+
+            <!-- INVESTMENT ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Funding Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                    >
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- INVESTMENT DATE -->
+
+            <div class="form-group">
+
+                <label for="investment_date">
+                    Investment Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="investment_date"
+                    name="investment_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- INVESTED AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="invested_amount">
+                    Invested Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="invested_amount"
+                        name="invested_amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- QUANTITY -->
+
+            <div class="form-group">
+
+                <label for="quantity">
+                    Quantity
+                </label>
+
+                <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    min="0"
+                    step="0.000001"
+                    placeholder="e.g. 10"
+                >
+
+                <small class="form-help">
+                    Number of shares, units or quantity purchased.
+                </small>
+
+            </div>
+
+
+            <!-- PURCHASE PRICE -->
+
+            <div class="form-group">
+
+                <label for="purchase_price">
+                    Purchase Price / NAV
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="purchase_price"
+                        name="purchase_price"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Price per share or unit at the time of purchase.
+                </small>
+
+            </div>
+
+
+            <!-- CURRENT VALUE -->
+
+            <div class="form-group">
+
+                <label for="current_value">
+                    Current Value
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="current_value"
+                        name="current_value"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this investment..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             INVESTMENT SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="investmentSummary"
+        >
+
+            <div>
+
+                <strong>
+                    Investment Summary
+                </strong>
+
+                <p id="investmentSummaryText">
+                    Enter the invested amount to see the summary.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('investments') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Investment
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "investmentForm"
+            );
+
+        const date =
+            document.getElementById(
+                "investment_date"
+            );
+
+        const investedAmount =
+            document.getElementById(
+                "invested_amount"
+            );
+
+        const quantity =
+            document.getElementById(
+                "quantity"
+            );
+
+        const purchasePrice =
+            document.getElementById(
+                "purchase_price"
+            );
+
+        const currentValue =
+            document.getElementById(
+                "current_value"
+            );
+
+        const summaryText =
+            document.getElementById(
+                "investmentSummaryText"
+            );
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!date.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            date.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           CALCULATE PURCHASE PRICE
+        ================================================= */
+
+        function calculatePurchasePrice() {
+
+            const amount =
+                parseFloat(
+                    investedAmount.value
+                ) || 0;
+
+            const qty =
+                parseFloat(
+                    quantity.value
+                ) || 0;
+
+
+            if (
+                amount > 0 &&
+                qty > 0
+            ) {
+
+                purchasePrice.value =
+                    (
+                        amount / qty
+                    ).toFixed(2);
+
+            }
+
+        }
+
+
+        quantity.addEventListener(
+            "input",
+            calculatePurchasePrice
+        );
+
+        investedAmount.addEventListener(
+            "input",
+            calculatePurchasePrice
+        );
+
+
+        /* =================================================
+           INVESTMENT SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const amount =
+                parseFloat(
+                    investedAmount.value
+                ) || 0;
+
+            const value =
+                parseFloat(
+                    currentValue.value
+                ) || 0;
+
+
+            if (amount <= 0) {
+
+                summaryText.textContent =
+                    "Enter the invested amount to see the summary.";
+
+                return;
+
+            }
+
+
+            if (value > 0) {
+
+                const profitLoss =
+                    value - amount;
+
+                const percentage =
+                    (
+                        profitLoss /
+                        amount
+                    ) * 100;
+
+
+                if (profitLoss >= 0) {
+
+                    summaryText.textContent =
+                        "Invested: ₹" +
+                        amount.toFixed(2) +
+                        " | Current Value: ₹" +
+                        value.toFixed(2) +
+                        " | Profit: ₹" +
+                        profitLoss.toFixed(2) +
+                        " (" +
+                        percentage.toFixed(2) +
+                        "%)";
+
+                } else {
+
+                    summaryText.textContent =
+                        "Invested: ₹" +
+                        amount.toFixed(2) +
+                        " | Current Value: ₹" +
+                        value.toFixed(2) +
+                        " | Loss: ₹" +
+                        Math.abs(
+                            profitLoss
+                        ).toFixed(2) +
+                        " (" +
+                        Math.abs(
+                            percentage
+                        ).toFixed(2) +
+                        "%)";
+
+                }
+
+            } else {
+
+                summaryText.textContent =
+                    "Total invested: ₹" +
+                    amount.toFixed(2);
+
+            }
+
+        }
+
+
+        investedAmount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+        currentValue.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const name =
+                    document
+                        .getElementById(
+                            "name"
+                        )
+                        .value
+                        .trim();
+
+                const investmentType =
+                    document
+                        .getElementById(
+                            "investment_type"
+                        )
+                        .value;
+
+                const amount =
+                    parseFloat(
+                        investedAmount.value
+                    );
+
+                const qty =
+                    parseFloat(
+                        quantity.value
+                    ) || 0;
+
+                const price =
+                    parseFloat(
+                        purchasePrice.value
+                    ) || 0;
+
+                const value =
+                    parseFloat(
+                        currentValue.value
+                    ) || 0;
+
+
+                if (!name) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter the investment name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!investmentType) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the investment type."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(amount) ||
+                    amount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid invested amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    qty < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Quantity cannot be negative."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    price < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Purchase price cannot be negative."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    value < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Current value cannot be negative."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

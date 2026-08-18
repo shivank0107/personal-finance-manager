@@ -1,0 +1,2650 @@
+{% extends "base.html" %}
+
+{% block title %}
+Financial Calendar - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Financial Calendar
+{% endblock %}
+
+{% block page_subtitle %}
+Track your upcoming financial activities
+{% endblock %}
+
+
+{% block content %}
+
+<div class="calendar-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h2>
+                Financial Calendar
+            </h2>
+
+            <p>
+                View income, expenses, EMIs, recurring payments,
+                investments and savings goals.
+            </p>
+
+        </div>
+
+
+        <div class="calendar-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="todayButton"
+            >
+                Today
+            </button>
+
+
+            <a
+                href="{{ url_for('add_expense') }}"
+                class="primary-button"
+            >
+                + Expense
+            </a>
+
+
+            <a
+                href="{{ url_for('add_income') }}"
+                class="primary-button"
+            >
+                + Income
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CALENDAR
+    ====================================================== -->
+
+    <div class="calendar-card">
+
+        <!-- TOOLBAR -->
+
+        <div class="calendar-toolbar">
+
+            <div class="calendar-navigation">
+
+                <button
+                    type="button"
+                    class="calendar-nav-button"
+                    id="previousMonth"
+                    aria-label="Previous month"
+                >
+                    ‹
+                </button>
+
+
+                <button
+                    type="button"
+                    class="calendar-nav-button"
+                    id="nextMonth"
+                    aria-label="Next month"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <h2
+                id="calendarMonthTitle"
+                class="calendar-month-title"
+            >
+                Calendar
+            </h2>
+
+
+            <div class="calendar-filter">
+
+                <select
+                    id="eventFilter"
+                    aria-label="Filter events"
+                >
+
+                    <option value="all">
+                        All Events
+                    </option>
+
+                    <option value="income">
+                        Income
+                    </option>
+
+                    <option value="expense">
+                        Expenses
+                    </option>
+
+                    <option value="loan">
+                        Loans / EMI
+                    </option>
+
+                    <option value="recurring">
+                        Recurring Payments
+                    </option>
+
+                    <option value="investment">
+                        Investments
+                    </option>
+
+                    <option value="goal">
+                        Savings Goals
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             LEGEND
+        ================================================== -->
+
+        <div class="calendar-legend">
+
+            <span class="legend-item">
+                <span class="legend-dot income-dot"></span>
+                Income
+            </span>
+
+
+            <span class="legend-item">
+                <span class="legend-dot expense-dot"></span>
+                Expense
+            </span>
+
+
+            <span class="legend-item">
+                <span class="legend-dot loan-dot"></span>
+                Loan / EMI
+            </span>
+
+
+            <span class="legend-item">
+                <span class="legend-dot recurring-dot"></span>
+                Recurring
+            </span>
+
+
+            <span class="legend-item">
+                <span class="legend-dot investment-dot"></span>
+                Investment
+            </span>
+
+
+            <span class="legend-item">
+                <span class="legend-dot goal-dot"></span>
+                Goal
+            </span>
+
+        </div>
+
+
+        <!-- =================================================
+             WEEK DAYS
+        ================================================== -->
+
+        <div class="calendar-weekdays">
+
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+
+        </div>
+
+
+        <!-- =================================================
+             CALENDAR GRID
+        ================================================== -->
+
+        <div
+            id="calendarGrid"
+            class="calendar-grid"
+        ></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         UPCOMING ACTIVITIES
+    ====================================================== -->
+
+    <div class="upcoming-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h3>
+                    Upcoming Activities
+                </h3>
+
+                <p>
+                    Your next financial activities.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="upcomingEvents"
+            class="upcoming-events"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     EVENT MODAL
+========================================================= -->
+
+<div
+    id="eventModal"
+    class="modal hidden"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal-overlay"
+        id="modalOverlay"
+    ></div>
+
+
+    <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="eventModalTitle"
+    >
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="eventModalTitle">
+                    Financial Activity
+                </h3>
+
+                <p
+                    id="eventModalDate"
+                    class="modal-date"
+                ></p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeEventModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="eventModalBody"
+            class="modal-body"
+        ></div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+<!-- =========================================================
+     STYLES
+========================================================= -->
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.calendar-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+
+.page-header-content h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header-content p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+
+.calendar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   CALENDAR CARD
+========================================================= */
+
+.calendar-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+
+.calendar-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.calendar-navigation {
+    display: flex;
+    gap: 8px;
+}
+
+
+.calendar-nav-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 25px;
+    line-height: 1;
+}
+
+
+.calendar-nav-button:hover {
+    background: rgba(100, 116, 139, 0.08);
+}
+
+
+.calendar-month-title {
+    margin: 0;
+    text-align: center;
+    font-size: 21px;
+}
+
+
+.calendar-filter {
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+.calendar-filter select {
+    min-width: 170px;
+}
+
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+
+.legend-dot {
+    width: 9px;
+    height: 9px;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+
+.income-dot {
+    background: #16a34a;
+}
+
+
+.expense-dot {
+    background: #dc2626;
+}
+
+
+.loan-dot {
+    background: #2563eb;
+}
+
+
+.recurring-dot {
+    background: #9333ea;
+}
+
+
+.investment-dot {
+    background: #ca8a04;
+}
+
+
+.goal-dot {
+    background: #0891b2;
+}
+
+
+/* =========================================================
+   WEEK DAYS
+========================================================= */
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.calendar-weekdays div {
+    padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   CALENDAR GRID
+========================================================= */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+
+.calendar-day {
+    min-height: 125px;
+    padding: 8px;
+    border-right: 1px solid var(--border-color, #e5e7eb);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    overflow: hidden;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+
+.calendar-day:hover {
+    background: rgba(100, 116, 139, 0.04);
+}
+
+
+.calendar-day:nth-child(7n) {
+    border-right: 0;
+}
+
+
+.calendar-day.other-month {
+    opacity: 0.4;
+}
+
+
+.calendar-day.today {
+    background: rgba(37, 99, 235, 0.06);
+}
+
+
+.day-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-bottom: 5px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.calendar-day.today .day-number {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.calendar-event {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    border-radius: 5px;
+    font-size: 10px;
+    line-height: 1.3;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+
+.calendar-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.calendar-event.income {
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+}
+
+
+.calendar-event.expense {
+    background: rgba(220, 38, 38, 0.12);
+    color: #b91c1c;
+}
+
+
+.calendar-event.loan {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+}
+
+
+.calendar-event.recurring {
+    background: rgba(147, 51, 234, 0.12);
+    color: #7e22ce;
+}
+
+
+.calendar-event.investment {
+    background: rgba(202, 138, 4, 0.12);
+    color: #a16207;
+}
+
+
+.calendar-event.goal {
+    background: rgba(8, 145, 178, 0.12);
+    color: #0e7490;
+}
+
+
+.more-events {
+    font-size: 10px;
+    padding: 3px 5px;
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   UPCOMING EVENTS
+========================================================= */
+
+.upcoming-card {
+    margin-top: 24px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+
+.section-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.section-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.section-header p {
+    margin: 0;
+    opacity: 0.65;
+    font-size: 13px;
+}
+
+
+.upcoming-events {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.upcoming-event {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    cursor: pointer;
+}
+
+
+.upcoming-event:hover {
+    background: rgba(100, 116, 139, 0.04);
+}
+
+
+.upcoming-event:last-child {
+    border-bottom: 0;
+}
+
+
+.upcoming-date {
+    width: 55px;
+    min-width: 55px;
+    text-align: center;
+}
+
+
+.upcoming-day {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.upcoming-month {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+
+.upcoming-info {
+    flex: 1;
+    min-width: 0;
+}
+
+
+.upcoming-title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+
+.upcoming-type {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+
+.upcoming-amount {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+.upcoming-amount.income {
+    color: #15803d;
+}
+
+
+.upcoming-amount.expense,
+.upcoming-amount.loan {
+    color: #b91c1c;
+}
+
+
+.upcoming-amount.recurring {
+    color: #7e22ce;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-panel {
+    padding: 45px 20px;
+    text-align: center;
+}
+
+
+.empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+
+.empty-panel h3 {
+    margin: 0 0 8px;
+}
+
+
+.empty-panel p {
+    margin: 0;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+
+.modal.hidden {
+    display: none;
+}
+
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+.modal-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.modal-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.modal-date {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+
+.modal-close {
+    border: 0;
+    background: transparent;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+
+.modal-body {
+    padding: 20px;
+}
+
+
+.modal-detail {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.modal-detail:last-child {
+    border-bottom: 0;
+}
+
+
+.modal-detail-label {
+    opacity: 0.6;
+}
+
+
+.modal-detail-value {
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .calendar-toolbar {
+        grid-template-columns: 1fr auto;
+    }
+
+
+    .calendar-month-title {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+
+    .calendar-navigation {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+
+    .calendar-filter {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+
+    .calendar-day {
+        min-height: 100px;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .calendar-actions {
+        flex-wrap: wrap;
+    }
+
+
+    .calendar-actions a,
+    .calendar-actions button {
+        flex: 1;
+        text-align: center;
+    }
+
+
+    .calendar-weekdays div {
+        padding: 8px 2px;
+        font-size: 9px;
+    }
+
+
+    .calendar-day {
+        min-height: 75px;
+        padding: 5px;
+    }
+
+
+    .day-number {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+
+    .calendar-event {
+        padding: 3px;
+        font-size: 8px;
+    }
+
+
+    .calendar-event-title {
+        display: none;
+    }
+
+
+    .calendar-event {
+        justify-content: center;
+    }
+
+
+    .calendar-legend {
+        gap: 8px;
+    }
+
+
+    .legend-item {
+        font-size: 10px;
+    }
+
+
+    .upcoming-event {
+        padding: 14px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+<!-- =========================================================
+     CALENDAR DATA
+     
+     IMPORTANT:
+     JSON is kept outside JavaScript.
+     This avoids VS Code Jinja/JavaScript errors.
+========================================================= -->
+
+{% block scripts %}
+
+<script
+    id="calendarEventsData"
+    type="application/json"
+>{{ calendar_events | default([]) | tojson }}</script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const calendarGrid =
+            document.getElementById(
+                "calendarGrid"
+            );
+
+
+        const monthTitle =
+            document.getElementById(
+                "calendarMonthTitle"
+            );
+
+
+        const previousMonth =
+            document.getElementById(
+                "previousMonth"
+            );
+
+
+        const nextMonth =
+            document.getElementById(
+                "nextMonth"
+            );
+
+
+        const todayButton =
+            document.getElementById(
+                "todayButton"
+            );
+
+
+        const eventFilter =
+            document.getElementById(
+                "eventFilter"
+            );
+
+
+        const upcomingEvents =
+            document.getElementById(
+                "upcomingEvents"
+            );
+
+
+        const eventModal =
+            document.getElementById(
+                "eventModal"
+            );
+
+
+        const eventModalTitle =
+            document.getElementById(
+                "eventModalTitle"
+            );
+
+
+        const eventModalDate =
+            document.getElementById(
+                "eventModalDate"
+            );
+
+
+        const eventModalBody =
+            document.getElementById(
+                "eventModalBody"
+            );
+
+
+        const closeEventModal =
+            document.getElementById(
+                "closeEventModal"
+            );
+
+
+        const modalOverlay =
+            document.getElementById(
+                "modalOverlay"
+            );
+
+
+        /* =================================================
+           READ CALENDAR JSON
+        ================================================= */
+
+        const calendarDataElement =
+            document.getElementById(
+                "calendarEventsData"
+            );
+
+
+        let rawEvents = [];
+
+
+        if (
+            calendarDataElement
+        ) {
+
+            try {
+
+                rawEvents =
+                    JSON.parse(
+                        calendarDataElement.textContent ||
+                        "[]"
+                    );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Unable to parse calendar events:",
+                    error
+                );
+
+                rawEvents = [];
+
+            }
+
+        }
+
+
+        /* =================================================
+           NORMALIZE EVENTS
+        ================================================= */
+
+        let events = [];
+
+
+        if (
+            Array.isArray(rawEvents)
+        ) {
+
+            events =
+                rawEvents.map(
+                    function (item) {
+
+                        return {
+
+                            id:
+                                item.id ??
+                                null,
+
+                            title:
+                                item.title ??
+                                item.name ??
+                                "Financial Activity",
+
+                            type:
+                                (
+                                    item.type ??
+                                    "other"
+                                )
+                                .toString()
+                                .toLowerCase(),
+
+                            date:
+                                item.date ??
+                                item.event_date ??
+                                item.start_date ??
+                                "",
+
+                            amount:
+                                parseFloat(
+                                    item.amount ?? 0
+                                ) || 0,
+
+                            description:
+                                item.description ??
+                                "",
+
+                            category:
+                                item.category ??
+                                "",
+
+                            status:
+                                item.status ??
+                                "",
+
+                            account:
+                                item.account ??
+                                item.account_name ??
+                                "",
+
+                            frequency:
+                                item.frequency ??
+                                "",
+
+                            url:
+                                item.url ??
+                                ""
+
+                        };
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           DATE HELPERS
+        ================================================= */
+
+        function parseDate(
+            dateString
+        ) {
+
+            if (
+                !dateString
+            ) {
+
+                return null;
+
+            }
+
+
+            const value =
+                String(
+                    dateString
+                );
+
+
+            const date =
+                new Date(
+                    value.length === 10
+                        ? value + "T00:00:00"
+                        : value
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return null;
+
+            }
+
+
+            return date;
+
+        }
+
+
+        function dateKey(
+            date
+        ) {
+
+            const year =
+                date.getFullYear();
+
+
+            const month =
+                String(
+                    date.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            const day =
+                String(
+                    date.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            return (
+                year +
+                "-" +
+                month +
+                "-" +
+                day
+            );
+
+        }
+
+
+        function formatDate(
+            date
+        ) {
+
+            if (
+                !date
+            ) {
+
+                return "";
+
+            }
+
+
+            return date.toLocaleDateString(
+                "en-IN",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
+
+        }
+
+
+        function formatCurrency(
+            amount
+        ) {
+
+            return new Intl.NumberFormat(
+                "en-IN",
+                {
+                    style: "currency",
+                    currency: "INR",
+                    maximumFractionDigits: 2
+                }
+            ).format(
+                Number(amount) || 0
+            );
+
+        }
+
+
+        /* =================================================
+           CURRENT DATE
+        ================================================= */
+
+        const today =
+            new Date();
+
+
+        const todayKey =
+            dateKey(
+                today
+            );
+
+
+        let currentMonth =
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
+            );
+
+
+        /* =================================================
+           FILTER
+        ================================================= */
+
+        function getFilteredEvents() {
+
+            const filter =
+                eventFilter
+                    ? eventFilter.value
+                    : "all";
+
+
+            if (
+                filter === "all"
+            ) {
+
+                return events;
+
+            }
+
+
+            return events.filter(
+                function (event) {
+
+                    return (
+                        event.type ===
+                        filter
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           RENDER CALENDAR
+        ================================================= */
+
+        function renderCalendar() {
+
+            if (
+                !calendarGrid
+            ) {
+
+                return;
+
+            }
+
+
+            calendarGrid.innerHTML =
+                "";
+
+
+            const year =
+                currentMonth.getFullYear();
+
+
+            const month =
+                currentMonth.getMonth();
+
+
+            const title =
+                currentMonth.toLocaleDateString(
+                    "en-IN",
+                    {
+                        month: "long",
+                        year: "numeric"
+                    }
+                );
+
+
+            if (
+                monthTitle
+            ) {
+
+                monthTitle.textContent =
+                    title;
+
+            }
+
+
+            const firstDay =
+                new Date(
+                    year,
+                    month,
+                    1
+                );
+
+
+            const lastDay =
+                new Date(
+                    year,
+                    month + 1,
+                    0
+                );
+
+
+            const firstWeekday =
+                firstDay.getDay();
+
+
+            const daysInMonth =
+                lastDay.getDate();
+
+
+            const previousMonthLastDay =
+                new Date(
+                    year,
+                    month,
+                    0
+                );
+
+
+            const previousDays =
+                previousMonthLastDay.getDate();
+
+
+            const filteredEvents =
+                getFilteredEvents();
+
+
+            const eventsByDate =
+                {};
+
+
+            filteredEvents.forEach(
+                function (event) {
+
+                    const date =
+                        parseDate(
+                            event.date
+                        );
+
+
+                    if (
+                        !date
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const key =
+                        dateKey(
+                            date
+                        );
+
+
+                    if (
+                        !eventsByDate[key]
+                    ) {
+
+                        eventsByDate[key] =
+                            [];
+
+                    }
+
+
+                    eventsByDate[key].push(
+                        event
+                    );
+
+                }
+            );
+
+
+            /*
+             * 42 cells = 6 calendar weeks.
+             */
+
+            for (
+                let index = 0;
+                index < 42;
+                index++
+            ) {
+
+                let dayNumber;
+
+                let cellMonth =
+                    month;
+
+                let cellYear =
+                    year;
+
+                let otherMonth =
+                    false;
+
+
+                if (
+                    index <
+                    firstWeekday
+                ) {
+
+                    dayNumber =
+                        previousDays -
+                        firstWeekday +
+                        index +
+                        1;
+
+                    cellMonth =
+                        month - 1;
+
+                    otherMonth =
+                        true;
+
+
+                    if (
+                        cellMonth < 0
+                    ) {
+
+                        cellMonth =
+                            11;
+
+                        cellYear =
+                            year - 1;
+
+                    }
+
+                }
+                else if (
+                    index >=
+                    firstWeekday +
+                    daysInMonth
+                ) {
+
+                    dayNumber =
+                        index -
+                        firstWeekday -
+                        daysInMonth +
+                        1;
+
+                    cellMonth =
+                        month + 1;
+
+                    otherMonth =
+                        true;
+
+
+                    if (
+                        cellMonth > 11
+                    ) {
+
+                        cellMonth =
+                            0;
+
+                        cellYear =
+                            year + 1;
+
+                    }
+
+                }
+                else {
+
+                    dayNumber =
+                        index -
+                        firstWeekday +
+                        1;
+
+                }
+
+
+                const cellDate =
+                    new Date(
+                        cellYear,
+                        cellMonth,
+                        dayNumber
+                    );
+
+
+                const cell =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                cell.className =
+                    "calendar-day";
+
+
+                if (
+                    otherMonth
+                ) {
+
+                    cell.classList.add(
+                        "other-month"
+                    );
+
+                }
+
+
+                if (
+                    dateKey(
+                        cellDate
+                    ) ===
+                    todayKey
+                ) {
+
+                    cell.classList.add(
+                        "today"
+                    );
+
+                }
+
+
+                const dayNumberElement =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                dayNumberElement.className =
+                    "day-number";
+
+
+                dayNumberElement.textContent =
+                    dayNumber;
+
+
+                cell.appendChild(
+                    dayNumberElement
+                );
+
+
+                const eventContainer =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                eventContainer.className =
+                    "day-events";
+
+
+                const key =
+                    dateKey(
+                        cellDate
+                    );
+
+
+                const dayEvents =
+                    eventsByDate[key] ||
+                    [];
+
+
+                dayEvents
+                    .slice(
+                        0,
+                        4
+                    )
+                    .forEach(
+                        function (event) {
+
+                            const eventElement =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            eventElement.className =
+                                "calendar-event " +
+                                getEventClass(
+                                    event.type
+                                );
+
+
+                            const titleElement =
+                                document.createElement(
+                                    "span"
+                                );
+
+
+                            titleElement.className =
+                                "calendar-event-title";
+
+
+                            titleElement.textContent =
+                                event.title;
+
+
+                            eventElement.appendChild(
+                                titleElement
+                            );
+
+
+                            eventElement.addEventListener(
+                                "click",
+                                function (
+                                    clickEvent
+                                ) {
+
+                                    clickEvent
+                                        .stopPropagation();
+
+
+                                    openEventModal(
+                                        event
+                                    );
+
+                                }
+                            );
+
+
+                            eventContainer.appendChild(
+                                eventElement
+                            );
+
+                        }
+                    );
+
+
+                if (
+                    dayEvents.length > 4
+                ) {
+
+                    const more =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    more.className =
+                        "more-events";
+
+
+                    more.textContent =
+                        "+" +
+                        (
+                            dayEvents.length -
+                            4
+                        ) +
+                        " more";
+
+
+                    eventContainer.appendChild(
+                        more
+                    );
+
+                }
+
+
+                cell.appendChild(
+                    eventContainer
+                );
+
+
+                cell.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            dayEvents.length === 1
+                        ) {
+
+                            openEventModal(
+                                dayEvents[0]
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                calendarGrid.appendChild(
+                    cell
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           EVENT CLASS
+        ================================================= */
+
+        function getEventClass(
+            type
+        ) {
+
+            const allowedTypes = [
+                "income",
+                "expense",
+                "loan",
+                "recurring",
+                "investment",
+                "goal"
+            ];
+
+
+            if (
+                allowedTypes.includes(
+                    type
+                )
+            ) {
+
+                return type;
+
+            }
+
+
+            return "expense";
+
+        }
+
+
+        /* =================================================
+           UPCOMING EVENTS
+        ================================================= */
+
+        function renderUpcomingEvents() {
+
+            if (
+                !upcomingEvents
+            ) {
+
+                return;
+
+            }
+
+
+            upcomingEvents.innerHTML =
+                "";
+
+
+            const filteredEvents =
+                getFilteredEvents();
+
+
+            const upcoming =
+                filteredEvents
+                    .filter(
+                        function (event) {
+
+                            return (
+                                event.date &&
+                                event.date >=
+                                todayKey
+                            );
+
+                        }
+                    )
+                    .sort(
+                        function (a, b) {
+
+                            return String(
+                                a.date
+                            ).localeCompare(
+                                String(
+                                    b.date
+                                )
+                            );
+
+                        }
+                    )
+                    .slice(
+                        0,
+                        10
+                    );
+
+
+            if (
+                upcoming.length === 0
+            ) {
+
+                const empty =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                empty.className =
+                    "empty-panel";
+
+
+                empty.innerHTML =
+                    "<div class=\"empty-icon\">📅</div>" +
+                    "<h3>No Upcoming Activities</h3>" +
+                    "<p>There are no upcoming financial activities.</p>";
+
+
+                upcomingEvents.appendChild(
+                    empty
+                );
+
+
+                return;
+
+            }
+
+
+            upcoming.forEach(
+                function (event) {
+
+                    const date =
+                        parseDate(
+                            event.date
+                        );
+
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "upcoming-event";
+
+
+                    const dateBox =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    dateBox.className =
+                        "upcoming-date";
+
+
+                    const day =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    day.className =
+                        "upcoming-day";
+
+
+                    day.textContent =
+                        date
+                            ? date.getDate()
+                            : "-";
+
+
+                    const month =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    month.className =
+                        "upcoming-month";
+
+
+                    month.textContent =
+                        date
+                            ? date.toLocaleDateString(
+                                "en-IN",
+                                {
+                                    month: "short"
+                                }
+                            )
+                            : "";
+
+
+                    dateBox.appendChild(
+                        day
+                    );
+
+
+                    dateBox.appendChild(
+                        month
+                    );
+
+
+                    const info =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    info.className =
+                        "upcoming-info";
+
+
+                    const title =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    title.className =
+                        "upcoming-title";
+
+
+                    title.textContent =
+                        event.title;
+
+
+                    const type =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    type.className =
+                        "upcoming-type";
+
+
+                    type.textContent =
+                        capitalize(
+                            event.type
+                        );
+
+
+                    if (
+                        event.category
+                    ) {
+
+                        type.textContent +=
+                            " • " +
+                            event.category;
+
+                    }
+
+
+                    info.appendChild(
+                        title
+                    );
+
+
+                    info.appendChild(
+                        type
+                    );
+
+
+                    const amount =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    amount.className =
+                        "upcoming-amount " +
+                        getEventClass(
+                            event.type
+                        );
+
+
+                    if (
+                        event.amount
+                    ) {
+
+                        let prefix = "-";
+
+
+                        if (
+                            event.type ===
+                            "income"
+                        ) {
+
+                            prefix = "+";
+
+                        }
+
+
+                        amount.textContent =
+                            prefix +
+                            formatCurrency(
+                                event.amount
+                            );
+
+                    }
+                    else {
+
+                        amount.textContent =
+                            "View";
+
+                    }
+
+
+                    item.appendChild(
+                        dateBox
+                    );
+
+
+                    item.appendChild(
+                        info
+                    );
+
+
+                    item.appendChild(
+                        amount
+                    );
+
+
+                    item.addEventListener(
+                        "click",
+                        function () {
+
+                            openEventModal(
+                                event
+                            );
+
+                        }
+                    );
+
+
+                    upcomingEvents.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CAPITALIZE
+        ================================================= */
+
+        function capitalize(
+            value
+        ) {
+
+            if (
+                !value
+            ) {
+
+                return "";
+
+            }
+
+
+            const text =
+                String(
+                    value
+                );
+
+
+            return (
+                text
+                    .charAt(0)
+                    .toUpperCase() +
+                text.slice(1)
+            );
+
+        }
+
+
+        /* =================================================
+           EVENT MODAL
+        ================================================= */
+
+        function openEventModal(
+            event
+        ) {
+
+            if (
+                !eventModal
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                eventModalTitle
+            ) {
+
+                eventModalTitle.textContent =
+                    event.title;
+
+            }
+
+
+            const date =
+                parseDate(
+                    event.date
+                );
+
+
+            if (
+                eventModalDate
+            ) {
+
+                eventModalDate.textContent =
+                    formatDate(
+                        date
+                    );
+
+            }
+
+
+            if (
+                eventModalBody
+            ) {
+
+                eventModalBody.innerHTML =
+                    "";
+
+            }
+
+
+            addModalDetail(
+                "Type",
+                capitalize(
+                    event.type
+                )
+            );
+
+
+            if (
+                event.amount
+            ) {
+
+                addModalDetail(
+                    "Amount",
+                    formatCurrency(
+                        event.amount
+                    )
+                );
+
+            }
+
+
+            if (
+                event.category
+            ) {
+
+                addModalDetail(
+                    "Category",
+                    event.category
+                );
+
+            }
+
+
+            if (
+                event.account
+            ) {
+
+                addModalDetail(
+                    "Account",
+                    event.account
+                );
+
+            }
+
+
+            if (
+                event.frequency
+            ) {
+
+                addModalDetail(
+                    "Frequency",
+                    event.frequency
+                );
+
+            }
+
+
+            if (
+                event.status
+            ) {
+
+                addModalDetail(
+                    "Status",
+                    event.status
+                );
+
+            }
+
+
+            if (
+                event.description
+            ) {
+
+                addModalDetail(
+                    "Description",
+                    event.description
+                );
+
+            }
+
+
+            eventModal.classList.remove(
+                "hidden"
+            );
+
+
+            eventModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+        }
+
+
+        /* =================================================
+           MODAL DETAIL
+        ================================================= */
+
+        function addModalDetail(
+            label,
+            value
+        ) {
+
+            if (
+                !eventModalBody
+            ) {
+
+                return;
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "modal-detail";
+
+
+            const labelElement =
+                document.createElement(
+                    "span"
+                );
+
+
+            labelElement.className =
+                "modal-detail-label";
+
+
+            labelElement.textContent =
+                label;
+
+
+            const valueElement =
+                document.createElement(
+                    "span"
+                );
+
+
+            valueElement.className =
+                "modal-detail-value";
+
+
+            valueElement.textContent =
+                value;
+
+
+            row.appendChild(
+                labelElement
+            );
+
+
+            row.appendChild(
+                valueElement
+            );
+
+
+            eventModalBody.appendChild(
+                row
+            );
+
+        }
+
+
+        /* =================================================
+           CLOSE MODAL
+        ================================================= */
+
+        function closeModal() {
+
+            if (
+                !eventModal
+            ) {
+
+                return;
+
+            }
+
+
+            eventModal.classList.add(
+                "hidden"
+            );
+
+
+            eventModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+        }
+
+
+        /* =================================================
+           PREVIOUS MONTH
+        ================================================= */
+
+        if (
+            previousMonth
+        ) {
+
+            previousMonth.addEventListener(
+                "click",
+                function () {
+
+                    currentMonth =
+                        new Date(
+                            currentMonth.getFullYear(),
+                            currentMonth.getMonth() - 1,
+                            1
+                        );
+
+
+                    renderCalendar();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           NEXT MONTH
+        ================================================= */
+
+        if (
+            nextMonth
+        ) {
+
+            nextMonth.addEventListener(
+                "click",
+                function () {
+
+                    currentMonth =
+                        new Date(
+                            currentMonth.getFullYear(),
+                            currentMonth.getMonth() + 1,
+                            1
+                        );
+
+
+                    renderCalendar();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           TODAY BUTTON
+        ================================================= */
+
+        if (
+            todayButton
+        ) {
+
+            todayButton.addEventListener(
+                "click",
+                function () {
+
+                    const currentDate =
+                        new Date();
+
+
+                    currentMonth =
+                        new Date(
+                            currentDate.getFullYear(),
+                            currentDate.getMonth(),
+                            1
+                        );
+
+
+                    renderCalendar();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           FILTER
+        ================================================= */
+
+        if (
+            eventFilter
+        ) {
+
+            eventFilter.addEventListener(
+                "change",
+                function () {
+
+                    renderCalendar();
+
+                    renderUpcomingEvents();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           MODAL CLOSE BUTTON
+        ================================================= */
+
+        if (
+            closeEventModal
+        ) {
+
+            closeEventModal.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        /* =================================================
+           MODAL OVERLAY
+        ================================================= */
+
+        if (
+            modalOverlay
+        ) {
+
+            modalOverlay.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        /* =================================================
+           ESC KEY
+        ================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
+
+                    closeModal();
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL LOAD
+        ================================================= */
+
+        renderCalendar();
+
+        renderUpcomingEvents();
+
+    }
+);
+
+</script>
+
+{% endblock %}

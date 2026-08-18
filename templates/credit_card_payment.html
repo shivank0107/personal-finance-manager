@@ -1,0 +1,679 @@
+{% extends "base.html" %}
+
+{% block title %}
+Credit Card Payment - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Credit Card Payment
+{% endblock %}
+
+{% block page_subtitle %}
+Make a payment towards your credit card balance
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Make Credit Card Payment
+            </h2>
+
+            <p>
+                Record a payment made towards your credit card.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CREDIT CARD INFORMATION
+    ====================================================== -->
+
+    {% if credit_card %}
+
+    {% set current_balance =
+        credit_card.current_balance or 0
+    %}
+
+    {% set credit_limit =
+        credit_card.credit_limit or 0
+    %}
+
+    <div
+        id="cardData"
+        data-balance="{{ current_balance }}"
+        data-limit="{{ credit_limit }}"
+    ></div>
+
+
+    <div class="form-notice">
+
+        <div>
+
+            <strong>
+                {{ credit_card.name }}
+            </strong>
+
+            {% if credit_card.card_number %}
+
+            <p>
+                Card:
+                ****
+                {{ credit_card.card_number[-4:] }}
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Current Balance
+            </span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_balance) }}
+            </strong>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         PAYMENT FORM
+    ====================================================== -->
+
+    {% if credit_card %}
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'credit_card_payment',
+            card_id=credit_card.id
+        ) }}"
+        id="creditCardPaymentForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- PAYMENT AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Payment Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter the amount paid towards the credit card.
+                </small>
+
+            </div>
+
+
+            <!-- PAYMENT DATE -->
+
+            <div class="form-group">
+
+                <label for="payment_date">
+
+                    Payment Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="payment_date"
+                    name="payment_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PAYMENT ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Payment Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option value="Bank Transfer">
+                        Bank Transfer
+                    </option>
+
+                    <option value="UPI">
+                        UPI
+                    </option>
+
+                    <option value="Debit Card">
+                        Debit Card
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="Net Banking">
+                        Net Banking
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- REFERENCE -->
+
+            <div class="form-group">
+
+                <label for="reference">
+                    Reference Number
+                </label>
+
+                <input
+                    type="text"
+                    id="reference"
+                    name="reference"
+                    maxlength="150"
+                    placeholder="Optional transaction reference"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this payment..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT PREVIEW
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="paymentPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Payment Summary
+                </strong>
+
+                <p id="paymentSummaryText">
+                    Enter a payment amount to see the updated balance.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Make Payment
+
+            </button>
+
+        </div>
+
+    </form>
+
+    {% else %}
+
+    <!-- =====================================================
+         CARD NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            💳
+        </div>
+
+        <h2>
+            Credit Card Not Found
+        </h2>
+
+        <p>
+            The requested credit card could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('credit_cards') }}"
+            class="primary-button"
+        >
+            Back to Credit Cards
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           GET ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "creditCardPaymentForm"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const paymentDate =
+            document.getElementById(
+                "payment_date"
+            );
+
+        const summary =
+            document.getElementById(
+                "paymentSummaryText"
+            );
+
+        const cardData =
+            document.getElementById(
+                "cardData"
+            );
+
+
+        /*
+         * Stop if card/form is not available.
+         */
+
+        if (
+            !form ||
+            !amount ||
+            !paymentDate ||
+            !summary ||
+            !cardData
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           READ CARD DATA
+        ================================================= */
+
+        const currentBalance =
+            parseFloat(
+                cardData.dataset.balance || "0"
+            ) || 0;
+
+
+        const creditLimit =
+            parseFloat(
+                cardData.dataset.limit || "0"
+            ) || 0;
+
+
+        /* =================================================
+           DEFAULT PAYMENT DATE
+        ================================================= */
+
+        if (!paymentDate.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            paymentDate.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           UPDATE PAYMENT SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const payment =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            if (
+                payment <= 0
+            ) {
+
+                summary.textContent =
+                    "Enter a payment amount to see the updated balance.";
+
+                return;
+
+            }
+
+
+            const newBalance =
+                Math.max(
+                    currentBalance -
+                    payment,
+                    0
+                );
+
+
+            const amountExceedingBalance =
+                Math.max(
+                    payment -
+                    currentBalance,
+                    0
+                );
+
+
+            let message =
+                "Current Balance: ₹" +
+                currentBalance.toFixed(2) +
+                " | Payment: ₹" +
+                payment.toFixed(2) +
+                " | New Balance: ₹" +
+                newBalance.toFixed(2);
+
+
+            if (
+                amountExceedingBalance > 0
+            ) {
+
+                message +=
+                    " | Excess Payment: ₹" +
+                    amountExceedingBalance.toFixed(2);
+
+            }
+
+
+            if (
+                creditLimit > 0
+            ) {
+
+                message +=
+                    " | Credit Limit: ₹" +
+                    creditLimit.toFixed(2);
+
+            }
+
+
+            summary.textContent =
+                message;
+
+        }
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const payment =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (
+                    Number.isNaN(payment) ||
+                    payment <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid payment amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !paymentDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the payment date."
+                    );
+
+                    paymentDate.focus();
+
+                    return;
+
+                }
+
+
+                /*
+                 * Allow payment greater than the current
+                 * balance, because some systems allow
+                 * advance payments or overpayments.
+                 *
+                 * The backend should decide whether this
+                 * is allowed.
+                 */
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

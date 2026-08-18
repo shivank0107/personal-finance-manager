@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Expense - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Expense
+{% endblock %}
+
+{% block page_subtitle %}
+Record a new expense and keep your spending up to date
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add New Expense
+            </h2>
+
+            <p>
+                Enter the details of your expense below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPENSE FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_expense') }}"
+        id="expenseForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="date">
+                    Expense Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Travel">
+                        Travel
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Rent">
+                        Rent
+                    </option>
+
+                    <option value="Utilities">
+                        Utilities
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="EMI">
+                        EMI
+                    </option>
+
+                    <option value="Insurance">
+                        Insurance
+                    </option>
+
+                    <option value="Groceries">
+                        Groceries
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                    required
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                    >
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT MODE -->
+
+            <div class="form-group">
+
+                <label for="payment_mode">
+                    Payment Mode
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="payment_mode"
+                    name="payment_mode"
+                    required
+                >
+
+                    <option value="">
+                        Select payment mode
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="UPI">
+                        UPI
+                    </option>
+
+                    <option value="Debit Card">
+                        Debit Card
+                    </option>
+
+                    <option value="Bank Transfer">
+                        Bank Transfer
+                    </option>
+
+                    <option value="Credit Card">
+                        Credit Card
+                    </option>
+
+                    <option value="Net Banking">
+                        Net Banking
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="What was this expense for?"
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CREDIT CARD WARNING
+        ================================================== -->
+
+        <div
+            id="creditCardNotice"
+            class="form-notice"
+            style="display:none;"
+        >
+
+            <span>
+                💳
+            </span>
+
+            <div>
+
+                <strong>
+                    Credit Card Expense
+                </strong>
+
+                <p>
+                    Credit card purchases are tracked separately
+                    and do not directly reduce your bank account
+                    balance until the card payment is made.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('expenses') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+                {% if not accounts %}
+                    disabled
+                {% endif %}
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Expense
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "expenseForm"
+            );
+
+        const date =
+            document.getElementById(
+                "date"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const account =
+            document.getElementById(
+                "account_id"
+            );
+
+        const paymentMode =
+            document.getElementById(
+                "payment_mode"
+            );
+
+        const creditCardNotice =
+            document.getElementById(
+                "creditCardNotice"
+            );
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!date.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            date.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           AMOUNT VALIDATION
+        ================================================= */
+
+        amount.addEventListener(
+            "input",
+            function () {
+
+                if (
+                    parseFloat(
+                        this.value
+                    ) < 0
+                ) {
+
+                    this.value = "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           PAYMENT MODE
+        ================================================= */
+
+        paymentMode.addEventListener(
+            "change",
+            function () {
+
+                if (
+                    this.value ===
+                    "Credit Card"
+                ) {
+
+                    creditCardNotice.style.display =
+                        "flex";
+
+                } else {
+
+                    creditCardNotice.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const expenseAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (!date.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the expense date."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(
+                        expenseAmount
+                    ) ||
+                    expenseAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid expense amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!category.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an expense category."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!account.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an account."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!paymentMode.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a payment mode."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

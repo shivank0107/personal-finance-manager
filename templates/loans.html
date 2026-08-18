@@ -1,0 +1,1591 @@
+{% extends "base.html" %}
+
+{% block title %}
+Loans - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Loans
+{% endblock %}
+
+{% block page_subtitle %}
+Manage your loans, EMIs and repayment progress
+{% endblock %}
+
+
+{% block content %}
+
+<div class="loans-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h2>
+                My Loans
+            </h2>
+
+            <p>
+                Track your loans, outstanding balances and EMI payments.
+            </p>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{{ url_for('add_loan') }}"
+                class="primary-button"
+            >
+                + Add Loan
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    {% set total_principal = namespace(value=0) %}
+    {% set total_outstanding = namespace(value=0) %}
+    {% set total_emi = namespace(value=0) %}
+    {% set active_count = namespace(value=0) %}
+
+    {% for loan in loans %}
+
+        {% set principal =
+            loan.principal_amount
+            or loan.loan_amount
+            or loan.amount
+            or 0
+        %}
+
+        {% set outstanding =
+            loan.outstanding_balance
+            or loan.remaining_balance
+            or loan.balance
+            or 0
+        %}
+
+        {% set emi =
+            loan.emi
+            or loan.monthly_emi
+            or 0
+        %}
+
+        {% set status =
+            loan.status
+            or 'Active'
+        %}
+
+        {% set total_principal.value =
+            total_principal.value + principal
+        %}
+
+        {% set total_outstanding.value =
+            total_outstanding.value + outstanding
+        %}
+
+        {% set total_emi.value =
+            total_emi.value + emi
+        %}
+
+        {% if status|lower == 'active' %}
+
+            {% set active_count.value =
+                active_count.value + 1
+            %}
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Total Loan Amount
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(
+                        total_principal.value
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📉
+            </div>
+
+            <div>
+
+                <span>
+                    Outstanding
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(
+                        total_outstanding.value
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💳
+            </div>
+
+            <div>
+
+                <span>
+                    Monthly EMI
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(
+                        total_emi.value
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📊
+            </div>
+
+            <div>
+
+                <span>
+                    Active Loans
+                </span>
+
+                <strong>
+                    {{ active_count.value }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH / FILTER
+    ====================================================== -->
+
+    <div class="card filter-card">
+
+        <div class="filter-row">
+
+            <div class="search-box">
+
+                <label for="loanSearch">
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="loanSearch"
+                    placeholder="Search loan, lender or type..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="statusFilter">
+                    Status
+                </label>
+
+                <select id="statusFilter">
+
+                    <option value="all">
+                        All Status
+                    </option>
+
+                    <option value="active">
+                        Active
+                    </option>
+
+                    <option value="closed">
+                        Closed
+                    </option>
+
+                    <option value="completed">
+                        Completed
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="typeFilter">
+                    Loan Type
+                </label>
+
+                <select id="typeFilter">
+
+                    <option value="all">
+                        All Types
+                    </option>
+
+                    {% set loan_types = [] %}
+
+                    {% for loan in loans %}
+
+                        {% set current_type =
+                            loan.loan_type
+                            or loan.type
+                        %}
+
+                        {% if current_type and current_type not in loan_types %}
+
+                            {% set loan_types =
+                                loan_types + [current_type]
+                            %}
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% for loan_type in loan_types %}
+
+                    <option value="{{ loan_type|lower }}">
+                        {{ loan_type }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOAN LIST
+    ====================================================== -->
+
+    {% if loans %}
+
+    <div
+        class="loans-grid"
+        id="loansGrid"
+    >
+
+        {% for loan in loans %}
+
+        {% set principal =
+            loan.principal_amount
+            or loan.loan_amount
+            or loan.amount
+            or 0
+        %}
+
+
+        {% set outstanding =
+            loan.outstanding_balance
+            or loan.remaining_balance
+            or loan.balance
+            or 0
+        %}
+
+
+        {% set emi =
+            loan.emi
+            or loan.monthly_emi
+            or 0
+        %}
+
+
+        {% set interest_rate =
+            loan.interest_rate
+            or loan.rate
+            or 0
+        %}
+
+
+        {% set loan_name =
+            loan.name
+            or loan.loan_name
+            or 'Loan'
+        %}
+
+
+        {% set lender =
+            loan.lender
+            or loan.bank_name
+            or ''
+        %}
+
+
+        {% set loan_type =
+            loan.loan_type
+            or loan.type
+            or ''
+        %}
+
+
+        {% set loan_status =
+            loan.status
+            or 'Active'
+        %}
+
+
+        {% if principal > 0 %}
+
+            {% set paid_amount =
+                loan.paid_amount
+                or loan.total_paid
+                or (principal - outstanding)
+            %}
+
+            {% set progress =
+                (paid_amount / principal) * 100
+            %}
+
+        {% else %}
+
+            {% set paid_amount = 0 %}
+            {% set progress = 0 %}
+
+        {% endif %}
+
+
+        {% if progress < 0 %}
+
+            {% set progress = 0 %}
+
+        {% endif %}
+
+
+        {% if progress > 100 %}
+
+            {% set progress = 100 %}
+
+        {% endif %}
+
+
+        <div
+            class="loan-card"
+            data-search="{{ (
+                loan_name|string
+                ~ ' '
+                ~ lender|string
+                ~ ' '
+                ~ loan_type|string
+            )|lower }}"
+            data-status="{{ loan_status|lower }}"
+            data-type="{{ loan_type|lower }}"
+        >
+
+            <!-- =================================================
+                 CARD HEADER
+            ================================================== -->
+
+            <div class="loan-card-header">
+
+                <div class="loan-title-section">
+
+                    <div class="loan-icon">
+                        🏦
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            {{ loan_name }}
+                        </h3>
+
+                        {% if lender %}
+
+                        <p>
+                            {{ lender }}
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <span
+                    class="status-badge
+                    {% if loan_status|lower == 'active' %}
+                        active
+                    {% elif loan_status|lower == 'closed' %}
+                        closed
+                    {% elif loan_status|lower == 'completed' %}
+                        completed
+                    {% else %}
+                        other
+                    {% endif %}"
+                >
+                    {{ loan_status }}
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 TYPE
+            ================================================== -->
+
+            {% if loan_type %}
+
+            <div class="loan-type">
+
+                {{ loan_type }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 BALANCE
+            ================================================== -->
+
+            <div class="balance-section">
+
+                <div>
+
+                    <span>
+                        Outstanding Balance
+                    </span>
+
+                    <strong class="balance-value">
+                        ₹{{ "%.2f"|format(
+                            outstanding
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="principal-value">
+
+                    <span>
+                        Principal
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(
+                            principal
+                        ) }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PROGRESS
+            ================================================== -->
+
+            <div class="progress-section">
+
+                <div class="progress-header">
+
+                    <span>
+                        Repayment Progress
+                    </span>
+
+                    <strong>
+                        {{ "%.1f"|format(
+                            progress
+                        ) }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="progress-fill"
+                        data-progress="{{ progress }}"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+            <div class="loan-details-grid">
+
+                <div class="loan-detail">
+
+                    <span>
+                        EMI
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(
+                            emi
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="loan-detail">
+
+                    <span>
+                        Interest
+                    </span>
+
+                    <strong>
+                        {{ "%.2f"|format(
+                            interest_rate
+                        ) }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="loan-detail">
+
+                    <span>
+                        Start Date
+                    </span>
+
+                    <strong>
+                        {{
+                            loan.start_date
+                            or loan.loan_start_date
+                            or '-'
+                        }}
+                    </strong>
+
+                </div>
+
+
+                <div class="loan-detail">
+
+                    <span>
+                        EMI Date
+                    </span>
+
+                    <strong>
+                        {{
+                            loan.emi_date
+                            or loan.payment_date
+                            or '-'
+                        }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 NEXT PAYMENT
+            ================================================== -->
+
+            {% if loan.next_payment_date %}
+
+            <div class="next-payment">
+
+                <span>
+                    Next Payment
+                </span>
+
+                <strong>
+                    {{ loan.next_payment_date }}
+                </strong>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="loan-actions">
+
+                {% if loan.id %}
+
+                <a
+                    href="{{ url_for(
+                        'loan_details',
+                        loan_id=loan.id
+                    ) }}"
+                    class="secondary-button"
+                >
+                    View Details
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'loan_payment',
+                        loan_id=loan.id
+                    ) }}"
+                    class="primary-button"
+                >
+                    + Payment
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =====================================================
+         NO SEARCH RESULTS
+    ====================================================== -->
+
+    <div
+        id="noSearchResults"
+        class="empty-panel hidden"
+    >
+
+        <div class="empty-icon">
+            🔍
+        </div>
+
+        <h3>
+            No Loans Found
+        </h3>
+
+        <p>
+            No loans match your search or filters.
+        </p>
+
+        <button
+            type="button"
+            class="secondary-button"
+            id="clearFilters"
+        >
+            Clear Filters
+        </button>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         NO LOANS
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="empty-panel">
+
+            <div class="empty-icon">
+                🏦
+            </div>
+
+            <h3>
+                No Loans Added
+            </h3>
+
+            <p>
+                Start tracking your loans and EMI payments.
+            </p>
+
+            <a
+                href="{{ url_for('add_loan') }}"
+                class="primary-button"
+            >
+                + Add Your First Loan
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.loans-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+
+.page-header-content h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header-content p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+
+.page-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.summary-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 21px;
+}
+
+
+.summary-card span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.summary-card strong {
+    display: block;
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.filter-card {
+    padding: 18px 20px;
+}
+
+
+.filter-row {
+    display: grid;
+    grid-template-columns:
+        minmax(250px, 2fr)
+        minmax(160px, 1fr)
+        minmax(160px, 1fr);
+    gap: 15px;
+}
+
+
+.search-box label,
+.filter-box label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.search-box input,
+.filter-box select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    outline: none;
+    font-family: inherit;
+}
+
+
+.search-box input:focus,
+.filter-box select:focus {
+    border-color: #64748b;
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.1);
+}
+
+
+/* =========================================================
+   LOANS GRID
+========================================================= */
+
+.loans-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+.loan-card {
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.loan-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.loan-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+
+.loan-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+
+.loan-icon {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 21px;
+}
+
+
+.loan-title-section h3 {
+    margin: 0 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.loan-title-section p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.status-badge.active {
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.1);
+}
+
+
+.status-badge.closed,
+.status-badge.completed {
+    color: #475569;
+    background: rgba(100, 116, 139, 0.1);
+}
+
+
+.status-badge.other {
+    color: #92400e;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+
+/* =========================================================
+   LOAN TYPE
+========================================================= */
+
+.loan-type {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: rgba(100, 116, 139, 0.08);
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   BALANCE
+========================================================= */
+
+.balance-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+
+.balance-section span,
+.principal-value span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.balance-value {
+    display: block;
+    font-size: 24px;
+}
+
+
+.principal-value {
+    text-align: right;
+}
+
+
+.principal-value strong {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-section {
+    margin-top: 20px;
+}
+
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+
+.progress-header span {
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.progress-header strong {
+    font-size: 12px;
+}
+
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.12);
+}
+
+
+.progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #16a34a;
+    transition: width 0.4s ease;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.loan-details-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+
+.loan-detail {
+    padding: 12px;
+    border-radius: 9px;
+    background: rgba(100, 116, 139, 0.05);
+}
+
+
+.loan-detail span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+
+.loan-detail strong {
+    display: block;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   NEXT PAYMENT
+========================================================= */
+
+.next-payment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: rgba(37, 99, 235, 0.07);
+}
+
+
+.next-payment span {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+
+.next-payment strong {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.loan-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-panel {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+
+.empty-panel.hidden {
+    display: none;
+}
+
+
+.empty-icon {
+    margin-bottom: 15px;
+    font-size: 45px;
+}
+
+
+.empty-panel h3 {
+    margin: 0 0 8px;
+}
+
+
+.empty-panel p {
+    margin: 0 0 20px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .loans-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .page-header-actions {
+        width: 100%;
+    }
+
+
+    .page-header-actions a {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .balance-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .principal-value {
+        text-align: left;
+    }
+
+
+    .loan-card-header {
+        flex-direction: column;
+    }
+
+
+    .loan-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .loan-actions {
+        flex-direction: column;
+    }
+
+
+    .loan-actions a {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           PROGRESS BARS
+        ================================================= */
+
+        const progressBars =
+            document.querySelectorAll(
+                ".progress-fill"
+            );
+
+
+        progressBars.forEach(
+            function (bar) {
+
+                let progress =
+                    parseFloat(
+                        bar.dataset.progress
+                    ) || 0;
+
+
+                if (progress < 0) {
+                    progress = 0;
+                }
+
+
+                if (progress > 100) {
+                    progress = 100;
+                }
+
+
+                bar.style.width =
+                    progress + "%";
+
+            }
+        );
+
+
+        /* =================================================
+           FILTER ELEMENTS
+        ================================================= */
+
+        const searchInput =
+            document.getElementById(
+                "loanSearch"
+            );
+
+
+        const statusFilter =
+            document.getElementById(
+                "statusFilter"
+            );
+
+
+        const typeFilter =
+            document.getElementById(
+                "typeFilter"
+            );
+
+
+        const loanCards =
+            document.querySelectorAll(
+                ".loan-card"
+            );
+
+
+        const noSearchResults =
+            document.getElementById(
+                "noSearchResults"
+            );
+
+
+        const clearFilters =
+            document.getElementById(
+                "clearFilters"
+            );
+
+
+        /* =================================================
+           FILTER FUNCTION
+        ================================================= */
+
+        function filterLoans() {
+
+            const search =
+                searchInput
+                    ? searchInput.value
+                        .trim()
+                        .toLowerCase()
+                    : "";
+
+
+            const selectedStatus =
+                statusFilter
+                    ? statusFilter.value
+                    : "all";
+
+
+            const selectedType =
+                typeFilter
+                    ? typeFilter.value
+                    : "all";
+
+
+            let visibleCount = 0;
+
+
+            loanCards.forEach(
+                function (card) {
+
+                    const cardSearch =
+                        card.dataset.search || "";
+
+
+                    const cardStatus =
+                        card.dataset.status || "";
+
+
+                    const cardType =
+                        card.dataset.type || "";
+
+
+                    const matchesSearch =
+                        !search ||
+                        cardSearch.includes(
+                            search
+                        );
+
+
+                    const matchesStatus =
+                        selectedStatus === "all" ||
+                        cardStatus === selectedStatus;
+
+
+                    const matchesType =
+                        selectedType === "all" ||
+                        cardType === selectedType;
+
+
+                    const visible =
+                        matchesSearch &&
+                        matchesStatus &&
+                        matchesType;
+
+
+                    card.style.display =
+                        visible
+                            ? ""
+                            : "none";
+
+
+                    if (visible) {
+                        visibleCount++;
+                    }
+
+                }
+            );
+
+
+            if (noSearchResults) {
+
+                if (
+                    loanCards.length > 0 &&
+                    visibleCount === 0
+                ) {
+
+                    noSearchResults.classList.remove(
+                        "hidden"
+                    );
+
+                } else {
+
+                    noSearchResults.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* =================================================
+           EVENTS
+        ================================================= */
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                filterLoans
+            );
+
+        }
+
+
+        if (statusFilter) {
+
+            statusFilter.addEventListener(
+                "change",
+                filterLoans
+            );
+
+        }
+
+
+        if (typeFilter) {
+
+            typeFilter.addEventListener(
+                "change",
+                filterLoans
+            );
+
+        }
+
+
+        /* =================================================
+           CLEAR FILTERS
+        ================================================= */
+
+        if (clearFilters) {
+
+            clearFilters.addEventListener(
+                "click",
+                function () {
+
+                    if (searchInput) {
+                        searchInput.value = "";
+                    }
+
+
+                    if (statusFilter) {
+                        statusFilter.value = "all";
+                    }
+
+
+                    if (typeFilter) {
+                        typeFilter.value = "all";
+                    }
+
+
+                    filterLoans();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           INITIAL FILTER
+        ================================================= */
+
+        filterLoans();
+
+    }
+);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Account - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Account
+{% endblock %}
+
+{% block page_subtitle %}
+Add a bank account, savings account or wallet
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add New Account
+            </h2>
+
+            <p>
+                Enter your account details below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_account') }}"
+        id="accountForm"
+        novalidate
+    >
+
+        <div class="form-grid">
+
+
+            <!-- ACCOUNT NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Account Name
+                    <span class="required">
+                        *
+                    </span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Salary Account"
+                    maxlength="100"
+                    required
+                    autocomplete="off"
+                >
+
+                <small class="form-help">
+                    Give this account a name that is easy to identify.
+                </small>
+
+            </div>
+
+
+            <!-- ACCOUNT TYPE -->
+
+            <div class="form-group">
+
+                <label for="type">
+                    Account Type
+                    <span class="required">
+                        *
+                    </span>
+                </label>
+
+                <select
+                    id="type"
+                    name="type"
+                    required
+                >
+
+                    <option value="">
+                        Select account type
+                    </option>
+
+                    <option value="Bank Account">
+                        Bank Account
+                    </option>
+
+                    <option value="Savings Account">
+                        Savings Account
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="Wallet">
+                        Wallet
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BANK NAME -->
+
+            <div
+                class="form-group"
+                id="bankNameGroup"
+            >
+
+                <label for="bank_name">
+                    Bank Name
+                </label>
+
+                <input
+                    type="text"
+                    id="bank_name"
+                    name="bank_name"
+                    placeholder="e.g. HDFC Bank"
+                    maxlength="100"
+                    autocomplete="organization"
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT NUMBER -->
+
+            <div
+                class="form-group"
+                id="accountNumberGroup"
+            >
+
+                <label for="account_number">
+                    Account Number
+                </label>
+
+                <input
+                    type="text"
+                    id="account_number"
+                    name="account_number"
+                    placeholder="Enter account number"
+                    maxlength="30"
+                    inputmode="numeric"
+                    autocomplete="off"
+                >
+
+                <small class="form-help">
+                    Only the last four digits are displayed on the
+                    Accounts page.
+                </small>
+
+            </div>
+
+
+            <!-- OPENING BALANCE -->
+
+            <div class="form-group">
+
+                <label for="opening_balance">
+                    Opening Balance
+                    <span class="required">
+                        *
+                    </span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="opening_balance"
+                        name="opening_balance"
+                        value="0"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter the balance available in this account
+                    when you start tracking it.
+                </small>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this account..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('accounts') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                <span>
+                    +
+                </span>
+
+                Add Account
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "accountForm"
+            );
+
+        const accountType =
+            document.getElementById(
+                "type"
+            );
+
+        const bankName =
+            document.getElementById(
+                "bank_name"
+            );
+
+        const accountNumber =
+            document.getElementById(
+                "account_number"
+            );
+
+
+        /* =================================================
+           ACCOUNT TYPE HANDLING
+        ================================================= */
+
+        function updateAccountFields() {
+
+            const type =
+                accountType.value;
+
+
+            /*
+             * Bank name is mainly useful for bank accounts.
+             * It remains available for other account types too,
+             * so existing data can be entered if required.
+             */
+
+            if (
+                type === "Cash" ||
+                type === "Wallet"
+            ) {
+
+                bankName.value = "";
+
+                bankName.disabled = true;
+
+                accountNumber.value = "";
+
+                accountNumber.disabled = true;
+
+            } else {
+
+                bankName.disabled = false;
+
+                accountNumber.disabled = false;
+
+            }
+
+        }
+
+
+        accountType.addEventListener(
+            "change",
+            updateAccountFields
+        );
+
+
+        updateAccountFields();
+
+
+        /* =================================================
+           ACCOUNT NUMBER VALIDATION
+        ================================================= */
+
+        accountNumber.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value.replace(
+                        /[^0-9]/g,
+                        ""
+                    );
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const name =
+                    document
+                        .getElementById(
+                            "name"
+                        )
+                        .value
+                        .trim();
+
+                const type =
+                    accountType.value;
+
+                const openingBalance =
+                    parseFloat(
+                        document
+                            .getElementById(
+                                "opening_balance"
+                            )
+                            .value
+                    );
+
+
+                if (!name) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter an account name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!type) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an account type."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(
+                        openingBalance
+                    )
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid opening balance."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    openingBalance < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Opening balance cannot be negative."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

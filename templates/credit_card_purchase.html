@@ -1,0 +1,1008 @@
+{% extends "base.html" %}
+
+{% block title %}
+Credit Card Purchase - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Credit Card Purchase
+{% endblock %}
+
+{% block page_subtitle %}
+Record a purchase made using your credit card
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add Credit Card Purchase
+            </h2>
+
+            <p>
+                Record a new purchase made using your credit card.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CREDIT CARD DATA
+    ====================================================== -->
+
+    {% if credit_card %}
+
+    {% set current_balance =
+        credit_card.current_balance or 0
+    %}
+
+    {% set credit_limit =
+        credit_card.credit_limit or 0
+    %}
+
+    <div
+        id="cardData"
+        data-balance="{{ current_balance }}"
+        data-limit="{{ credit_limit }}"
+    ></div>
+
+
+    <!-- =====================================================
+         CARD SUMMARY
+    ====================================================== -->
+
+    <div class="form-notice">
+
+        <div>
+
+            <strong>
+                {{ credit_card.name }}
+            </strong>
+
+            {% if credit_card.card_number %}
+
+            <p>
+
+                Card:
+                ****{{ credit_card.card_number[-4:] }}
+
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Current Balance
+            </span>
+
+            <strong>
+                ₹{{ "%.2f"|format(current_balance) }}
+            </strong>
+
+        </div>
+
+
+        {% if credit_limit > 0 %}
+
+        <div>
+
+            <span>
+                Available Credit
+            </span>
+
+            <strong id="availableCredit">
+                ₹{{ "%.2f"|format(
+                    [credit_limit - current_balance, 0]|max
+                ) }}
+            </strong>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    {% if credit_card %}
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'credit_card_purchase',
+            card_id=credit_card.id
+        ) }}"
+        id="creditCardPurchaseForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- PURCHASE DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+
+                    Purchase Description
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    maxlength="200"
+                    placeholder="e.g. Amazon Shopping"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Purchase Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PURCHASE DATE -->
+
+            <div class="form-group">
+
+                <label for="purchase_date">
+
+                    Purchase Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="purchase_date"
+                    name="purchase_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Travel">
+                        Travel
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="Utilities">
+                        Utilities
+                    </option>
+
+                    <option value="Insurance">
+                        Insurance
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- MERCHANT -->
+
+            <div class="form-group">
+
+                <label for="merchant">
+                    Merchant
+                </label>
+
+                <input
+                    type="text"
+                    id="merchant"
+                    name="merchant"
+                    maxlength="150"
+                    placeholder="e.g. Amazon, Flipkart"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- INSTALLMENT -->
+
+            <div class="form-group">
+
+                <label for="is_installment">
+                    Payment Type
+                </label>
+
+                <select
+                    id="is_installment"
+                    name="is_installment"
+                >
+
+                    <option value="0">
+                        Full Payment
+                    </option>
+
+                    <option value="1">
+                        EMI / Installment
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- INSTALLMENT COUNT -->
+
+            <div
+                class="form-group"
+                id="installmentCountGroup"
+                style="display: none;"
+            >
+
+                <label for="installment_count">
+                    Number of Installments
+                </label>
+
+                <input
+                    type="number"
+                    id="installment_count"
+                    name="installment_count"
+                    min="1"
+                    step="1"
+                    placeholder="e.g. 6"
+                >
+
+            </div>
+
+
+            <!-- INTEREST RATE -->
+
+            <div
+                class="form-group"
+                id="installmentRateGroup"
+                style="display: none;"
+            >
+
+                <label for="interest_rate">
+                    Interest Rate (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="interest_rate"
+                        name="interest_rate"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                        placeholder="0"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- REFERENCE -->
+
+            <div class="form-group">
+
+                <label for="reference">
+                    Transaction Reference
+                </label>
+
+                <input
+                    type="text"
+                    id="reference"
+                    name="reference"
+                    maxlength="150"
+                    placeholder="Optional reference number"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this purchase..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PURCHASE SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="purchasePreview"
+        >
+
+            <div>
+
+                <strong>
+                    Purchase Summary
+                </strong>
+
+                <p id="purchaseSummaryText">
+                    Enter the purchase amount to see the updated
+                    credit card balance.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Purchase
+
+            </button>
+
+        </div>
+
+    </form>
+
+    {% else %}
+
+    <!-- =====================================================
+         CARD NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            💳
+        </div>
+
+        <h2>
+            Credit Card Not Found
+        </h2>
+
+        <p>
+            The requested credit card could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('credit_cards') }}"
+            class="primary-button"
+        >
+            Back to Credit Cards
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "creditCardPurchaseForm"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const description =
+            document.getElementById(
+                "description"
+            );
+
+        const purchaseDate =
+            document.getElementById(
+                "purchase_date"
+            );
+
+        const paymentType =
+            document.getElementById(
+                "is_installment"
+            );
+
+        const installmentCount =
+            document.getElementById(
+                "installment_count"
+            );
+
+        const interestRate =
+            document.getElementById(
+                "interest_rate"
+            );
+
+        const installmentCountGroup =
+            document.getElementById(
+                "installmentCountGroup"
+            );
+
+        const installmentRateGroup =
+            document.getElementById(
+                "installmentRateGroup"
+            );
+
+        const summary =
+            document.getElementById(
+                "purchaseSummaryText"
+            );
+
+        const cardData =
+            document.getElementById(
+                "cardData"
+            );
+
+
+        /*
+         * Stop if card/form is unavailable.
+         */
+
+        if (
+            !form ||
+            !amount ||
+            !description ||
+            !purchaseDate ||
+            !paymentType ||
+            !summary ||
+            !cardData
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           CARD DATA
+        ================================================= */
+
+        const currentBalance =
+            parseFloat(
+                cardData.dataset.balance || "0"
+            ) || 0;
+
+
+        const creditLimit =
+            parseFloat(
+                cardData.dataset.limit || "0"
+            ) || 0;
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!purchaseDate.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            purchaseDate.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           INSTALLMENT TOGGLE
+        ================================================= */
+
+        function updateInstallmentFields() {
+
+            const installment =
+                paymentType.value === "1";
+
+
+            if (
+                installmentCountGroup
+            ) {
+
+                installmentCountGroup.style.display =
+                    installment
+                        ? ""
+                        : "none";
+
+            }
+
+
+            if (
+                installmentRateGroup
+            ) {
+
+                installmentRateGroup.style.display =
+                    installment
+                        ? ""
+                        : "none";
+
+            }
+
+
+            if (
+                installmentCount
+            ) {
+
+                installmentCount.required =
+                    installment;
+
+            }
+
+
+            if (
+                interestRate
+            ) {
+
+                interestRate.required =
+                    false;
+
+            }
+
+
+            updateSummary();
+
+        }
+
+
+        paymentType.addEventListener(
+            "change",
+            updateInstallmentFields
+        );
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const purchaseAmount =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            if (
+                purchaseAmount <= 0
+            ) {
+
+                summary.textContent =
+                    "Enter the purchase amount to see the updated credit card balance.";
+
+                return;
+
+            }
+
+
+            const newBalance =
+                currentBalance +
+                purchaseAmount;
+
+
+            let message =
+                "Current Balance: ₹" +
+                currentBalance.toFixed(2) +
+                " | Purchase: ₹" +
+                purchaseAmount.toFixed(2) +
+                " | New Balance: ₹" +
+                newBalance.toFixed(2);
+
+
+            if (
+                creditLimit > 0
+            ) {
+
+                const availableCredit =
+                    Math.max(
+                        creditLimit -
+                        newBalance,
+                        0
+                    );
+
+
+                message +=
+                    " | Available Credit: ₹" +
+                    availableCredit.toFixed(2);
+
+
+                if (
+                    newBalance >
+                    creditLimit
+                ) {
+
+                    message +=
+                        " | Credit Limit Exceeded";
+
+                }
+
+            }
+
+
+            if (
+                paymentType.value === "1" &&
+                installmentCount
+            ) {
+
+                const count =
+                    parseInt(
+                        installmentCount.value,
+                        10
+                    ) || 0;
+
+
+                if (
+                    count > 0
+                ) {
+
+                    const monthlyAmount =
+                        purchaseAmount /
+                        count;
+
+
+                    message +=
+                        " | Approx. EMI: ₹" +
+                        monthlyAmount.toFixed(2);
+
+                }
+
+            }
+
+
+            summary.textContent =
+                message;
+
+        }
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        if (
+            installmentCount
+        ) {
+
+            installmentCount.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        if (
+            interestRate
+        ) {
+
+            interestRate.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const purchaseAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (
+                    Number.isNaN(
+                        purchaseAmount
+                    ) ||
+                    purchaseAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid purchase amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !description.value.trim()
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a purchase description."
+                    );
+
+                    description.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !purchaseDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the purchase date."
+                    );
+
+                    purchaseDate.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    paymentType.value === "1"
+                ) {
+
+                    const count =
+                        parseInt(
+                            installmentCount.value,
+                            10
+                        );
+
+
+                    if (
+                        Number.isNaN(count) ||
+                        count <= 0
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a valid number of installments."
+                        );
+
+                        installmentCount.focus();
+
+                        return;
+
+                    }
+
+
+                    const rate =
+                        parseFloat(
+                            interestRate.value
+                        ) || 0;
+
+
+                    if (
+                        rate < 0
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Interest rate cannot be negative."
+                        );
+
+                        interestRate.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL STATE
+        ================================================= */
+
+        updateInstallmentFields();
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

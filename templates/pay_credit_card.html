@@ -1,0 +1,1406 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pay Credit Card - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Pay Credit Card
+{% endblock %}
+
+{% block page_subtitle %}
+Record a payment towards your credit card
+{% endblock %}
+
+
+{% block content %}
+
+<div class="pay-credit-card-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h2>
+                Pay Credit Card
+            </h2>
+
+            <p>
+                Record your credit card payment and reduce your outstanding balance.
+            </p>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            {% if credit_card and credit_card.id %}
+
+            <a
+                href="{{ url_for(
+                    'edit_credit_card',
+                    credit_card_id=credit_card.id
+                ) }}"
+                class="secondary-button"
+            >
+                ✏️ Edit Card
+            </a>
+
+            {% endif %}
+
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="secondary-button"
+            >
+                ← Credit Cards
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CREDIT CARD SUMMARY
+    ====================================================== -->
+
+    {% if credit_card %}
+
+    <div class="card-summary">
+
+        <div class="summary-item">
+
+            <div class="summary-icon">
+                💳
+            </div>
+
+            <div>
+
+                <span>
+                    Credit Card
+                </span>
+
+                <strong>
+                    {{
+                        credit_card.name
+                        or credit_card.card_name
+                        or credit_card.bank_name
+                        or 'Credit Card'
+                    }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-item">
+
+            <div class="summary-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Outstanding
+                </span>
+
+                <strong>
+
+                    ₹{{ "%.2f"|format(
+                        credit_card.outstanding_balance
+                        or credit_card.outstanding
+                        or credit_card.current_balance
+                        or credit_card.balance
+                        or 0
+                    ) }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-item">
+
+            <div class="summary-icon">
+                📊
+            </div>
+
+            <div>
+
+                <span>
+                    Credit Limit
+                </span>
+
+                <strong>
+
+                    ₹{{ "%.2f"|format(
+                        credit_card.credit_limit
+                        or credit_card.limit
+                        or 0
+                    ) }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-item">
+
+            <div class="summary-icon">
+                📅
+            </div>
+
+            <div>
+
+                <span>
+                    Due Date
+                </span>
+
+                <strong>
+
+                    {{
+                        credit_card.due_date
+                        or credit_card.payment_due_date
+                        or '-'
+                    }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         MAIN LAYOUT
+    ====================================================== -->
+
+    <div class="payment-layout">
+
+        <!-- =================================================
+             PAYMENT FORM
+        ================================================== -->
+
+        <div class="card form-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Payment Information
+                    </h3>
+
+                    <p>
+                        Enter the payment details below.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action=""
+                id="creditCardPaymentForm"
+                novalidate
+            >
+
+                {% if credit_card and credit_card.id %}
+
+                <input
+                    type="hidden"
+                    name="credit_card_id"
+                    value="{{ credit_card.id }}"
+                >
+
+                {% endif %}
+
+
+                <div class="form-body">
+
+                    <!-- =================================================
+                         PAYMENT DATE
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="payment_date">
+                            Payment Date
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="payment_date"
+                            name="payment_date"
+                            value="{{
+                                payment.payment_date
+                                if payment is defined and payment.payment_date
+                                else ''
+                            }}"
+                            required
+                        >
+
+                        <small
+                            class="field-error"
+                            id="paymentDateError"
+                        ></small>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PAYMENT AMOUNT
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="amount">
+                            Payment Amount
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-with-prefix">
+
+                            <span>
+                                ₹
+                            </span>
+
+                            <input
+                                type="number"
+                                id="amount"
+                                name="amount"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Enter payment amount"
+                                value="{{
+                                    payment.amount
+                                    if payment is defined and payment.amount is not none
+                                    else ''
+                                }}"
+                                required
+                            >
+
+                        </div>
+
+                        <small class="form-help">
+                            Enter the amount paid towards your credit card.
+                        </small>
+
+                        <small
+                            class="field-error"
+                            id="amountError"
+                        ></small>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PAYMENT METHOD
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="payment_method">
+                            Payment Method
+                        </label>
+
+                        {% set selected_method =
+                            payment.payment_method
+                            if payment is defined
+                            else ''
+                        %}
+
+                        <select
+                            id="payment_method"
+                            name="payment_method"
+                        >
+
+                            <option value="">
+                                Select payment method
+                            </option>
+
+                            <option
+                                value="Bank Transfer"
+                                {% if selected_method == 'Bank Transfer' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Bank Transfer
+                            </option>
+
+                            <option
+                                value="UPI"
+                                {% if selected_method == 'UPI' %}
+                                    selected
+                                {% endif %}
+                            >
+                                UPI
+                            </option>
+
+                            <option
+                                value="Auto Debit"
+                                {% if selected_method == 'Auto Debit' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Auto Debit
+                            </option>
+
+                            <option
+                                value="Cash"
+                                {% if selected_method == 'Cash' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Cash
+                            </option>
+
+                            <option
+                                value="Cheque"
+                                {% if selected_method == 'Cheque' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Cheque
+                            </option>
+
+                            <option
+                                value="Card"
+                                {% if selected_method == 'Card' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Card
+                            </option>
+
+                            <option
+                                value="Other"
+                                {% if selected_method == 'Other' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         REFERENCE
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="reference">
+                            Reference Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="reference"
+                            name="reference"
+                            maxlength="150"
+                            placeholder="Transaction / UTR / reference number"
+                            value="{{
+                                payment.reference
+                                if payment is defined and payment.reference
+                                else ''
+                            }}"
+                        >
+
+                    </div>
+
+
+                    <!-- =================================================
+                         NOTES
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="notes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            rows="4"
+                            maxlength="1000"
+                            placeholder="Add notes about this payment..."
+                        >{{
+                            payment.notes
+                            if payment is defined and payment.notes
+                            else ''
+                        }}</textarea>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                    ================================================== -->
+
+                    <div class="form-actions">
+
+                        <a
+                            href="{{
+                                url_for(
+                                    'credit_cards'
+                                )
+                            }}"
+                            class="secondary-button"
+                        >
+                            Cancel
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                            id="submitPayment"
+                        >
+                            💳 Record Payment
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT PREVIEW
+        ================================================== -->
+
+        <div class="card preview-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Payment Summary
+                    </h3>
+
+                    <p>
+                        Review the payment before submitting.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="preview-body">
+
+                <div class="preview-row">
+
+                    <span>
+                        Payment Amount
+                    </span>
+
+                    <strong id="previewAmount">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div class="preview-divider"></div>
+
+
+                <div class="preview-row total-row">
+
+                    <span>
+                        Payment Total
+                    </span>
+
+                    <strong id="previewTotal">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                {% if credit_card %}
+
+                <div class="balance-preview">
+
+                    <span class="balance-label">
+                        Current Outstanding
+                    </span>
+
+                    <strong class="balance-current">
+
+                        ₹{{ "%.2f"|format(
+                            credit_card.outstanding_balance
+                            or credit_card.outstanding
+                            or credit_card.current_balance
+                            or credit_card.balance
+                            or 0
+                        ) }}
+
+                    </strong>
+
+
+                    <div class="balance-after">
+
+                        After Payment
+
+                        <strong id="previewBalance">
+                            ₹0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="info-box">
+
+                    <strong>
+                        💡 Tip
+                    </strong>
+
+                    <p>
+                        Make sure the payment amount matches your bank
+                        or credit card transaction before submitting.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.pay-credit-card-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+
+.page-header-content h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header-content p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+
+.page-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   CARD SUMMARY
+========================================================= */
+
+.card-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 18px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.summary-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 20px;
+}
+
+
+.summary-item span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.summary-item strong {
+    display: block;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.payment-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(300px, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+
+.card {
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.preview-card {
+    position: sticky;
+    top: 20px;
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.card-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.card-header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-body {
+    padding: 24px;
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.required {
+    color: #dc2626;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #64748b;
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.1);
+}
+
+
+.form-group input.invalid,
+.form-group select.invalid,
+.form-group textarea.invalid {
+    border-color: #dc2626;
+}
+
+
+.form-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+
+.field-error {
+    display: block;
+    min-height: 16px;
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   INPUT PREFIX
+========================================================= */
+
+.input-with-prefix {
+    display: flex;
+    align-items: stretch;
+}
+
+
+.input-with-prefix > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-right: 0;
+    border-radius: 8px 0 0 8px;
+    background: rgba(100, 116, 139, 0.06);
+    font-weight: 600;
+}
+
+
+.input-with-prefix input {
+    border-radius: 0 8px 8px 0;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+========================================================= */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-body {
+    padding: 20px;
+}
+
+
+.preview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 13px 0;
+}
+
+
+.preview-row span {
+    opacity: 0.7;
+}
+
+
+.preview-row strong {
+    text-align: right;
+}
+
+
+.preview-divider {
+    height: 1px;
+    margin: 5px 0;
+    background: var(--border-color, #e5e7eb);
+}
+
+
+.total-row {
+    font-size: 16px;
+}
+
+
+.total-row strong {
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   BALANCE
+========================================================= */
+
+.balance-preview {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.07);
+}
+
+
+.balance-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.balance-current {
+    display: block;
+    font-size: 22px;
+}
+
+
+.balance-after {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(100, 116, 139, 0.15);
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+
+.balance-after strong {
+    display: block;
+    margin-top: 5px;
+    color: #15803d;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
+
+.info-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.08);
+}
+
+
+.info-box strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+
+.info-box p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .card-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .payment-layout {
+        grid-template-columns: 1fr;
+    }
+
+
+    .preview-card {
+        position: static;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .page-header-actions {
+        width: 100%;
+    }
+
+
+    .page-header-actions a {
+        flex: 1;
+        text-align: center;
+    }
+
+
+    .card-summary {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .form-body {
+        padding: 18px;
+    }
+
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .form-actions a,
+    .form-actions button {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "creditCardPaymentForm"
+            );
+
+
+        const amountInput =
+            document.getElementById(
+                "amount"
+            );
+
+
+        const paymentDate =
+            document.getElementById(
+                "payment_date"
+            );
+
+
+        const previewAmount =
+            document.getElementById(
+                "previewAmount"
+            );
+
+
+        const previewTotal =
+            document.getElementById(
+                "previewTotal"
+            );
+
+
+        const previewBalance =
+            document.getElementById(
+                "previewBalance"
+            );
+
+
+        const amountError =
+            document.getElementById(
+                "amountError"
+            );
+
+
+        const paymentDateError =
+            document.getElementById(
+                "paymentDateError"
+            );
+
+
+        /* =================================================
+           CURRENT BALANCE
+        ================================================= */
+
+        const balanceElement =
+            document.querySelector(
+                ".balance-current"
+            );
+
+
+        let currentBalance = 0;
+
+
+        if (balanceElement) {
+
+            const balanceText =
+                balanceElement.textContent
+                    .replace(/[^0-9.-]/g, "");
+
+
+            currentBalance =
+                parseFloat(balanceText) || 0;
+
+        }
+
+
+        /* =================================================
+           CURRENCY FORMAT
+        ================================================= */
+
+        function formatCurrency(value) {
+
+            const number =
+                Number(value) || 0;
+
+
+            return "₹" +
+                number.toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           GET AMOUNT
+        ================================================= */
+
+        function getAmount() {
+
+            if (!amountInput) {
+                return 0;
+            }
+
+
+            return parseFloat(
+                amountInput.value
+            ) || 0;
+
+        }
+
+
+        /* =================================================
+           UPDATE PREVIEW
+        ================================================= */
+
+        function updatePreview() {
+
+            const amount =
+                getAmount();
+
+
+            if (previewAmount) {
+
+                previewAmount.textContent =
+                    formatCurrency(
+                        amount
+                    );
+
+            }
+
+
+            if (previewTotal) {
+
+                previewTotal.textContent =
+                    formatCurrency(
+                        amount
+                    );
+
+            }
+
+
+            if (previewBalance) {
+
+                let balanceAfter =
+                    currentBalance -
+                    amount;
+
+
+                if (balanceAfter < 0) {
+                    balanceAfter = 0;
+                }
+
+
+                previewBalance.textContent =
+                    formatCurrency(
+                        balanceAfter
+                    );
+
+            }
+
+        }
+
+
+        /* =================================================
+           VALIDATION
+        ================================================= */
+
+        function validateForm() {
+
+            let valid = true;
+
+
+            if (amountError) {
+                amountError.textContent = "";
+            }
+
+
+            if (paymentDateError) {
+                paymentDateError.textContent = "";
+            }
+
+
+            if (amountInput) {
+
+                amountInput.classList.remove(
+                    "invalid"
+                );
+
+            }
+
+
+            if (paymentDate) {
+
+                paymentDate.classList.remove(
+                    "invalid"
+                );
+
+            }
+
+
+            const amount =
+                getAmount();
+
+
+            if (amount <= 0) {
+
+                valid = false;
+
+
+                if (amountInput) {
+
+                    amountInput.classList.add(
+                        "invalid"
+                    );
+
+                }
+
+
+                if (amountError) {
+
+                    amountError.textContent =
+                        "Please enter a valid payment amount.";
+
+                }
+
+            }
+
+
+            if (
+                paymentDate &&
+                !paymentDate.value
+            ) {
+
+                valid = false;
+
+
+                paymentDate.classList.add(
+                    "invalid"
+                );
+
+
+                if (paymentDateError) {
+
+                    paymentDateError.textContent =
+                        "Please select the payment date.";
+
+                }
+
+            }
+
+
+            return valid;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENT
+        ================================================= */
+
+        if (amountInput) {
+
+            amountInput.addEventListener(
+                "input",
+                updatePreview
+            );
+
+        }
+
+
+        /* =================================================
+           FORM SUBMIT
+        ================================================= */
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                function (event) {
+
+                    if (
+                        !validateForm()
+                    ) {
+
+                        event.preventDefault();
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        document.getElementById(
+                            "submitPayment"
+                        );
+
+
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            true;
+
+
+                        submitButton.textContent =
+                            "Saving Payment...";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           INITIAL PREVIEW
+        ================================================= */
+
+        updatePreview();
+
+    }
+);
+
+</script>
+
+{% endblock %}

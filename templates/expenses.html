@@ -1,0 +1,2040 @@
+{% extends "base.html" %}
+
+{% block title %}
+Expenses - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Expenses
+{% endblock %}
+
+{% block page_subtitle %}
+Track and manage your expenses
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-container">
+
+    <!-- =====================================================
+         HEADER / ACTIONS
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>
+                Expense Management
+            </h2>
+
+            <p>
+                View, filter and manage your expenses.
+            </p>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{{ url_for('add_expense') }}"
+                class="primary-button"
+            >
+                + Add Expense
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                💸
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    Total Expenses
+                </span>
+
+                <strong class="stat-value">
+                    ₹{{ "%.2f"|format(total_expenses or 0) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    This Month
+                </span>
+
+                <strong class="stat-value">
+                    ₹{{ "%.2f"|format(monthly_expenses or 0) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📊
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    Average Expense
+                </span>
+
+                <strong class="stat-value">
+                    ₹{{ "%.2f"|format(average_expense or 0) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🔢
+            </div>
+
+            <div class="stat-content">
+
+                <span class="stat-label">
+                    Transactions
+                </span>
+
+                <strong class="stat-value">
+                    {{ expenses|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+
+    <div class="card filter-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Filters
+                </h3>
+
+                <p>
+                    Find specific expenses quickly.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-grid">
+
+            <!-- SEARCH -->
+
+            <div class="form-group">
+
+                <label for="expenseSearch">
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="expenseSearch"
+                    placeholder="Search expense..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="categoryFilter">
+                    Category
+                </label>
+
+                <select
+                    id="categoryFilter"
+                >
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Travel">
+                        Travel
+                    </option>
+
+                    <option value="Utilities">
+                        Utilities
+                    </option>
+
+                    <option value="Insurance">
+                        Insurance
+                    </option>
+
+                    <option value="Rent">
+                        Rent
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="paymentMethodFilter">
+                    Payment Method
+                </label>
+
+                <select
+                    id="paymentMethodFilter"
+                >
+
+                    <option value="">
+                        All Methods
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="UPI">
+                        UPI
+                    </option>
+
+                    <option value="Debit Card">
+                        Debit Card
+                    </option>
+
+                    <option value="Credit Card">
+                        Credit Card
+                    </option>
+
+                    <option value="Bank Transfer">
+                        Bank Transfer
+                    </option>
+
+                    <option value="Net Banking">
+                        Net Banking
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DATE FROM -->
+
+            <div class="form-group">
+
+                <label for="dateFrom">
+                    From
+                </label>
+
+                <input
+                    type="date"
+                    id="dateFrom"
+                >
+
+            </div>
+
+
+            <!-- DATE TO -->
+
+            <div class="form-group">
+
+                <label for="dateTo">
+                    To
+                </label>
+
+                <input
+                    type="date"
+                    id="dateTo"
+                >
+
+            </div>
+
+
+            <!-- RESET -->
+
+            <div class="form-group filter-action">
+
+                <label>
+                    &nbsp;
+                </label>
+
+                <button
+                    type="button"
+                    id="resetFilters"
+                    class="secondary-button"
+                >
+                    Reset Filters
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPENSE TABLE
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Expense History
+                </h3>
+
+                <p id="resultCount">
+                    Showing {{ expenses|length }} expense(s)
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if expenses %}
+
+        <div class="table-wrapper">
+
+            <table
+                class="data-table"
+                id="expensesTable"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Account
+                        </th>
+
+                        <th>
+                            Payment Method
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for expense in expenses %}
+
+                    <tr
+                        class="expense-row"
+                        data-description="{{ (expense.description or '')|lower }}"
+                        data-category="{{ (expense.category or '')|lower }}"
+                        data-payment-method="{{ (expense.payment_method or '')|lower }}"
+                        data-date="{{ expense.expense_date or expense.date or '' }}"
+                    >
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <span class="date-value">
+
+                                {{ expense.expense_date or expense.date or '-' }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <td>
+
+                            <div class="transaction-info">
+
+                                <strong>
+                                    {{ expense.description or 'Unnamed Expense' }}
+                                </strong>
+
+                                {% if expense.merchant %}
+
+                                <small>
+                                    {{ expense.merchant }}
+                                </small>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- CATEGORY -->
+
+                        <td>
+
+                            {% if expense.category %}
+
+                            <span class="badge">
+
+                                {{ expense.category }}
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="muted">
+                                -
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACCOUNT -->
+
+                        <td>
+
+                            {% if expense.account_name %}
+
+                            {{ expense.account_name }}
+
+                            {% elif expense.account %}
+
+                            {{ expense.account }}
+
+                            {% else %}
+
+                            <span class="muted">
+                                -
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PAYMENT METHOD -->
+
+                        <td>
+
+                            {% if expense.payment_method %}
+
+                            {{ expense.payment_method }}
+
+                            {% else %}
+
+                            <span class="muted">
+                                -
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- AMOUNT -->
+
+                        <td>
+
+                            <strong class="amount expense-amount">
+
+                                ₹{{ "%.2f"|format(expense.amount or 0) }}
+
+                            </strong>
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="table-actions">
+
+                                <a
+                                    href="{{ url_for(
+                                        'edit_expense',
+                                        expense_id=expense.id
+                                    ) }}"
+                                    class="icon-button"
+                                    title="Edit Expense"
+                                >
+                                    ✏️
+                                </a>
+
+
+                                <button
+                                    type="button"
+                                    class="icon-button delete-expense"
+                                    title="Delete Expense"
+                                    data-expense-id="{{ expense.id }}"
+                                    data-expense-name="{{ expense.description or 'this expense' }}"
+                                >
+                                    🗑️
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =================================================
+             NO FILTER RESULTS
+        ================================================== -->
+
+        <div
+            id="noResults"
+            class="empty-panel hidden"
+        >
+
+            <div class="empty-icon">
+                🔍
+            </div>
+
+            <h3>
+                No Expenses Found
+            </h3>
+
+            <p>
+                No expenses match your current filters.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+        <!-- =================================================
+             NO EXPENSES
+        ================================================== -->
+
+        <div class="empty-panel">
+
+            <div class="empty-icon">
+                💸
+            </div>
+
+            <h3>
+                No Expenses Yet
+            </h3>
+
+            <p>
+                Start tracking your expenses by adding your first transaction.
+            </p>
+
+            <a
+                href="{{ url_for('add_expense') }}"
+                class="primary-button"
+            >
+                + Add Expense
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     DELETE CONFIRMATION MODAL
+========================================================= -->
+
+<div
+    id="deleteModal"
+    class="modal hidden"
+    aria-hidden="true"
+>
+
+    <div class="modal-overlay"></div>
+
+    <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteModalTitle"
+    >
+
+        <div class="modal-header">
+
+            <h3 id="deleteModalTitle">
+                Delete Expense
+            </h3>
+
+            <button
+                type="button"
+                id="closeDeleteModal"
+                class="modal-close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <p>
+                Are you sure you want to delete
+                <strong id="deleteExpenseName">
+                    this expense
+                </strong>?
+            </p>
+
+            <p class="warning-text">
+                This action cannot be undone.
+            </p>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                id="cancelDelete"
+                class="secondary-button"
+            >
+                Cancel
+            </button>
+
+            <form
+                method="POST"
+                id="deleteExpenseForm"
+            >
+
+                <button
+                    type="submit"
+                    class="danger-button"
+                >
+                    Delete Expense
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+.page-container {
+
+    width: 100%;
+
+}
+
+
+.page-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.page-header h2 {
+
+    margin: 0 0 6px;
+
+}
+
+
+.page-header p {
+
+    margin: 0;
+
+    opacity: 0.7;
+
+}
+
+
+.page-header-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+
+}
+
+
+.stat-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 20px;
+
+    border-radius: 14px;
+
+    background: var(--card-bg, #ffffff);
+
+    border: 1px solid
+        var(--border-color, #e5e7eb);
+
+}
+
+
+.stat-icon {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(100, 116, 139, 0.1);
+
+    font-size: 22px;
+
+}
+
+
+.stat-content {
+
+    min-width: 0;
+
+}
+
+
+.stat-label {
+
+    display: block;
+
+    font-size: 13px;
+
+    opacity: 0.65;
+
+    margin-bottom: 5px;
+
+}
+
+
+.stat-value {
+
+    display: block;
+
+    font-size: 20px;
+
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card {
+
+    background: var(--card-bg, #ffffff);
+
+    border: 1px solid
+        var(--border-color, #e5e7eb);
+
+    border-radius: 14px;
+
+    margin-bottom: 24px;
+
+    overflow: hidden;
+
+}
+
+
+.card-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px;
+
+    border-bottom: 1px solid
+        var(--border-color, #e5e7eb);
+
+}
+
+
+.card-header h3 {
+
+    margin: 0 0 5px;
+
+}
+
+
+.card-header p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    opacity: 0.65;
+
+}
+
+
+/* =====================================================
+   FILTERS
+===================================================== */
+
+.filter-card {
+
+    padding: 0;
+
+}
+
+
+.filter-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 15px;
+
+    padding: 20px;
+
+}
+
+
+.filter-grid .form-group {
+
+    min-width: 0;
+
+}
+
+
+.filter-action {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+.data-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 900px;
+
+}
+
+
+.data-table th {
+
+    text-align: left;
+
+    padding: 14px 18px;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    opacity: 0.65;
+
+    border-bottom: 1px solid
+        var(--border-color, #e5e7eb);
+
+    white-space: nowrap;
+
+}
+
+
+.data-table td {
+
+    padding: 16px 18px;
+
+    border-bottom: 1px solid
+        var(--border-color, #e5e7eb);
+
+    vertical-align: middle;
+
+}
+
+
+.data-table tbody tr:hover {
+
+    background: rgba(100, 116, 139, 0.04);
+
+}
+
+
+.transaction-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+}
+
+
+.transaction-info strong {
+
+    font-size: 14px;
+
+}
+
+
+.transaction-info small {
+
+    font-size: 12px;
+
+    opacity: 0.6;
+
+}
+
+
+.date-value {
+
+    white-space: nowrap;
+
+    font-size: 13px;
+
+}
+
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    background: rgba(100, 116, 139, 0.1);
+
+}
+
+
+.expense-amount {
+
+    white-space: nowrap;
+
+}
+
+
+.muted {
+
+    opacity: 0.5;
+
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.table-actions {
+
+    display: flex;
+
+    gap: 7px;
+
+}
+
+
+.icon-button {
+
+    width: 34px;
+
+    height: 34px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid
+        var(--border-color, #e5e7eb);
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+}
+
+
+.icon-button:hover {
+
+    background: rgba(100, 116, 139, 0.08);
+
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-panel {
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+}
+
+
+.empty-icon {
+
+    font-size: 42px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.empty-panel h3 {
+
+    margin: 0 0 8px;
+
+}
+
+
+.empty-panel p {
+
+    margin: 0 0 20px;
+
+    opacity: 0.65;
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
+
+
+.modal.hidden {
+
+    display: none;
+
+}
+
+
+.modal-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.5);
+
+}
+
+
+.modal-content {
+
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+
+    max-width: 480px;
+
+    border-radius: 14px;
+
+    background: var(--card-bg, #ffffff);
+
+    border: 1px solid
+        var(--border-color, #e5e7eb);
+
+    box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.2);
+
+}
+
+
+.modal-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid
+        var(--border-color, #e5e7eb);
+
+}
+
+
+.modal-header h3 {
+
+    margin: 0;
+
+}
+
+
+.modal-close {
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+}
+
+
+.modal-body {
+
+    padding: 25px 20px;
+
+}
+
+
+.modal-body p {
+
+    line-height: 1.6;
+
+}
+
+
+.warning-text {
+
+    font-size: 13px;
+
+    opacity: 0.65;
+
+}
+
+
+.modal-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 18px 20px;
+
+    border-top: 1px solid
+        var(--border-color, #e5e7eb);
+
+}
+
+
+.danger-button {
+
+    border: 0;
+
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    cursor: pointer;
+
+    background: #dc2626;
+
+    color: #ffffff;
+
+    font-weight: 600;
+
+}
+
+
+.danger-button:hover {
+
+    opacity: 0.9;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1200px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    .filter-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .page-header {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .page-header-actions {
+
+        width: 100%;
+
+    }
+
+
+    .page-header-actions a {
+
+        width: 100%;
+
+        text-align: center;
+
+        box-sizing: border-box;
+
+    }
+
+
+    .stats-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .filter-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .modal-footer {
+
+        flex-direction: column;
+
+    }
+
+
+    .modal-footer button,
+    .modal-footer form {
+
+        width: 100%;
+
+    }
+
+
+    .modal-footer form button {
+
+        width: 100%;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const searchInput =
+            document.getElementById(
+                "expenseSearch"
+            );
+
+        const categoryFilter =
+            document.getElementById(
+                "categoryFilter"
+            );
+
+        const paymentMethodFilter =
+            document.getElementById(
+                "paymentMethodFilter"
+            );
+
+        const dateFrom =
+            document.getElementById(
+                "dateFrom"
+            );
+
+        const dateTo =
+            document.getElementById(
+                "dateTo"
+            );
+
+        const resetButton =
+            document.getElementById(
+                "resetFilters"
+            );
+
+        const resultCount =
+            document.getElementById(
+                "resultCount"
+            );
+
+        const noResults =
+            document.getElementById(
+                "noResults"
+            );
+
+        const rows =
+            document.querySelectorAll(
+                ".expense-row"
+            );
+
+
+        /* =================================================
+           FILTER EXPENSES
+        ================================================= */
+
+        function filterExpenses() {
+
+            const search =
+                (
+                    searchInput
+                        ? searchInput.value
+                        : ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const category =
+                (
+                    categoryFilter
+                        ? categoryFilter.value
+                        : ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const paymentMethod =
+                (
+                    paymentMethodFilter
+                        ? paymentMethodFilter.value
+                        : ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const from =
+                dateFrom
+                    ? dateFrom.value
+                    : "";
+
+
+            const to =
+                dateTo
+                    ? dateTo.value
+                    : "";
+
+
+            let visibleCount = 0;
+
+
+            rows.forEach(
+                function (row) {
+
+                    const rowDescription =
+                        row.dataset.description ||
+                        "";
+
+
+                    const rowCategory =
+                        row.dataset.category ||
+                        "";
+
+
+                    const rowPaymentMethod =
+                        row.dataset.paymentMethod ||
+                        "";
+
+
+                    const rowDate =
+                        row.dataset.date ||
+                        "";
+
+
+                    const matchesSearch =
+                        !search ||
+                        rowDescription.includes(
+                            search
+                        ) ||
+                        rowCategory.includes(
+                            search
+                        ) ||
+                        rowPaymentMethod.includes(
+                            search
+                        );
+
+
+                    const matchesCategory =
+                        !category ||
+                        rowCategory === category;
+
+
+                    const matchesPaymentMethod =
+                        !paymentMethod ||
+                        rowPaymentMethod ===
+                            paymentMethod;
+
+
+                    const matchesFrom =
+                        !from ||
+                        rowDate >= from;
+
+
+                    const matchesTo =
+                        !to ||
+                        rowDate <= to;
+
+
+                    const visible =
+                        matchesSearch &&
+                        matchesCategory &&
+                        matchesPaymentMethod &&
+                        matchesFrom &&
+                        matchesTo;
+
+
+                    row.style.display =
+                        visible
+                            ? ""
+                            : "none";
+
+
+                    if (
+                        visible
+                    ) {
+
+                        visibleCount++;
+
+                    }
+
+                }
+            );
+
+
+            if (
+                resultCount
+            ) {
+
+                resultCount.textContent =
+                    "Showing " +
+                    visibleCount +
+                    " expense(s)";
+
+            }
+
+
+            if (
+                noResults
+            ) {
+
+                if (
+                    visibleCount === 0 &&
+                    rows.length > 0
+                ) {
+
+                    noResults.classList.remove(
+                        "hidden"
+                    );
+
+                }
+                else {
+
+                    noResults.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* =================================================
+           FILTER EVENTS
+        ================================================= */
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                filterExpenses
+            );
+
+        }
+
+
+        if (categoryFilter) {
+
+            categoryFilter.addEventListener(
+                "change",
+                filterExpenses
+            );
+
+        }
+
+
+        if (paymentMethodFilter) {
+
+            paymentMethodFilter.addEventListener(
+                "change",
+                filterExpenses
+            );
+
+        }
+
+
+        if (dateFrom) {
+
+            dateFrom.addEventListener(
+                "change",
+                filterExpenses
+            );
+
+        }
+
+
+        if (dateTo) {
+
+            dateTo.addEventListener(
+                "change",
+                filterExpenses
+            );
+
+        }
+
+
+        /* =================================================
+           RESET FILTERS
+        ================================================= */
+
+        if (resetButton) {
+
+            resetButton.addEventListener(
+                "click",
+                function () {
+
+                    if (searchInput) {
+
+                        searchInput.value = "";
+
+                    }
+
+
+                    if (categoryFilter) {
+
+                        categoryFilter.value = "";
+
+                    }
+
+
+                    if (paymentMethodFilter) {
+
+                        paymentMethodFilter.value = "";
+
+                    }
+
+
+                    if (dateFrom) {
+
+                        dateFrom.value = "";
+
+                    }
+
+
+                    if (dateTo) {
+
+                        dateTo.value = "";
+
+                    }
+
+
+                    filterExpenses();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           DELETE MODAL
+        ================================================= */
+
+        const deleteModal =
+            document.getElementById(
+                "deleteModal"
+            );
+
+        const deleteForm =
+            document.getElementById(
+                "deleteExpenseForm"
+            );
+
+        const deleteName =
+            document.getElementById(
+                "deleteExpenseName"
+            );
+
+        const closeDeleteModal =
+            document.getElementById(
+                "closeDeleteModal"
+            );
+
+        const cancelDelete =
+            document.getElementById(
+                "cancelDelete"
+            );
+
+
+        /* =================================================
+           OPEN DELETE MODAL
+        ================================================= */
+
+        function openDeleteModal(
+            expenseId,
+            expenseName
+        ) {
+
+            if (
+                !deleteModal ||
+                !deleteForm
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                deleteName
+            ) {
+
+                deleteName.textContent =
+                    expenseName ||
+                    "this expense";
+
+            }
+
+
+            /*
+             * The delete endpoint is kept in one place.
+             *
+             * Change this URL only if your Flask
+             * delete route uses a different endpoint.
+             */
+
+            deleteForm.action =
+                "/expenses/delete/" +
+                encodeURIComponent(
+                    expenseId
+                );
+
+
+            deleteModal.classList.remove(
+                "hidden"
+            );
+
+
+            deleteModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+        }
+
+
+        /* =================================================
+           CLOSE DELETE MODAL
+        ================================================= */
+
+        function closeModal() {
+
+            if (
+                !deleteModal
+            ) {
+
+                return;
+
+            }
+
+
+            deleteModal.classList.add(
+                "hidden"
+            );
+
+
+            deleteModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+        }
+
+
+        /* =================================================
+           DELETE BUTTONS
+        ================================================= */
+
+        const deleteButtons =
+            document.querySelectorAll(
+                ".delete-expense"
+            );
+
+
+        deleteButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const expenseId =
+                            this.dataset.expenseId;
+
+
+                        const expenseName =
+                            this.dataset.expenseName;
+
+
+                        if (
+                            expenseId
+                        ) {
+
+                            openDeleteModal(
+                                expenseId,
+                                expenseName
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           CLOSE BUTTONS
+        ================================================= */
+
+        if (
+            closeDeleteModal
+        ) {
+
+            closeDeleteModal.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        if (
+            cancelDelete
+        ) {
+
+            cancelDelete.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        if (
+            deleteModal
+        ) {
+
+            const overlay =
+                deleteModal.querySelector(
+                    ".modal-overlay"
+                );
+
+
+            if (
+                overlay
+            ) {
+
+                overlay.addEventListener(
+                    "click",
+                    closeModal
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           ESC KEY
+        ================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeModal();
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL FILTER
+        ================================================= */
+
+        filterExpenses();
+
+    }
+);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,477 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Budget - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Budget
+{% endblock %}
+
+{% block page_subtitle %}
+Create a spending limit for a category
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Create New Budget
+            </h2>
+
+            <p>
+                Set a spending limit and track your expenses.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BUDGET FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_budget') }}"
+        id="budgetForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- BUDGET NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Budget Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Monthly Food Budget"
+                    maxlength="100"
+                    required
+                >
+
+                <small class="form-help">
+                    Give your budget an easy-to-identify name.
+                </small>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Travel">
+                        Travel
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Rent">
+                        Rent
+                    </option>
+
+                    <option value="Utilities">
+                        Utilities
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="EMI">
+                        EMI
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BUDGET AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Budget Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Maximum amount you plan to spend.
+                </small>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label for="start_date">
+                    Start Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- END DATE -->
+
+            <div class="form-group">
+
+                <label for="end_date">
+                    End Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this budget..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('budgets') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Create Budget
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "budgetForm"
+            );
+
+        const startDate =
+            document.getElementById(
+                "start_date"
+            );
+
+        const endDate =
+            document.getElementById(
+                "end_date"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+
+        /* =================================================
+           DATE RANGE
+        ================================================= */
+
+        startDate.addEventListener(
+            "change",
+            function () {
+
+                if (this.value) {
+
+                    endDate.min =
+                        this.value;
+
+                }
+
+                if (
+                    endDate.value &&
+                    endDate.value < this.value
+                ) {
+
+                    endDate.value = "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           AMOUNT VALIDATION
+        ================================================= */
+
+        amount.addEventListener(
+            "input",
+            function () {
+
+                if (
+                    parseFloat(this.value) < 0
+                ) {
+
+                    this.value = "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const budgetName =
+                    document
+                        .getElementById("name")
+                        .value
+                        .trim();
+
+                const category =
+                    document
+                        .getElementById("category")
+                        .value;
+
+                const budgetAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+                const start =
+                    startDate.value;
+
+                const end =
+                    endDate.value;
+
+
+                if (!budgetName) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a budget name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!category) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a category."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(
+                        budgetAmount
+                    ) ||
+                    budgetAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid budget amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!start) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a start date."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!end) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an end date."
+                    );
+
+                    return;
+
+                }
+
+
+                if (end < start) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "End date cannot be before start date."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

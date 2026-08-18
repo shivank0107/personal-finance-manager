@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}
+Error - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Something Went Wrong
+{% endblock %}
+
+{% block page_subtitle %}
+An error occurred while processing your request
+{% endblock %}
+
+
+{% block content %}
+
+<div class="error-page">
+
+    <!-- =====================================================
+         ERROR ICON
+    ====================================================== -->
+
+    <div class="error-icon">
+        ⚠️
+    </div>
+
+
+    <!-- =====================================================
+         ERROR MESSAGE
+    ====================================================== -->
+
+    <div class="error-content">
+
+        <h1>
+            Something Went Wrong
+        </h1>
+
+        <p class="error-message">
+            We couldn't complete your request right now.
+            Please try again.
+        </p>
+
+
+        {% if error_message %}
+
+        <div class="error-details">
+
+            <strong>
+                Details
+            </strong>
+
+            <p>
+                {{ error_message }}
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if error_code %}
+
+        <div class="error-code">
+
+            Error Code:
+            <strong>
+                {{ error_code }}
+            </strong>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="error-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="window.history.back();"
+            >
+                ← Go Back
+            </button>
+
+
+            <a
+                href="{{ url_for('home') }}"
+                class="primary-button"
+            >
+                🏠 Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+.error-page {
+
+    max-width: 700px;
+
+    margin: 60px auto;
+
+    padding: 50px 30px;
+
+    text-align: center;
+
+}
+
+
+.error-icon {
+
+    width: 90px;
+
+    height: 90px;
+
+    margin: 0 auto 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 42px;
+
+    background: rgba(255, 193, 7, 0.12);
+
+}
+
+
+.error-content h1 {
+
+    margin-bottom: 12px;
+
+    font-size: 32px;
+
+}
+
+
+.error-message {
+
+    margin: 0 auto 25px;
+
+    max-width: 550px;
+
+    line-height: 1.7;
+
+    opacity: 0.75;
+
+}
+
+
+.error-details {
+
+    margin: 25px auto;
+
+    padding: 18px 20px;
+
+    max-width: 600px;
+
+    text-align: left;
+
+    border-radius: 10px;
+
+    background: rgba(128, 128, 128, 0.08);
+
+    border: 1px solid rgba(128, 128, 128, 0.15);
+
+}
+
+
+.error-details strong {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+}
+
+
+.error-details p {
+
+    margin: 0;
+
+    word-break: break-word;
+
+    line-height: 1.6;
+
+}
+
+
+.error-code {
+
+    margin: 20px 0;
+
+    font-size: 14px;
+
+    opacity: 0.7;
+
+}
+
+
+.error-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 30px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.error-actions button,
+.error-actions a {
+
+    text-decoration: none;
+
+}
+
+
+@media (max-width: 600px) {
+
+    .error-page {
+
+        margin: 30px auto;
+
+        padding: 30px 20px;
+
+    }
+
+
+    .error-content h1 {
+
+        font-size: 26px;
+
+    }
+
+
+    .error-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .error-actions button,
+    .error-actions a {
+
+        width: 100%;
+
+        box-sizing: border-box;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /*
+         * Allow the user to go back using
+         * the browser back button.
+         */
+
+        const backButton =
+            document.querySelector(
+                ".error-actions button"
+            );
+
+
+        if (
+            backButton
+        ) {
+
+            backButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        window.history.length > 1
+                    ) {
+
+                        window.history.back();
+
+                    }
+                    else {
+
+                        window.location.href = "/";
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

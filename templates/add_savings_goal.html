@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Savings Goal - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Savings Goal
+{% endblock %}
+
+{% block page_subtitle %}
+Create a goal and track your savings progress
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Create Savings Goal
+            </h2>
+
+            <p>
+                Set a target and start building your savings.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SAVINGS GOAL FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_savings_goal') }}"
+        id="savingsGoalForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- GOAL NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Goal Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Emergency Fund"
+                    maxlength="150"
+                    required
+                    autocomplete="off"
+                >
+
+                <small class="form-help">
+                    Give your savings goal a clear name.
+                </small>
+
+            </div>
+
+
+            <!-- TARGET AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="target_amount">
+                    Target Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="target_amount"
+                        name="target_amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    How much money do you want to save?
+                </small>
+
+            </div>
+
+
+            <!-- ALREADY SAVED -->
+
+            <div class="form-group">
+
+                <label for="saved_amount">
+                    Already Saved
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="saved_amount"
+                        name="saved_amount"
+                        value="0"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter any amount already saved towards this goal.
+                </small>
+
+            </div>
+
+
+            <!-- TARGET DATE -->
+
+            <div class="form-group">
+
+                <label for="target_date">
+                    Target Date
+                </label>
+
+                <input
+                    type="date"
+                    id="target_date"
+                    name="target_date"
+                >
+
+                <small class="form-help">
+                    When do you want to achieve this goal?
+                </small>
+
+            </div>
+
+
+            <!-- PRIORITY -->
+
+            <div class="form-group">
+
+                <label for="priority">
+                    Priority
+                </label>
+
+                <select
+                    id="priority"
+                    name="priority"
+                >
+
+                    <option value="Low">
+                        Low
+                    </option>
+
+                    <option
+                        value="Medium"
+                        selected
+                    >
+                        Medium
+                    </option>
+
+                    <option value="High">
+                        High
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Emergency Fund">
+                        Emergency Fund
+                    </option>
+
+                    <option value="Travel">
+                        Travel
+                    </option>
+
+                    <option value="Home">
+                        Home
+                    </option>
+
+                    <option value="Car">
+                        Car
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Wedding">
+                        Wedding
+                    </option>
+
+                    <option value="Investment">
+                        Investment
+                    </option>
+
+                    <option value="Retirement">
+                        Retirement
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this savings goal..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GOAL PREVIEW
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="goalPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Savings Goal Summary
+                </strong>
+
+                <p id="goalSummaryText">
+                    Enter the target amount to see your progress.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Create Goal
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "savingsGoalForm"
+            );
+
+        const targetAmount =
+            document.getElementById(
+                "target_amount"
+            );
+
+        const savedAmount =
+            document.getElementById(
+                "saved_amount"
+            );
+
+        const targetDate =
+            document.getElementById(
+                "target_date"
+            );
+
+        const summary =
+            document.getElementById(
+                "goalSummaryText"
+            );
+
+
+        /* =================================================
+           DEFAULT SAVED AMOUNT
+        ================================================= */
+
+        if (!savedAmount.value) {
+
+            savedAmount.value = "0";
+
+        }
+
+
+        /* =================================================
+           TARGET DATE
+        ================================================= */
+
+        const today =
+            new Date();
+
+        const year =
+            today.getFullYear();
+
+        const month =
+            String(
+                today.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+        const day =
+            String(
+                today.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+        const todayString =
+            year +
+            "-" +
+            month +
+            "-" +
+            day;
+
+
+        targetDate.min =
+            todayString;
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const target =
+                parseFloat(
+                    targetAmount.value
+                ) || 0;
+
+            const saved =
+                parseFloat(
+                    savedAmount.value
+                ) || 0;
+
+
+            if (target <= 0) {
+
+                summary.textContent =
+                    "Enter the target amount to see your progress.";
+
+                return;
+
+            }
+
+
+            const remaining =
+                Math.max(
+                    target - saved,
+                    0
+                );
+
+
+            const percentage =
+                Math.min(
+                    (
+                        saved /
+                        target
+                    ) * 100,
+                    100
+                );
+
+
+            summary.textContent =
+                "Target: ₹" +
+                target.toFixed(2) +
+                " | Saved: ₹" +
+                saved.toFixed(2) +
+                " | Remaining: ₹" +
+                remaining.toFixed(2) +
+                " | Progress: " +
+                percentage.toFixed(1) +
+                "%";
+
+        }
+
+
+        targetAmount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+        savedAmount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const name =
+                    document
+                        .getElementById(
+                            "name"
+                        )
+                        .value
+                        .trim();
+
+                const target =
+                    parseFloat(
+                        targetAmount.value
+                    );
+
+                const saved =
+                    parseFloat(
+                        savedAmount.value
+                    ) || 0;
+
+
+                if (!name) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a goal name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(target) ||
+                    target <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid target amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (saved < 0) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Saved amount cannot be negative."
+                    );
+
+                    return;
+
+                }
+
+
+                if (saved > target) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Already saved amount cannot be greater than the target amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    targetDate.value &&
+                    targetDate.value < todayString
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Target date cannot be in the past."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================== */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

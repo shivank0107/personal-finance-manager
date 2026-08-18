@@ -1,0 +1,909 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Budget - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Budget
+{% endblock %}
+
+{% block page_subtitle %}
+Update your budget details and spending limit
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Budget
+            </h2>
+
+            <p>
+                Update the details of your existing budget.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if budget %}
+
+    <!-- =====================================================
+         BUDGET DATA
+    ====================================================== -->
+
+    <div
+        id="budgetData"
+        data-budget-id="{{ budget.id }}"
+        data-amount="{{ budget.amount or 0 }}"
+        data-spent="{{ budget.spent or 0 }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_budget',
+            budget_id=budget.id
+        ) }}"
+        id="editBudgetForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- BUDGET NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+
+                    Budget Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ budget.name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Monthly Food Budget"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option
+                        value="Food"
+                        {% if budget.category == "Food" %}
+                            selected
+                        {% endif %}
+                    >
+                        Food
+                    </option>
+
+                    <option
+                        value="Shopping"
+                        {% if budget.category == "Shopping" %}
+                            selected
+                        {% endif %}
+                    >
+                        Shopping
+                    </option>
+
+                    <option
+                        value="Transport"
+                        {% if budget.category == "Transport" %}
+                            selected
+                        {% endif %}
+                    >
+                        Transport
+                    </option>
+
+                    <option
+                        value="Bills"
+                        {% if budget.category == "Bills" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bills
+                    </option>
+
+                    <option
+                        value="Entertainment"
+                        {% if budget.category == "Entertainment" %}
+                            selected
+                        {% endif %}
+                    >
+                        Entertainment
+                    </option>
+
+                    <option
+                        value="Healthcare"
+                        {% if budget.category == "Healthcare" %}
+                            selected
+                        {% endif %}
+                    >
+                        Healthcare
+                    </option>
+
+                    <option
+                        value="Education"
+                        {% if budget.category == "Education" %}
+                            selected
+                        {% endif %}
+                    >
+                        Education
+                    </option>
+
+                    <option
+                        value="Utilities"
+                        {% if budget.category == "Utilities" %}
+                            selected
+                        {% endif %}
+                    >
+                        Utilities
+                    </option>
+
+                    <option
+                        value="Travel"
+                        {% if budget.category == "Travel" %}
+                            selected
+                        {% endif %}
+                    >
+                        Travel
+                    </option>
+
+                    <option
+                        value="Insurance"
+                        {% if budget.category == "Insurance" %}
+                            selected
+                        {% endif %}
+                    >
+                        Insurance
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if budget.category == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BUDGET AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Budget Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        value="{{ budget.amount or 0 }}"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Set the maximum amount you want to spend.
+                </small>
+
+            </div>
+
+
+            <!-- PERIOD -->
+
+            <div class="form-group">
+
+                <label for="period">
+
+                    Budget Period
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <select
+                    id="period"
+                    name="period"
+                    required
+                >
+
+                    <option
+                        value="Monthly"
+                        {% if budget.period == "Monthly" or budget.period == "monthly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Monthly
+                    </option>
+
+                    <option
+                        value="Weekly"
+                        {% if budget.period == "Weekly" or budget.period == "weekly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Weekly
+                    </option>
+
+                    <option
+                        value="Yearly"
+                        {% if budget.period == "Yearly" or budget.period == "yearly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Yearly
+                    </option>
+
+                    <option
+                        value="Quarterly"
+                        {% if budget.period == "Quarterly" or budget.period == "quarterly" %}
+                            selected
+                        {% endif %}
+                    >
+                        Quarterly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label for="start_date">
+                    Start Date
+                </label>
+
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ budget.start_date or '' }}"
+                >
+
+            </div>
+
+
+            <!-- END DATE -->
+
+            <div class="form-group">
+
+                <label for="end_date">
+                    End Date
+                </label>
+
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ budget.end_date or '' }}"
+                >
+
+            </div>
+
+
+            <!-- ALERT LIMIT -->
+
+            <div class="form-group">
+
+                <label for="alert_percentage">
+                    Alert Percentage
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="alert_percentage"
+                        name="alert_percentage"
+                        value="{{ budget.alert_percentage or 80 }}"
+                        min="1"
+                        max="100"
+                        step="1"
+                        placeholder="80"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+                <small class="form-help">
+                    Alert when this percentage of the budget is used.
+                </small>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="is_active">
+                    Status
+                </label>
+
+                <select
+                    id="is_active"
+                    name="is_active"
+                >
+
+                    <option
+                        value="1"
+                        {% if budget.is_active is not defined or budget.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="0"
+                        {% if budget.is_active is defined and not budget.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ budget.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CURRENT USAGE
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="budgetPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Budget Usage
+                </strong>
+
+                <p id="budgetSummaryText">
+                    Review your budget before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('budgets') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         BUDGET NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            🎯
+        </div>
+
+        <h2>
+            Budget Not Found
+        </h2>
+
+        <p>
+            The requested budget could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('budgets') }}"
+            class="primary-button"
+        >
+            Back to Budgets
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editBudgetForm"
+            );
+
+        const name =
+            document.getElementById(
+                "name"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const period =
+            document.getElementById(
+                "period"
+            );
+
+        const startDate =
+            document.getElementById(
+                "start_date"
+            );
+
+        const endDate =
+            document.getElementById(
+                "end_date"
+            );
+
+        const alertPercentage =
+            document.getElementById(
+                "alert_percentage"
+            );
+
+        const summary =
+            document.getElementById(
+                "budgetSummaryText"
+            );
+
+        const budgetData =
+            document.getElementById(
+                "budgetData"
+            );
+
+
+        /*
+         * Stop if budget/form is unavailable.
+         */
+
+        if (
+            !form ||
+            !name ||
+            !amount ||
+            !period ||
+            !summary ||
+            !budgetData
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           READ EXISTING DATA
+        ================================================= */
+
+        const currentSpent =
+            parseFloat(
+                budgetData.dataset.spent || "0"
+            ) || 0;
+
+
+        /* =================================================
+           UPDATE BUDGET SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const budgetAmount =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            const budgetName =
+                name.value.trim();
+
+
+            const selectedCategory =
+                category
+                    ? category.value
+                    : "";
+
+
+            let percentage = 0;
+
+
+            if (
+                budgetAmount > 0
+            ) {
+
+                percentage =
+                    (
+                        currentSpent /
+                        budgetAmount
+                    ) *
+                    100;
+
+            }
+
+
+            let message =
+                "Spent: ₹" +
+                currentSpent.toFixed(2) +
+                " | Budget: ₹" +
+                budgetAmount.toFixed(2) +
+                " | Used: " +
+                percentage.toFixed(1) +
+                "%";
+
+
+            if (
+                budgetName
+            ) {
+
+                message =
+                    budgetName +
+                    " • " +
+                    message;
+
+            }
+
+
+            if (
+                selectedCategory
+            ) {
+
+                message +=
+                    " • " +
+                    selectedCategory;
+
+            }
+
+
+            summary.textContent =
+                message;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        name.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        if (category) {
+
+            category.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           DATE VALIDATION
+        ================================================= */
+
+        function validateDates() {
+
+            if (
+                !startDate ||
+                !endDate ||
+                !startDate.value ||
+                !endDate.value
+            ) {
+
+                return true;
+
+            }
+
+
+            const start =
+                new Date(
+                    startDate.value
+                );
+
+            const end =
+                new Date(
+                    endDate.value
+                );
+
+
+            return end >= start;
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const budgetName =
+                    name.value.trim();
+
+
+                const budgetAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (
+                    !budgetName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a budget name."
+                    );
+
+                    name.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(
+                        budgetAmount
+                    ) ||
+                    budgetAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid budget amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !period.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a budget period."
+                    );
+
+                    period.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !validateDates()
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "End date cannot be earlier than start date."
+                    );
+
+                    if (endDate) {
+
+                        endDate.focus();
+
+                    }
+
+                    return;
+
+                }
+
+
+                if (
+                    alertPercentage
+                ) {
+
+                    const alertValue =
+                        parseFloat(
+                            alertPercentage.value
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            alertValue
+                        ) ||
+                        alertValue < 1 ||
+                        alertValue > 100
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Alert percentage must be between 1 and 100."
+                        );
+
+                        alertPercentage.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

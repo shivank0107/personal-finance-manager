@@ -1,0 +1,857 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Expense - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Expense
+{% endblock %}
+
+{% block page_subtitle %}
+Update your expense details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Expense
+            </h2>
+
+            <p>
+                Update the details of your existing expense.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if expense %}
+
+    <!-- =====================================================
+         EXPENSE DATA
+    ====================================================== -->
+
+    <div
+        id="expenseData"
+        data-expense-id="{{ expense.id }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_expense',
+            expense_id=expense.id
+        ) }}"
+        id="editExpenseForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+
+                    Description
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    value="{{ expense.description or '' }}"
+                    maxlength="200"
+                    placeholder="e.g. Grocery Shopping"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        value="{{ expense.amount or 0 }}"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+
+                    Category
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option
+                        value="Food"
+                        {% if expense.category == "Food" %}
+                            selected
+                        {% endif %}
+                    >
+                        Food
+                    </option>
+
+                    <option
+                        value="Shopping"
+                        {% if expense.category == "Shopping" %}
+                            selected
+                        {% endif %}
+                    >
+                        Shopping
+                    </option>
+
+                    <option
+                        value="Transport"
+                        {% if expense.category == "Transport" %}
+                            selected
+                        {% endif %}
+                    >
+                        Transport
+                    </option>
+
+                    <option
+                        value="Bills"
+                        {% if expense.category == "Bills" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bills
+                    </option>
+
+                    <option
+                        value="Entertainment"
+                        {% if expense.category == "Entertainment" %}
+                            selected
+                        {% endif %}
+                    >
+                        Entertainment
+                    </option>
+
+                    <option
+                        value="Healthcare"
+                        {% if expense.category == "Healthcare" %}
+                            selected
+                        {% endif %}
+                    >
+                        Healthcare
+                    </option>
+
+                    <option
+                        value="Education"
+                        {% if expense.category == "Education" %}
+                            selected
+                        {% endif %}
+                    >
+                        Education
+                    </option>
+
+                    <option
+                        value="Travel"
+                        {% if expense.category == "Travel" %}
+                            selected
+                        {% endif %}
+                    >
+                        Travel
+                    </option>
+
+                    <option
+                        value="Utilities"
+                        {% if expense.category == "Utilities" %}
+                            selected
+                        {% endif %}
+                    >
+                        Utilities
+                    </option>
+
+                    <option
+                        value="Insurance"
+                        {% if expense.category == "Insurance" %}
+                            selected
+                        {% endif %}
+                    >
+                        Insurance
+                    </option>
+
+                    <option
+                        value="Rent"
+                        {% if expense.category == "Rent" %}
+                            selected
+                        {% endif %}
+                    >
+                        Rent
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if expense.category == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="expense_date">
+
+                    Expense Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="expense_date"
+                    name="expense_date"
+                    value="{{ expense.expense_date or expense.date or '' }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                        {% if expense.account_id == account.id %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option
+                        value="Cash"
+                        {% if expense.payment_method == "Cash" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cash
+                    </option>
+
+                    <option
+                        value="UPI"
+                        {% if expense.payment_method == "UPI" %}
+                            selected
+                        {% endif %}
+                    >
+                        UPI
+                    </option>
+
+                    <option
+                        value="Debit Card"
+                        {% if expense.payment_method == "Debit Card" %}
+                            selected
+                        {% endif %}
+                    >
+                        Debit Card
+                    </option>
+
+                    <option
+                        value="Credit Card"
+                        {% if expense.payment_method == "Credit Card" %}
+                            selected
+                        {% endif %}
+                    >
+                        Credit Card
+                    </option>
+
+                    <option
+                        value="Bank Transfer"
+                        {% if expense.payment_method == "Bank Transfer" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bank Transfer
+                    </option>
+
+                    <option
+                        value="Net Banking"
+                        {% if expense.payment_method == "Net Banking" %}
+                            selected
+                        {% endif %}
+                    >
+                        Net Banking
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if expense.payment_method == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- MERCHANT -->
+
+            <div class="form-group">
+
+                <label for="merchant">
+                    Merchant
+                </label>
+
+                <input
+                    type="text"
+                    id="merchant"
+                    name="merchant"
+                    value="{{ expense.merchant or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Amazon, Swiggy"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- REFERENCE -->
+
+            <div class="form-group">
+
+                <label for="reference">
+                    Transaction Reference
+                </label>
+
+                <input
+                    type="text"
+                    id="reference"
+                    name="reference"
+                    value="{{ expense.reference or '' }}"
+                    maxlength="150"
+                    placeholder="Optional reference number"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ expense.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             EXPENSE SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="expensePreview"
+        >
+
+            <div>
+
+                <strong>
+                    Expense Summary
+                </strong>
+
+                <p id="expenseSummaryText">
+                    Review the expense details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('expenses') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         EXPENSE NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            💸
+        </div>
+
+        <h2>
+            Expense Not Found
+        </h2>
+
+        <p>
+            The requested expense could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('expenses') }}"
+            class="primary-button"
+        >
+            Back to Expenses
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editExpenseForm"
+            );
+
+        const description =
+            document.getElementById(
+                "description"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const expenseDate =
+            document.getElementById(
+                "expense_date"
+            );
+
+        const summary =
+            document.getElementById(
+                "expenseSummaryText"
+            );
+
+
+        /*
+         * Stop if form is unavailable.
+         */
+
+        if (
+            !form ||
+            !description ||
+            !amount ||
+            !category ||
+            !expenseDate ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const expenseAmount =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            const expenseName =
+                description.value.trim();
+
+
+            const selectedCategory =
+                category.value ||
+                "Uncategorized";
+
+
+            let text =
+                "Amount: ₹" +
+                expenseAmount.toFixed(2) +
+                " | Category: " +
+                selectedCategory;
+
+
+            if (
+                expenseName
+            ) {
+
+                text =
+                    expenseName +
+                    " • " +
+                    text;
+
+            }
+
+
+            if (
+                expenseDate.value
+            ) {
+
+                text +=
+                    " | Date: " +
+                    expenseDate.value;
+
+            }
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        description.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        category.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        expenseDate.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const expenseName =
+                    description.value.trim();
+
+
+                const expenseAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                /* -----------------------------------------
+                   DESCRIPTION
+                ------------------------------------------ */
+
+                if (
+                    !expenseName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter an expense description."
+                    );
+
+                    description.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   AMOUNT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(
+                        expenseAmount
+                    ) ||
+                    expenseAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid expense amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   CATEGORY
+                ------------------------------------------ */
+
+                if (
+                    !category.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an expense category."
+                    );
+
+                    category.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   DATE
+                ------------------------------------------ */
+
+                if (
+                    !expenseDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the expense date."
+                    );
+
+                    expenseDate.focus();
+
+                    return;
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

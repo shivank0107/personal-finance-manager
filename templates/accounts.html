@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block title %}Accounts{% endblock %}
+
+{% block page_title %}Accounts{% endblock %}
+
+{% block page_subtitle %}
+Manage your bank accounts, cash and wallets
+{% endblock %}
+
+{% block content %}
+
+<div class="accounts-page">
+
+    <!-- =========================================
+         PAGE HEADER
+    ========================================== -->
+
+    <div class="accounts-header">
+
+        <div class="accounts-header-text">
+            <h1>Your Accounts</h1>
+
+            <p>
+                Bank accounts, savings accounts and cash accounts
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('add_account') }}"
+            class="accounts-add-btn"
+        >
+            <span class="add-icon">+</span>
+            Add Account
+        </a>
+
+    </div>
+
+
+    <!-- =========================================
+         ACCOUNT SUMMARY
+    ========================================== -->
+
+    {% set active_count = namespace(value=0) %}
+
+    {% for account in accounts %}
+
+        {% if account.current_balance|default(0) > 0 %}
+
+            {% set active_count.value =
+                active_count.value + 1
+            %}
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <div class="account-summary-grid">
+
+
+        <!-- TOTAL ACCOUNTS -->
+
+        <div class="account-summary-card">
+
+            <div class="account-summary-icon blue">
+                🏦
+            </div>
+
+            <div class="account-summary-content">
+
+                <span class="account-summary-label">
+                    Total Accounts
+                </span>
+
+                <strong>
+                    {{ accounts|length }}
+                </strong>
+
+                <small>
+                    All registered accounts
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVE ACCOUNTS -->
+
+        <div class="account-summary-card">
+
+            <div class="account-summary-icon green">
+                ✓
+            </div>
+
+            <div class="account-summary-content">
+
+                <span class="account-summary-label">
+                    Active Accounts
+                </span>
+
+                <strong>
+                    {{ active_count.value }}
+                </strong>
+
+                <small>
+                    Currently in use
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL BALANCE -->
+
+        <div class="account-summary-card">
+
+            <div class="account-summary-icon purple">
+                ₹
+            </div>
+
+            <div class="account-summary-content">
+
+                <span class="account-summary-label">
+                    Total Balance
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(total_balance|default(0)) }}
+                </strong>
+
+                <small>
+                    Across all accounts
+                </small>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================
+         ACCOUNTS LIST
+    ========================================== -->
+
+    {% if accounts %}
+
+    <div class="account-grid">
+
+
+        {% for account in accounts %}
+
+
+        <!-- =====================================
+             SINGLE ACCOUNT CARD
+        ====================================== -->
+
+        <div class="account-card">
+
+
+            <!-- ACCOUNT HEADER -->
+
+            <div class="account-card-header">
+
+                <div class="account-icon">
+
+                    {% if account.type == "Cash" %}
+
+                        💵
+
+                    {% elif account.type == "Wallet" %}
+
+                        👛
+
+                    {% elif account.type == "Savings Account" %}
+
+                        💰
+
+                    {% elif account.type == "Current Account" %}
+
+                        🏦
+
+                    {% else %}
+
+                        🏦
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="account-heading">
+
+                    <h3>
+                        {{ account.name }}
+                    </h3>
+
+                    <span class="account-type">
+                        {{ account.type|default("Account") }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 ACCOUNT DETAILS
+            ================================== -->
+
+            <div class="account-details">
+
+
+                <!-- BANK -->
+
+                <div class="account-detail">
+
+                    <span class="account-detail-label">
+                        Bank
+                    </span>
+
+                    <strong class="account-detail-value">
+
+                        {% if account.bank_name %}
+
+                            {{ account.bank_name }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- ACCOUNT NUMBER -->
+
+                <div class="account-detail">
+
+                    <span class="account-detail-label">
+                        Account
+                    </span>
+
+                    <strong class="account-detail-value">
+
+                        {% if account.account_number %}
+
+                            {% set account_no =
+                                account.account_number|string
+                            %}
+
+                            {% if account_no|length > 4 %}
+
+                                {% set last_four =
+                                    account_no[-4:]
+                                %}
+
+                                **** {{ last_four }}
+
+                            {% else %}
+
+                                {{ account_no }}
+
+                            {% endif %}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 CURRENT BALANCE
+            ================================== -->
+
+            <div class="account-balance">
+
+                <span class="account-balance-label">
+                    Current Balance
+                </span>
+
+                <strong class="account-balance-value">
+
+                    ₹{{ "%.2f"|format(
+                        account.current_balance|default(0)
+                    ) }}
+
+                </strong>
+
+            </div>
+
+
+            <!-- =================================
+                 OPENING BALANCE
+            ================================== -->
+
+            <div class="account-opening">
+
+                <span>
+                    Opening Balance
+                </span>
+
+                <strong>
+
+                    ₹{{ "%.2f"|format(
+                        account.opening_balance|default(0)
+                    ) }}
+
+                </strong>
+
+            </div>
+
+
+            <!-- =================================
+                 ACTION BUTTONS
+            ================================== -->
+
+            <div class="account-actions">
+
+
+                <!-- EDIT -->
+
+                <a
+                    href="{{ url_for(
+                        'edit_account',
+                        account_id=account.id
+                    ) }}"
+                    class="account-edit-btn"
+                >
+                    Edit
+                </a>
+
+
+                <!-- DELETE -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'delete_account',
+                        account_id=account.id
+                    ) }}"
+                    class="account-delete-form"
+                    onsubmit="return confirm(
+                        'Are you sure you want to delete this account?'
+                    );"
+                >
+
+                    <button
+                        type="submit"
+                        class="account-delete-btn"
+                    >
+                        Delete
+                    </button>
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- =========================================
+         EMPTY STATE
+    ========================================== -->
+
+    <div class="accounts-empty">
+
+        <div class="accounts-empty-icon">
+            🏦
+        </div>
+
+        <h3>
+            No accounts yet
+        </h3>
+
+        <p>
+            Add your first bank account, savings account
+            or cash account.
+        </p>
+
+        <a
+            href="{{ url_for('add_account') }}"
+            class="accounts-add-btn"
+        >
+            <span class="add-icon">+</span>
+            Add Account
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

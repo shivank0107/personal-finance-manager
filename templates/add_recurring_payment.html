@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Recurring Payment - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Recurring Payment
+{% endblock %}
+
+{% block page_subtitle %}
+Set up a recurring income or expense
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add Recurring Payment
+            </h2>
+
+            <p>
+                Schedule a recurring payment or income transaction.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECURRING PAYMENT FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_recurring_payment') }}"
+        id="recurringPaymentForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. Netflix Subscription"
+                    maxlength="150"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- TYPE -->
+
+            <div class="form-group">
+
+                <label for="transaction_type">
+                    Type
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="transaction_type"
+                    name="transaction_type"
+                    required
+                >
+
+                    <option value="">
+                        Select type
+                    </option>
+
+                    <option value="Expense">
+                        Expense
+                    </option>
+
+                    <option value="Income">
+                        Income
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Salary">
+                        Salary
+                    </option>
+
+                    <option value="Food">
+                        Food
+                    </option>
+
+                    <option value="Shopping">
+                        Shopping
+                    </option>
+
+                    <option value="Bills">
+                        Bills
+                    </option>
+
+                    <option value="Rent">
+                        Rent
+                    </option>
+
+                    <option value="Utilities">
+                        Utilities
+                    </option>
+
+                    <option value="Entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="Healthcare">
+                        Healthcare
+                    </option>
+
+                    <option value="Education">
+                        Education
+                    </option>
+
+                    <option value="Transport">
+                        Transport
+                    </option>
+
+                    <option value="Insurance">
+                        Insurance
+                    </option>
+
+                    <option value="Subscription">
+                        Subscription
+                    </option>
+
+                    <option value="EMI">
+                        EMI
+                    </option>
+
+                    <option value="Investment">
+                        Investment
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- FREQUENCY -->
+
+            <div class="form-group">
+
+                <label for="frequency">
+                    Frequency
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="frequency"
+                    name="frequency"
+                    required
+                >
+
+                    <option value="">
+                        Select frequency
+                    </option>
+
+                    <option value="Daily">
+                        Daily
+                    </option>
+
+                    <option value="Weekly">
+                        Weekly
+                    </option>
+
+                    <option value="Monthly">
+                        Monthly
+                    </option>
+
+                    <option value="Quarterly">
+                        Quarterly
+                    </option>
+
+                    <option value="Yearly">
+                        Yearly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- START DATE -->
+
+            <div class="form-group">
+
+                <label for="start_date">
+                    Start Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- END DATE -->
+
+            <div class="form-group">
+
+                <label for="end_date">
+                    End Date
+                </label>
+
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                >
+
+                <small class="form-help">
+                    Leave empty if this payment has no end date.
+                </small>
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option value="{{ account.id }}">
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a href="{{ url_for('add_account') }}">
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option value="UPI">
+                        UPI
+                    </option>
+
+                    <option value="Cash">
+                        Cash
+                    </option>
+
+                    <option value="Debit Card">
+                        Debit Card
+                    </option>
+
+                    <option value="Credit Card">
+                        Credit Card
+                    </option>
+
+                    <option value="Bank Transfer">
+                        Bank Transfer
+                    </option>
+
+                    <option value="Auto Debit">
+                        Auto Debit
+                    </option>
+
+                    <option value="Net Banking">
+                        Net Banking
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- ACTIVE STATUS -->
+
+            <div class="form-group">
+
+                <label for="is_active">
+                    Status
+                </label>
+
+                <select
+                    id="is_active"
+                    name="is_active"
+                >
+
+                    <option value="1" selected>
+                        Active
+                    </option>
+
+                    <option value="0">
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PREVIEW
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="recurringPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Recurring Payment Summary
+                </strong>
+
+                <p id="recurringSummaryText">
+                    Enter the details to see a summary.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('recurring_payments') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Recurring Payment
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "recurringPaymentForm"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const type =
+            document.getElementById(
+                "transaction_type"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const frequency =
+            document.getElementById(
+                "frequency"
+            );
+
+        const startDate =
+            document.getElementById(
+                "start_date"
+            );
+
+        const endDate =
+            document.getElementById(
+                "end_date"
+            );
+
+        const summary =
+            document.getElementById(
+                "recurringSummaryText"
+            );
+
+
+        /* =================================================
+           DEFAULT START DATE
+        ================================================= */
+
+        if (!startDate.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            startDate.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           END DATE
+        ================================================= */
+
+        startDate.addEventListener(
+            "change",
+            function () {
+
+                if (this.value) {
+
+                    endDate.min =
+                        this.value;
+
+                }
+
+                if (
+                    endDate.value &&
+                    endDate.value <
+                    this.value
+                ) {
+
+                    endDate.value =
+                        "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const value =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+            const transactionType =
+                type.value ||
+                "Transaction";
+
+            const selectedCategory =
+                category.value ||
+                "Uncategorized";
+
+            const selectedFrequency =
+                frequency.value ||
+                "Not specified";
+
+
+            if (value <= 0) {
+
+                summary.textContent =
+                    "Enter the amount and frequency to see a summary.";
+
+                return;
+
+            }
+
+
+            summary.textContent =
+                transactionType +
+                " of ₹" +
+                value.toFixed(2) +
+                " | " +
+                selectedCategory +
+                " | " +
+                selectedFrequency;
+
+        }
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+        type.addEventListener(
+            "change",
+            updateSummary
+        );
+
+        category.addEventListener(
+            "change",
+            updateSummary
+        );
+
+        frequency.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================== */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const name =
+                    document
+                        .getElementById(
+                            "name"
+                        )
+                        .value
+                        .trim();
+
+                const value =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (!name) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!type.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the transaction type."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(value) ||
+                    value <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!category.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a category."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!frequency.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a frequency."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!startDate.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select a start date."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    endDate.value &&
+                    endDate.value <
+                    startDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "End date cannot be before start date."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

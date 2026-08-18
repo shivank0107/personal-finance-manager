@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Income - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Income
+{% endblock %}
+
+{% block page_subtitle %}
+Record your salary, freelance income or other earnings
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add New Income
+            </h2>
+
+            <p>
+                Enter the details of your income below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INCOME FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_income') }}"
+        id="incomeForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- INCOME DATE -->
+
+            <div class="form-group">
+
+                <label for="date">
+                    Income Date
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- INCOME SOURCE -->
+
+            <div class="form-group">
+
+                <label for="source">
+                    Income Source
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="source"
+                    name="source"
+                    required
+                >
+
+                    <option value="">
+                        Select income source
+                    </option>
+
+                    <option value="Salary">
+                        Salary
+                    </option>
+
+                    <option value="Freelance">
+                        Freelance
+                    </option>
+
+                    <option value="Business">
+                        Business
+                    </option>
+
+                    <option value="Investment">
+                        Investment
+                    </option>
+
+                    <option value="Interest">
+                        Interest
+                    </option>
+
+                    <option value="Rental Income">
+                        Rental Income
+                    </option>
+
+                    <option value="Bonus">
+                        Bonus
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                    required
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                    >
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes about this income..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('income') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+                {% if not accounts %}
+                    disabled
+                {% endif %}
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Income
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "incomeForm"
+            );
+
+        const date =
+            document.getElementById(
+                "date"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const source =
+            document.getElementById(
+                "source"
+            );
+
+        const account =
+            document.getElementById(
+                "account_id"
+            );
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!date.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            date.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           AMOUNT VALIDATION
+        ================================================= */
+
+        amount.addEventListener(
+            "input",
+            function () {
+
+                if (
+                    parseFloat(
+                        this.value
+                    ) < 0
+                ) {
+
+                    this.value = "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const incomeAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (!date.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the income date."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(
+                        incomeAmount
+                    ) ||
+                    incomeAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid income amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!source.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an income source."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!account.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an account."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

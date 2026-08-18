@@ -1,0 +1,2204 @@
+{% extends "base.html" %}
+
+{% block title %}
+Tax Planner - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Tax Planner
+{% endblock %}
+
+{% block page_subtitle %}
+Estimate your tax liability and compare tax-saving options
+{% endblock %}
+
+
+{% block content %}
+
+<div class="tax-planner-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div>
+            <h2>Tax Planner</h2>
+
+            <p>
+                Plan your taxes, deductions and investments.
+            </p>
+        </div>
+
+        <div class="page-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="resetTaxPlanner"
+            >
+                Reset
+            </button>
+
+            <button
+                type="button"
+                class="primary-button"
+                id="calculateTax"
+            >
+                Calculate Tax
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TAX INPUTS
+    ====================================================== -->
+
+    <div class="tax-layout">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Income Details</h3>
+
+                    <p>
+                        Enter your annual income details.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="salaryIncome">
+                            Salary Income
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="salaryIncome"
+                                min="0"
+                                step="1000"
+                                value="{{ salary_income|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="businessIncome">
+                            Business / Professional Income
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="businessIncome"
+                                min="0"
+                                step="1000"
+                                value="{{ business_income|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="interestIncome">
+                            Interest Income
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="interestIncome"
+                                min="0"
+                                step="100"
+                                value="{{ interest_income|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="rentalIncome">
+                            Rental Income
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="rentalIncome"
+                                min="0"
+                                step="1000"
+                                value="{{ rental_income|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="otherIncome">
+                            Other Income
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="otherIncome"
+                                min="0"
+                                step="1000"
+                                value="{{ other_income|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="capitalGains">
+                            Capital Gains
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="capitalGains"
+                                min="0"
+                                step="1000"
+                                value="{{ capital_gains|default(0) }}"
+                            >
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PERSONAL DETAILS
+        ================================================== -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Tax Profile</h3>
+
+                    <p>
+                        Select your applicable tax profile.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="form-group">
+
+                    <label for="taxRegime">
+                        Tax Regime
+                    </label>
+
+                    <select id="taxRegime">
+
+                        <option value="new">
+                            New Tax Regime
+                        </option>
+
+                        <option value="old">
+                            Old Tax Regime
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="ageGroup">
+                        Age Group
+                    </label>
+
+                    <select id="ageGroup">
+
+                        <option value="below60">
+                            Below 60 Years
+                        </option>
+
+                        <option value="60to79">
+                            60 - 79 Years
+                        </option>
+
+                        <option value="80plus">
+                            80 Years or Above
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="financialYear">
+                        Financial Year
+                    </label>
+
+                    <select id="financialYear">
+
+                        <option value="2026-27">
+                            FY 2026-27
+                        </option>
+
+                        <option value="2025-26">
+                            FY 2025-26
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DEDUCTIONS
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3>Tax Deductions & Investments</h3>
+
+                <p>
+                    Enter eligible deductions for the old tax regime.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="section80C">
+                        Section 80C
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="section80C"
+                            min="0"
+                            step="1000"
+                            value="{{ section_80c|default(0) }}"
+                        >
+                    </div>
+
+                    <small>
+                        EPF, PPF, ELSS, LIC, tuition fees etc.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="section80D">
+                        Section 80D
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="section80D"
+                            min="0"
+                            step="1000"
+                            value="{{ section_80d|default(0) }}"
+                        >
+                    </div>
+
+                    <small>
+                        Eligible medical insurance deduction.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="homeLoanInterest">
+                        Home Loan Interest
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="homeLoanInterest"
+                            min="0"
+                            step="1000"
+                            value="{{ home_loan_interest|default(0) }}"
+                        >
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="hraExemption">
+                        HRA Exemption
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="hraExemption"
+                            min="0"
+                            step="1000"
+                            value="{{ hra_exemption|default(0) }}"
+                        >
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nps80CCD">
+                        NPS - Section 80CCD(1B)
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="nps80CCD"
+                            min="0"
+                            step="1000"
+                            value="{{ nps_80ccd|default(0) }}"
+                        >
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="otherDeductions">
+                        Other Deductions
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="otherDeductions"
+                            min="0"
+                            step="1000"
+                            value="{{ other_deductions|default(0) }}"
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <span class="summary-label">
+                Gross Income
+            </span>
+
+            <strong id="grossIncome">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <span class="summary-label">
+                Total Deductions
+            </span>
+
+            <strong id="totalDeductions">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <span class="summary-label">
+                Taxable Income
+            </span>
+
+            <strong id="taxableIncome">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <div class="summary-card highlight">
+
+            <span class="summary-label">
+                Estimated Tax
+            </span>
+
+            <strong id="estimatedTax">
+                ₹0
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TAX COMPARISON
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3>Tax Regime Comparison</h3>
+
+                <p>
+                    Compare estimated tax under both regimes.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="comparison-grid">
+
+            <div class="regime-card">
+
+                <div class="regime-header">
+
+                    <h3>
+                        New Regime
+                    </h3>
+
+                    <span>
+                        Estimated
+                    </span>
+
+                </div>
+
+                <div class="regime-tax">
+                    ₹<span id="newRegimeTax">0</span>
+                </div>
+
+                <div class="regime-income">
+                    Taxable Income:
+                    ₹<span id="newRegimeIncome">0</span>
+                </div>
+
+            </div>
+
+
+            <div class="regime-card">
+
+                <div class="regime-header">
+
+                    <h3>
+                        Old Regime
+                    </h3>
+
+                    <span>
+                        Estimated
+                    </span>
+
+                </div>
+
+                <div class="regime-tax">
+                    ₹<span id="oldRegimeTax">0</span>
+                </div>
+
+                <div class="regime-income">
+                    Taxable Income:
+                    ₹<span id="oldRegimeIncome">0</span>
+                </div>
+
+            </div>
+
+
+            <div class="regime-result">
+
+                <span>
+                    Potentially Better Option
+                </span>
+
+                <strong id="betterRegime">
+                    -
+                </strong>
+
+                <small id="taxDifference">
+                    Calculate to compare
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TAX BREAKDOWN
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3>Tax Breakdown</h3>
+
+                <p>
+                    Estimated tax calculation.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="tax-breakdown">
+
+            <div class="breakdown-row">
+
+                <span>
+                    Gross Income
+                </span>
+
+                <strong id="breakdownGross">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row">
+
+                <span>
+                    Standard Deduction
+                </span>
+
+                <strong id="breakdownStandard">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row">
+
+                <span>
+                    Other Deductions
+                </span>
+
+                <strong id="breakdownDeductions">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row">
+
+                <span>
+                    Taxable Income
+                </span>
+
+                <strong id="breakdownTaxable">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row">
+
+                <span>
+                    Income Tax
+                </span>
+
+                <strong id="breakdownIncomeTax">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row">
+
+                <span>
+                    Health & Education Cess
+                </span>
+
+                <strong id="breakdownCess">
+                    ₹0
+                </strong>
+
+            </div>
+
+
+            <div class="breakdown-row total">
+
+                <span>
+                    Total Estimated Tax
+                </span>
+
+                <strong id="breakdownTotal">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TAX SAVING SUGGESTIONS
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h3>Tax Saving Opportunities</h3>
+
+                <p>
+                    Potential areas to review for tax planning.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="suggestions-grid">
+
+            <div class="suggestion-card">
+
+                <div class="suggestion-icon">
+                    🏦
+                </div>
+
+                <div>
+
+                    <h4>
+                        Section 80C
+                    </h4>
+
+                    <p>
+                        Review eligible investments and payments
+                        such as EPF, PPF, ELSS and eligible insurance.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="suggestion-card">
+
+                <div class="suggestion-icon">
+                    🏥
+                </div>
+
+                <div>
+
+                    <h4>
+                        Health Insurance
+                    </h4>
+
+                    <p>
+                        Check whether eligible medical insurance
+                        deductions can be claimed.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="suggestion-card">
+
+                <div class="suggestion-icon">
+                    📈
+                </div>
+
+                <div>
+
+                    <h4>
+                        NPS
+                    </h4>
+
+                    <p>
+                        Review eligible NPS contributions and
+                        applicable deductions.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="suggestion-card">
+
+                <div class="suggestion-icon">
+                    🏠
+                </div>
+
+                <div>
+
+                    <h4>
+                        Home Loan
+                    </h4>
+
+                    <p>
+                        Review applicable home-loan principal and
+                        interest benefits.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DISCLAIMER
+    ====================================================== -->
+
+    <div class="tax-disclaimer">
+
+        <strong>
+            ⚠ Tax Planning Disclaimer
+        </strong>
+
+        <p>
+            This calculator provides an estimate for planning purposes only.
+            Actual tax liability depends on your applicable income,
+            deductions, exemptions, tax rules and other circumstances.
+            Verify the final calculation with the applicable
+            government rules or a qualified tax professional.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.tax-planner-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+
+.page-header h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+
+.page-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    margin-bottom: 22px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.card-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.card-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.card-header p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.card-body {
+    padding: 20px;
+}
+
+
+/* =========================================================
+   TAX LAYOUT
+========================================================= */
+
+.tax-layout {
+    display: grid;
+    grid-template-columns:
+        2fr
+        1fr;
+    gap: 20px;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    font-size: 10px;
+    line-height: 1.5;
+    opacity: 0.6;
+}
+
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    font-family: inherit;
+    outline: none;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #64748b;
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.1);
+}
+
+
+.input-wrapper {
+    position: relative;
+}
+
+
+.input-wrapper > span {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    transform: translateY(-50%);
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+
+.input-wrapper input {
+    padding-left: 32px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+
+.summary-card {
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.summary-card.highlight {
+    border-color: #64748b;
+    background: rgba(100, 116, 139, 0.06);
+}
+
+
+.summary-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.summary-card strong {
+    font-size: 22px;
+}
+
+
+/* =========================================================
+   COMPARISON
+========================================================= */
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+
+.regime-card {
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+}
+
+
+.regime-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.regime-header h3 {
+    margin: 0;
+}
+
+
+.regime-header span {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+
+.regime-tax {
+    margin-top: 20px;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+
+.regime-income {
+    margin-top: 8px;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.regime-result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(22, 163, 74, 0.08);
+}
+
+
+.regime-result > span {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+
+.regime-result strong {
+    margin-top: 8px;
+    font-size: 22px;
+}
+
+
+.regime-result small {
+    margin-top: 6px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   TAX BREAKDOWN
+========================================================= */
+
+.tax-breakdown {
+    padding: 10px 20px 20px;
+}
+
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    font-size: 13px;
+}
+
+
+.breakdown-row:last-child {
+    border-bottom: 0;
+}
+
+
+.breakdown-row span {
+    opacity: 0.7;
+}
+
+
+.breakdown-row.total {
+    margin-top: 5px;
+    padding-top: 18px;
+    font-size: 15px;
+}
+
+
+.breakdown-row.total strong {
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   SUGGESTIONS
+========================================================= */
+
+.suggestions-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    padding: 20px;
+}
+
+
+.suggestion-card {
+    display: flex;
+    gap: 13px;
+    padding: 16px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 11px;
+}
+
+
+.suggestion-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: rgba(100, 116, 139, 0.1);
+}
+
+
+.suggestion-card h4 {
+    margin: 0 0 5px;
+}
+
+
+.suggestion-card p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.6;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+========================================================= */
+
+.tax-disclaimer {
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.08);
+}
+
+
+.tax-disclaimer strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+
+.tax-disclaimer p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .tax-layout {
+        grid-template-columns: 1fr;
+    }
+
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .comparison-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    .page-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .page-actions {
+        width: 100%;
+    }
+
+
+    .page-actions button {
+        flex: 1;
+    }
+
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .suggestions-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .page-actions {
+        flex-direction: column;
+    }
+
+
+    .page-actions button {
+        width: 100%;
+    }
+
+
+    .breakdown-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           HELPERS
+        ================================================= */
+
+        function getNumber(id) {
+
+            const element =
+                document.getElementById(id);
+
+
+            if (!element) {
+                return 0;
+            }
+
+
+            const value =
+                parseFloat(
+                    element.value
+                );
+
+
+            if (
+                Number.isNaN(value) ||
+                value < 0
+            ) {
+
+                return 0;
+
+            }
+
+
+            return value;
+
+        }
+
+
+        function formatCurrency(value) {
+
+            const number =
+                Number(value) || 0;
+
+
+            return number.toLocaleString(
+                "en-IN",
+                {
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 0
+                }
+            );
+
+        }
+
+
+        function setText(
+            id,
+            value
+        ) {
+
+            const element =
+                document.getElementById(id);
+
+
+            if (element) {
+
+                element.textContent =
+                    value;
+
+            }
+
+        }
+
+
+        /* =================================================
+           INCOME
+        ================================================= */
+
+        function calculateGrossIncome() {
+
+            return (
+                getNumber("salaryIncome") +
+                getNumber("businessIncome") +
+                getNumber("interestIncome") +
+                getNumber("rentalIncome") +
+                getNumber("otherIncome") +
+                getNumber("capitalGains")
+            );
+
+        }
+
+
+        /* =================================================
+           DEDUCTIONS
+        ================================================= */
+
+        function calculateDeductions() {
+
+            return (
+                getNumber("section80C") +
+                getNumber("section80D") +
+                getNumber("homeLoanInterest") +
+                getNumber("hraExemption") +
+                getNumber("nps80CCD") +
+                getNumber("otherDeductions")
+            );
+
+        }
+
+
+        /* =================================================
+           NEW REGIME TAX
+           
+           Planning calculator only.
+           Slab values should be updated when official
+           tax rules change.
+        ================================================= */
+
+        function calculateNewRegimeTax(
+            income
+        ) {
+
+            let taxable =
+                Math.max(
+                    0,
+                    income
+                );
+
+
+            /*
+             * Standard deduction
+             * kept separate for transparency.
+             */
+
+            const standardDeduction =
+                75000;
+
+
+            taxable =
+                Math.max(
+                    0,
+                    taxable -
+                    standardDeduction
+                );
+
+
+            let tax = 0;
+
+
+            if (taxable <= 400000) {
+
+                tax = 0;
+
+            } else if (
+                taxable <= 800000
+            ) {
+
+                tax =
+                    (
+                        taxable -
+                        400000
+                    ) * 0.05;
+
+            } else if (
+                taxable <= 1200000
+            ) {
+
+                tax =
+                    400000 * 0.05 +
+                    (
+                        taxable -
+                        800000
+                    ) * 0.10;
+
+            } else if (
+                taxable <= 1600000
+            ) {
+
+                tax =
+                    400000 * 0.05 +
+                    400000 * 0.10 +
+                    (
+                        taxable -
+                        1200000
+                    ) * 0.15;
+
+            } else if (
+                taxable <= 2000000
+            ) {
+
+                tax =
+                    400000 * 0.05 +
+                    400000 * 0.10 +
+                    400000 * 0.15 +
+                    (
+                        taxable -
+                        1600000
+                    ) * 0.20;
+
+            } else if (
+                taxable <= 2400000
+            ) {
+
+                tax =
+                    400000 * 0.05 +
+                    400000 * 0.10 +
+                    400000 * 0.15 +
+                    400000 * 0.20 +
+                    (
+                        taxable -
+                        2000000
+                    ) * 0.25;
+
+            } else {
+
+                tax =
+                    400000 * 0.05 +
+                    400000 * 0.10 +
+                    400000 * 0.15 +
+                    400000 * 0.20 +
+                    400000 * 0.25 +
+                    (
+                        taxable -
+                        2400000
+                    ) * 0.30;
+
+            }
+
+
+            /*
+             * Rebate handling is intentionally simplified
+             * for planning.
+             */
+
+            if (taxable <= 1200000) {
+                tax = 0;
+            }
+
+
+            return {
+                taxable: taxable,
+                tax: tax
+            };
+
+        }
+
+
+        /* =================================================
+           OLD REGIME TAX
+        ================================================= */
+
+        function calculateOldRegimeTax(
+            income,
+            ageGroup
+        ) {
+
+            const deductions =
+                calculateDeductions();
+
+
+            let taxable =
+                Math.max(
+                    0,
+                    income -
+                    deductions -
+                    50000
+                );
+
+
+            let tax = 0;
+
+
+            if (
+                ageGroup ===
+                "80plus"
+            ) {
+
+                if (taxable > 500000) {
+
+                    if (
+                        taxable <= 1000000
+                    ) {
+
+                        tax =
+                            (
+                                taxable -
+                                500000
+                            ) * 0.20;
+
+                    } else {
+
+                        tax =
+                            500000 * 0.20 +
+                            (
+                                taxable -
+                                1000000
+                            ) * 0.30;
+
+                    }
+
+                }
+
+            } else if (
+                ageGroup ===
+                "60to79"
+            ) {
+
+                if (taxable > 300000) {
+
+                    if (
+                        taxable <= 500000
+                    ) {
+
+                        tax =
+                            (
+                                taxable -
+                                300000
+                            ) * 0.05;
+
+                    } else if (
+                        taxable <= 1000000
+                    ) {
+
+                        tax =
+                            200000 * 0.05 +
+                            (
+                                taxable -
+                                500000
+                            ) * 0.20;
+
+                    } else {
+
+                        tax =
+                            200000 * 0.05 +
+                            500000 * 0.20 +
+                            (
+                                taxable -
+                                1000000
+                            ) * 0.30;
+
+                    }
+
+                }
+
+            } else {
+
+                if (taxable > 250000) {
+
+                    if (
+                        taxable <= 500000
+                    ) {
+
+                        tax =
+                            (
+                                taxable -
+                                250000
+                            ) * 0.05;
+
+                    } else if (
+                        taxable <= 1000000
+                    ) {
+
+                        tax =
+                            250000 * 0.05 +
+                            (
+                                taxable -
+                                500000
+                            ) * 0.20;
+
+                    } else {
+
+                        tax =
+                            250000 * 0.05 +
+                            500000 * 0.20 +
+                            (
+                                taxable -
+                                1000000
+                            ) * 0.30;
+
+                    }
+
+                }
+
+            }
+
+
+            /*
+             * Simplified rebate.
+             */
+
+            if (
+                taxable <= 500000 &&
+                ageGroup === "below60"
+            ) {
+
+                tax = 0;
+
+            }
+
+
+            return {
+                taxable: taxable,
+                tax: tax
+            };
+
+        }
+
+
+        /* =================================================
+           MAIN CALCULATION
+        ================================================= */
+
+        function calculateTax() {
+
+            const grossIncome =
+                calculateGrossIncome();
+
+
+            const deductions =
+                calculateDeductions();
+
+
+            const selectedRegime =
+                document.getElementById(
+                    "taxRegime"
+                )?.value || "new";
+
+
+            const ageGroup =
+                document.getElementById(
+                    "ageGroup"
+                )?.value || "below60";
+
+
+            const newTaxResult =
+                calculateNewRegimeTax(
+                    grossIncome
+                );
+
+
+            const oldTaxResult =
+                calculateOldRegimeTax(
+                    grossIncome,
+                    ageGroup
+                );
+
+
+            const newCess =
+                newTaxResult.tax * 0.04;
+
+
+            const oldCess =
+                oldTaxResult.tax * 0.04;
+
+
+            const newTotal =
+                newTaxResult.tax +
+                newCess;
+
+
+            const oldTotal =
+                oldTaxResult.tax +
+                oldCess;
+
+
+            let selectedTax;
+            let selectedTaxable;
+
+
+            if (
+                selectedRegime === "old"
+            ) {
+
+                selectedTax =
+                    oldTotal;
+
+                selectedTaxable =
+                    oldTaxResult.taxable;
+
+            } else {
+
+                selectedTax =
+                    newTotal;
+
+                selectedTaxable =
+                    newTaxResult.taxable;
+
+            }
+
+
+            /* =============================================
+               SUMMARY
+            ============================================== */
+
+            setText(
+                "grossIncome",
+                "₹" +
+                formatCurrency(
+                    grossIncome
+                )
+            );
+
+
+            setText(
+                "totalDeductions",
+                "₹" +
+                formatCurrency(
+                    deductions
+                )
+            );
+
+
+            setText(
+                "taxableIncome",
+                "₹" +
+                formatCurrency(
+                    selectedTaxable
+                )
+            );
+
+
+            setText(
+                "estimatedTax",
+                "₹" +
+                formatCurrency(
+                    selectedTax
+                )
+            );
+
+
+            /* =============================================
+               COMPARISON
+            ============================================== */
+
+            setText(
+                "newRegimeTax",
+                formatCurrency(
+                    newTotal
+                )
+            );
+
+
+            setText(
+                "oldRegimeTax",
+                formatCurrency(
+                    oldTotal
+                )
+            );
+
+
+            setText(
+                "newRegimeIncome",
+                formatCurrency(
+                    newTaxResult.taxable
+                )
+            );
+
+
+            setText(
+                "oldRegimeIncome",
+                formatCurrency(
+                    oldTaxResult.taxable
+                )
+            );
+
+
+            const difference =
+                Math.abs(
+                    newTotal -
+                    oldTotal
+                );
+
+
+            if (
+                newTotal < oldTotal
+            ) {
+
+                setText(
+                    "betterRegime",
+                    "New Regime"
+                );
+
+            } else if (
+                oldTotal < newTotal
+            ) {
+
+                setText(
+                    "betterRegime",
+                    "Old Regime"
+                );
+
+            } else {
+
+                setText(
+                    "betterRegime",
+                    "Both Similar"
+                );
+
+            }
+
+
+            setText(
+                "taxDifference",
+                "Estimated difference: ₹" +
+                formatCurrency(
+                    difference
+                )
+            );
+
+
+            /* =============================================
+               BREAKDOWN
+            ============================================== */
+
+            const standardDeduction =
+                selectedRegime === "new"
+                    ? 75000
+                    : 50000;
+
+
+            const deductionAmount =
+                selectedRegime === "old"
+                    ? deductions
+                    : 0;
+
+
+            const incomeTax =
+                selectedRegime === "old"
+                    ? oldTaxResult.tax
+                    : newTaxResult.tax;
+
+
+            const cess =
+                selectedRegime === "old"
+                    ? oldCess
+                    : newCess;
+
+
+            setText(
+                "breakdownGross",
+                "₹" +
+                formatCurrency(
+                    grossIncome
+                )
+            );
+
+
+            setText(
+                "breakdownStandard",
+                "₹" +
+                formatCurrency(
+                    standardDeduction
+                )
+            );
+
+
+            setText(
+                "breakdownDeductions",
+                "₹" +
+                formatCurrency(
+                    deductionAmount
+                )
+            );
+
+
+            setText(
+                "breakdownTaxable",
+                "₹" +
+                formatCurrency(
+                    selectedTaxable
+                )
+            );
+
+
+            setText(
+                "breakdownIncomeTax",
+                "₹" +
+                formatCurrency(
+                    incomeTax
+                )
+            );
+
+
+            setText(
+                "breakdownCess",
+                "₹" +
+                formatCurrency(
+                    cess
+                )
+            );
+
+
+            setText(
+                "breakdownTotal",
+                "₹" +
+                formatCurrency(
+                    selectedTax
+                )
+            );
+
+        }
+
+
+        /* =================================================
+           CALCULATE BUTTON
+        ================================================= */
+
+        const calculateButton =
+            document.getElementById(
+                "calculateTax"
+            );
+
+
+        if (calculateButton) {
+
+            calculateButton.addEventListener(
+                "click",
+                calculateTax
+            );
+
+        }
+
+
+        /* =================================================
+           AUTO CALCULATE
+        ================================================= */
+
+        const inputs =
+            document.querySelectorAll(
+                "input[type='number'], select"
+            );
+
+
+        inputs.forEach(
+            function (input) {
+
+                input.addEventListener(
+                    "change",
+                    calculateTax
+                );
+
+
+                input.addEventListener(
+                    "input",
+                    calculateTax
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           RESET
+        ================================================= */
+
+        const resetButton =
+            document.getElementById(
+                "resetTaxPlanner"
+            );
+
+
+        if (resetButton) {
+
+            resetButton.addEventListener(
+                "click",
+                function () {
+
+                    const numberInputs =
+                        document.querySelectorAll(
+                            "input[type='number']"
+                        );
+
+
+                    numberInputs.forEach(
+                        function (input) {
+
+                            input.value = "0";
+
+                        }
+                    );
+
+
+                    const taxRegime =
+                        document.getElementById(
+                            "taxRegime"
+                        );
+
+
+                    if (taxRegime) {
+                        taxRegime.value = "new";
+                    }
+
+
+                    const ageGroup =
+                        document.getElementById(
+                            "ageGroup"
+                        );
+
+
+                    if (ageGroup) {
+                        ageGroup.value = "below60";
+                    }
+
+
+                    calculateTax();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           INITIAL CALCULATION
+        ================================================= */
+
+        calculateTax();
+
+    }
+);
+
+</script>
+
+{% endblock %}

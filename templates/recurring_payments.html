@@ -1,0 +1,2092 @@
+{% extends "base.html" %}
+
+{% block title %}
+Recurring Payments - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Recurring Payments
+{% endblock %}
+
+{% block page_subtitle %}
+Manage your subscriptions, bills and recurring expenses
+{% endblock %}
+
+
+{% block content %}
+
+<div class="recurring-payments-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h2>
+                Recurring Payments
+            </h2>
+
+            <p>
+                Track recurring bills, subscriptions and automatic payments.
+            </p>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{{ url_for('add_recurring_payment') }}"
+                class="primary-button"
+            >
+                + Add Recurring Payment
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    {% set total_monthly = namespace(value=0) %}
+    {% set active_count = namespace(value=0) %}
+    {% set due_count = namespace(value=0) %}
+    {% set total_yearly = namespace(value=0) %}
+
+
+    {% for payment in recurring_payments %}
+
+        {% set amount =
+            payment.amount
+            or payment.payment_amount
+            or 0
+        %}
+
+        {% set frequency =
+            payment.frequency
+            or payment.recurrence
+            or 'Monthly'
+        %}
+
+        {% set status =
+            payment.status
+            or 'Active'
+        %}
+
+
+        {% if status|lower == 'active' %}
+
+            {% set active_count.value =
+                active_count.value + 1
+            %}
+
+        {% endif %}
+
+
+        {% if frequency|lower in ['monthly', 'month'] %}
+
+            {% set monthly_amount = amount %}
+
+        {% elif frequency|lower in ['weekly', 'week'] %}
+
+            {% set monthly_amount =
+                amount * 52 / 12
+            %}
+
+        {% elif frequency|lower in ['yearly', 'annual', 'annually'] %}
+
+            {% set monthly_amount =
+                amount / 12
+            %}
+
+        {% elif frequency|lower in ['quarterly', 'quarter'] %}
+
+            {% set monthly_amount =
+                amount / 3
+            %}
+
+        {% elif frequency|lower in ['daily', 'day'] %}
+
+            {% set monthly_amount =
+                amount * 30
+            %}
+
+        {% else %}
+
+            {% set monthly_amount = amount %}
+
+        {% endif %}
+
+
+        {% set total_monthly.value =
+            total_monthly.value + monthly_amount
+        %}
+
+
+        {% set total_yearly.value =
+            total_yearly.value + (monthly_amount * 12)
+        %}
+
+    {% endfor %}
+
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🔄
+            </div>
+
+            <div>
+
+                <span>
+                    Active Payments
+                </span>
+
+                <strong>
+                    {{ active_count.value }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Monthly Cost
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(
+                        total_monthly.value
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📅
+            </div>
+
+            <div>
+
+                <span>
+                    Yearly Cost
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(
+                        total_yearly.value
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📊
+            </div>
+
+            <div>
+
+                <span>
+                    Total Payments
+                </span>
+
+                <strong>
+                    {{ recurring_payments|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+
+    <div class="card filter-card">
+
+        <div class="filter-row">
+
+            <div class="search-box">
+
+                <label for="paymentSearch">
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="paymentSearch"
+                    placeholder="Search payment, category..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="statusFilter">
+                    Status
+                </label>
+
+                <select id="statusFilter">
+
+                    <option value="all">
+                        All Status
+                    </option>
+
+                    <option value="active">
+                        Active
+                    </option>
+
+                    <option value="inactive">
+                        Inactive
+                    </option>
+
+                    <option value="paused">
+                        Paused
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="frequencyFilter">
+                    Frequency
+                </label>
+
+                <select id="frequencyFilter">
+
+                    <option value="all">
+                        All Frequencies
+                    </option>
+
+                    <option value="daily">
+                        Daily
+                    </option>
+
+                    <option value="weekly">
+                        Weekly
+                    </option>
+
+                    <option value="monthly">
+                        Monthly
+                    </option>
+
+                    <option value="quarterly">
+                        Quarterly
+                    </option>
+
+                    <option value="yearly">
+                        Yearly
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAYMENT LIST
+    ====================================================== -->
+
+    {% if recurring_payments %}
+
+    <div
+        class="payments-grid"
+        id="paymentsGrid"
+    >
+
+        {% for payment in recurring_payments %}
+
+        {% set payment_name =
+            payment.name
+            or payment.payment_name
+            or payment.title
+            or 'Recurring Payment'
+        %}
+
+
+        {% set amount =
+            payment.amount
+            or payment.payment_amount
+            or 0
+        %}
+
+
+        {% set category =
+            payment.category
+            or payment.category_name
+            or ''
+        %}
+
+
+        {% set frequency =
+            payment.frequency
+            or payment.recurrence
+            or 'Monthly'
+        %}
+
+
+        {% set status =
+            payment.status
+            or 'Active'
+        %}
+
+
+        {% set payment_method =
+            payment.payment_method
+            or payment.method
+            or ''
+        %}
+
+
+        {% set next_date =
+            payment.next_payment_date
+            or payment.next_due_date
+            or payment.due_date
+            or ''
+        %}
+
+
+        <div
+            class="payment-card"
+            data-search="{{ (
+                payment_name|string
+                ~ ' '
+                ~ category|string
+                ~ ' '
+                ~ payment_method|string
+            )|lower }}"
+            data-status="{{ status|lower }}"
+            data-frequency="{{ frequency|lower }}"
+        >
+
+            <!-- =================================================
+                 CARD HEADER
+            ================================================== -->
+
+            <div class="payment-card-header">
+
+                <div class="payment-title">
+
+                    <div class="payment-icon">
+                        🔄
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            {{ payment_name }}
+                        </h3>
+
+                        {% if category %}
+
+                        <p>
+                            {{ category }}
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <span
+                    class="status-badge
+                    {% if status|lower == 'active' %}
+                        active
+                    {% elif status|lower == 'paused' %}
+                        paused
+                    {% elif status|lower == 'inactive' %}
+                        inactive
+                    {% else %}
+                        other
+                    {% endif %}"
+                >
+                    {{ status }}
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 AMOUNT
+            ================================================== -->
+
+            <div class="amount-section">
+
+                <div>
+
+                    <span>
+                        Amount
+                    </span>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(
+                            amount
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="frequency-badge">
+
+                    {{ frequency }}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+            <div class="payment-details">
+
+                <div class="detail-item">
+
+                    <span>
+                        Next Payment
+                    </span>
+
+                    <strong>
+                        {{ next_date or '-' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Payment Method
+                    </span>
+
+                    <strong>
+                        {{ payment_method or '-' }}
+                    </strong>
+
+                </div>
+
+
+                {% if payment.start_date %}
+
+                <div class="detail-item">
+
+                    <span>
+                        Start Date
+                    </span>
+
+                    <strong>
+                        {{ payment.start_date }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if payment.end_date %}
+
+                <div class="detail-item">
+
+                    <span>
+                        End Date
+                    </span>
+
+                    <strong>
+                        {{ payment.end_date }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 DESCRIPTION
+            ================================================== -->
+
+            {% if payment.description or payment.notes %}
+
+            <div class="payment-description">
+
+                {{
+                    payment.description
+                    or payment.notes
+                }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="payment-actions">
+
+                {% if payment.id %}
+
+                <a
+                    href="{{ url_for(
+                        'edit_recurring_payment',
+                        payment_id=payment.id
+                    ) }}"
+                    class="secondary-button"
+                >
+                    ✏️ Edit
+                </a>
+
+                <button
+                    type="button"
+                    class="primary-button pay-now-button"
+                    data-payment-id="{{ payment.id }}"
+                    data-payment-name="{{ payment_name }}"
+                    data-payment-amount="{{ amount }}"
+                >
+                    ✓ Mark Paid
+                </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =====================================================
+         NO FILTER RESULTS
+    ====================================================== -->
+
+    <div
+        id="noPaymentResults"
+        class="empty-panel hidden"
+    >
+
+        <div class="empty-icon">
+            🔍
+        </div>
+
+        <h3>
+            No Payments Found
+        </h3>
+
+        <p>
+            No recurring payments match your filters.
+        </p>
+
+        <button
+            type="button"
+            class="secondary-button"
+            id="clearFilters"
+        >
+            Clear Filters
+        </button>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         EMPTY STATE
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="empty-panel">
+
+            <div class="empty-icon">
+                🔄
+            </div>
+
+            <h3>
+                No Recurring Payments
+            </h3>
+
+            <p>
+                Add your subscriptions, bills and recurring payments
+                to keep track of them.
+            </p>
+
+            <a
+                href="{{ url_for('add_recurring_payment') }}"
+                class="primary-button"
+            >
+                + Add Recurring Payment
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         MARK PAYMENT MODAL
+    ====================================================== -->
+
+    <div
+        class="modal-overlay hidden"
+        id="paymentModal"
+    >
+
+        <div
+            class="payment-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="paymentModalTitle"
+        >
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h3 id="paymentModalTitle">
+                        Mark Payment as Paid
+                    </h3>
+
+                    <p id="modalPaymentName">
+                        Recurring Payment
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closePaymentModal"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="modal-payment-amount">
+
+                    <span>
+                        Payment Amount
+                    </span>
+
+                    <strong id="modalPaymentAmount">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="modalPaymentDate">
+                        Payment Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="modalPaymentDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="modalPaymentNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="modalPaymentNotes"
+                        rows="3"
+                        placeholder="Optional notes..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="cancelPayment"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="confirmPayment"
+                >
+                    ✓ Confirm Payment
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.recurring-payments-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+
+.page-header-content h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header-content p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+
+.page-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.summary-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 21px;
+}
+
+
+.summary-card span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.summary-card strong {
+    display: block;
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.filter-card {
+    padding: 18px 20px;
+}
+
+
+.filter-row {
+    display: grid;
+    grid-template-columns:
+        minmax(250px, 2fr)
+        minmax(160px, 1fr)
+        minmax(160px, 1fr);
+    gap: 15px;
+}
+
+
+.search-box label,
+.filter-box label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.search-box input,
+.filter-box select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    outline: none;
+    font-family: inherit;
+}
+
+
+.search-box input:focus,
+.filter-box select:focus {
+    border-color: #64748b;
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.1);
+}
+
+
+/* =========================================================
+   PAYMENTS GRID
+========================================================= */
+
+.payments-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+/* =========================================================
+   PAYMENT CARD
+========================================================= */
+
+.payment-card {
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.payment-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.payment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+
+.payment-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+
+.payment-icon {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 21px;
+}
+
+
+.payment-title h3 {
+    margin: 0 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.payment-title p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.status-badge.active {
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.1);
+}
+
+
+.status-badge.paused {
+    color: #a16207;
+    background: rgba(234, 179, 8, 0.12);
+}
+
+
+.status-badge.inactive {
+    color: #475569;
+    background: rgba(100, 116, 139, 0.1);
+}
+
+
+.status-badge.other {
+    color: #92400e;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+
+/* =========================================================
+   AMOUNT
+========================================================= */
+
+.amount-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 22px;
+}
+
+
+.amount-section span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.amount-section strong {
+    display: block;
+    font-size: 24px;
+}
+
+
+.frequency-badge {
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: rgba(100, 116, 139, 0.08);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.payment-details {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+
+.detail-item {
+    padding: 12px;
+    border-radius: 9px;
+    background: rgba(100, 116, 139, 0.05);
+}
+
+
+.detail-item span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+
+.detail-item strong {
+    display: block;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.payment-description {
+    margin-top: 15px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: rgba(100, 116, 139, 0.05);
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: 0.75;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.payment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-panel {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+
+.empty-panel.hidden {
+    display: none;
+}
+
+
+.empty-icon {
+    margin-bottom: 15px;
+    font-size: 45px;
+}
+
+
+.empty-panel h3 {
+    margin: 0 0 8px;
+}
+
+
+.empty-panel p {
+    margin: 0 0 20px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+
+.payment-modal {
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.2);
+}
+
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.modal-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.modal-header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(100, 116, 139, 0.08);
+    color: inherit;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+}
+
+
+.modal-body {
+    padding: 20px;
+}
+
+
+.modal-payment-amount {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 10px;
+    background: rgba(100, 116, 139, 0.06);
+}
+
+
+.modal-payment-amount span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+.modal-payment-amount strong {
+    font-size: 22px;
+}
+
+
+.modal-body .form-group {
+    margin-bottom: 18px;
+}
+
+
+.modal-body .form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+.modal-body label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.modal-body input,
+.modal-body textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    font-family: inherit;
+    outline: none;
+}
+
+
+.modal-body textarea {
+    resize: vertical;
+}
+
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 20px;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .payments-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .page-header-actions {
+        width: 100%;
+    }
+
+
+    .page-header-actions a {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .payment-card-header {
+        flex-direction: column;
+    }
+
+
+    .amount-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .payment-details {
+        grid-template-columns: 1fr;
+    }
+
+
+    .payment-actions {
+        flex-direction: column;
+    }
+
+
+    .payment-actions a,
+    .payment-actions button {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           FILTER ELEMENTS
+        ================================================= */
+
+        const searchInput =
+            document.getElementById(
+                "paymentSearch"
+            );
+
+
+        const statusFilter =
+            document.getElementById(
+                "statusFilter"
+            );
+
+
+        const frequencyFilter =
+            document.getElementById(
+                "frequencyFilter"
+            );
+
+
+        const paymentCards =
+            document.querySelectorAll(
+                ".payment-card"
+            );
+
+
+        const noPaymentResults =
+            document.getElementById(
+                "noPaymentResults"
+            );
+
+
+        const clearFilters =
+            document.getElementById(
+                "clearFilters"
+            );
+
+
+        /* =================================================
+           FILTER PAYMENTS
+        ================================================= */
+
+        function filterPayments() {
+
+            const search =
+                searchInput
+                    ? searchInput.value
+                        .trim()
+                        .toLowerCase()
+                    : "";
+
+
+            const selectedStatus =
+                statusFilter
+                    ? statusFilter.value
+                    : "all";
+
+
+            const selectedFrequency =
+                frequencyFilter
+                    ? frequencyFilter.value
+                    : "all";
+
+
+            let visibleCount = 0;
+
+
+            paymentCards.forEach(
+                function (card) {
+
+                    const cardSearch =
+                        card.dataset.search || "";
+
+
+                    const cardStatus =
+                        card.dataset.status || "";
+
+
+                    const cardFrequency =
+                        card.dataset.frequency || "";
+
+
+                    const matchesSearch =
+                        !search ||
+                        cardSearch.includes(
+                            search
+                        );
+
+
+                    const matchesStatus =
+                        selectedStatus === "all" ||
+                        cardStatus === selectedStatus;
+
+
+                    const matchesFrequency =
+                        selectedFrequency === "all" ||
+                        cardFrequency === selectedFrequency ||
+                        (
+                            selectedFrequency === "monthly" &&
+                            cardFrequency === "month"
+                        ) ||
+                        (
+                            selectedFrequency === "yearly" &&
+                            (
+                                cardFrequency === "annual" ||
+                                cardFrequency === "annually"
+                            )
+                        );
+
+
+                    const visible =
+                        matchesSearch &&
+                        matchesStatus &&
+                        matchesFrequency;
+
+
+                    card.style.display =
+                        visible
+                            ? ""
+                            : "none";
+
+
+                    if (visible) {
+                        visibleCount++;
+                    }
+
+                }
+            );
+
+
+            if (noPaymentResults) {
+
+                if (
+                    paymentCards.length > 0 &&
+                    visibleCount === 0
+                ) {
+
+                    noPaymentResults.classList.remove(
+                        "hidden"
+                    );
+
+                } else {
+
+                    noPaymentResults.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* =================================================
+           FILTER EVENTS
+        ================================================= */
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                filterPayments
+            );
+
+        }
+
+
+        if (statusFilter) {
+
+            statusFilter.addEventListener(
+                "change",
+                filterPayments
+            );
+
+        }
+
+
+        if (frequencyFilter) {
+
+            frequencyFilter.addEventListener(
+                "change",
+                filterPayments
+            );
+
+        }
+
+
+        /* =================================================
+           CLEAR FILTERS
+        ================================================= */
+
+        if (clearFilters) {
+
+            clearFilters.addEventListener(
+                "click",
+                function () {
+
+                    if (searchInput) {
+                        searchInput.value = "";
+                    }
+
+
+                    if (statusFilter) {
+                        statusFilter.value = "all";
+                    }
+
+
+                    if (frequencyFilter) {
+                        frequencyFilter.value = "all";
+                    }
+
+
+                    filterPayments();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           MODAL
+        ================================================= */
+
+        const modal =
+            document.getElementById(
+                "paymentModal"
+            );
+
+
+        const closeModal =
+            document.getElementById(
+                "closePaymentModal"
+            );
+
+
+        const cancelPayment =
+            document.getElementById(
+                "cancelPayment"
+            );
+
+
+        const confirmPayment =
+            document.getElementById(
+                "confirmPayment"
+            );
+
+
+        const modalPaymentName =
+            document.getElementById(
+                "modalPaymentName"
+            );
+
+
+        const modalPaymentAmount =
+            document.getElementById(
+                "modalPaymentAmount"
+            );
+
+
+        const modalPaymentDate =
+            document.getElementById(
+                "modalPaymentDate"
+            );
+
+
+        const modalPaymentNotes =
+            document.getElementById(
+                "modalPaymentNotes"
+            );
+
+
+        let selectedPaymentId = null;
+
+
+        /* =================================================
+           TODAY
+        ================================================= */
+
+        function getToday() {
+
+            const today =
+                new Date();
+
+
+            const year =
+                today.getFullYear();
+
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(2, "0");
+
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(2, "0");
+
+
+            return (
+                year +
+                "-" +
+                month +
+                "-" +
+                day
+            );
+
+        }
+
+
+        /* =================================================
+           CURRENCY
+        ================================================= */
+
+        function formatCurrency(value) {
+
+            const number =
+                Number(value) || 0;
+
+
+            return "₹" +
+                number.toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           OPEN MODAL
+        ================================================= */
+
+        const payButtons =
+            document.querySelectorAll(
+                ".pay-now-button"
+            );
+
+
+        payButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        selectedPaymentId =
+                            button.dataset.paymentId ||
+                            null;
+
+
+                        const paymentName =
+                            button.dataset.paymentName ||
+                            "Recurring Payment";
+
+
+                        const paymentAmount =
+                            parseFloat(
+                                button.dataset.paymentAmount
+                            ) || 0;
+
+
+                        if (modalPaymentName) {
+
+                            modalPaymentName.textContent =
+                                paymentName;
+
+                        }
+
+
+                        if (modalPaymentAmount) {
+
+                            modalPaymentAmount.textContent =
+                                formatCurrency(
+                                    paymentAmount
+                                );
+
+                        }
+
+
+                        if (modalPaymentDate) {
+
+                            modalPaymentDate.value =
+                                getToday();
+
+                        }
+
+
+                        if (modalPaymentNotes) {
+
+                            modalPaymentNotes.value =
+                                "";
+
+                        }
+
+
+                        if (modal) {
+
+                            modal.classList.remove(
+                                "hidden"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           CLOSE MODAL
+        ================================================= */
+
+        function hideModal() {
+
+            if (modal) {
+
+                modal.classList.add(
+                    "hidden"
+                );
+
+            }
+
+
+            selectedPaymentId = null;
+
+        }
+
+
+        if (closeModal) {
+
+            closeModal.addEventListener(
+                "click",
+                hideModal
+            );
+
+        }
+
+
+        if (cancelPayment) {
+
+            cancelPayment.addEventListener(
+                "click",
+                hideModal
+            );
+
+        }
+
+
+        if (modal) {
+
+            modal.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target === modal
+                    ) {
+
+                        hideModal();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CONFIRM PAYMENT
+        ================================================= */
+
+        if (confirmPayment) {
+
+            confirmPayment.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        !selectedPaymentId
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const paymentDate =
+                        modalPaymentDate
+                            ? modalPaymentDate.value
+                            : "";
+
+
+                    const notes =
+                        modalPaymentNotes
+                            ? modalPaymentNotes.value
+                            : "";
+
+
+                    /*
+                     * The backend route can handle
+                     * the actual payment update.
+                     *
+                     * If your Flask route is different,
+                     * change the URL below.
+                     */
+
+                    const url =
+                        "/recurring-payments/" +
+                        selectedPaymentId +
+                        "/pay";
+
+
+                    confirmPayment.disabled =
+                        true;
+
+
+                    confirmPayment.textContent =
+                        "Saving...";
+
+
+                    fetch(
+                        url,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+                                "X-Requested-With":
+                                    "XMLHttpRequest"
+                            },
+                            body: JSON.stringify(
+                                {
+                                    payment_date:
+                                        paymentDate,
+                                    notes:
+                                        notes
+                                }
+                            )
+                        }
+                    )
+                    .then(
+                        function (response) {
+
+                            if (
+                                !response.ok
+                            ) {
+
+                                throw new Error(
+                                    "Payment could not be recorded."
+                                );
+
+                            }
+
+
+                            return response.json()
+                                .catch(
+                                    function () {
+                                        return {};
+                                    }
+                                );
+
+                        }
+                    )
+                    .then(
+                        function () {
+
+                            hideModal();
+
+                            window.location.reload();
+
+                        }
+                    )
+                    .catch(
+                        function (error) {
+
+                            console.error(
+                                error
+                            );
+
+
+                            alert(
+                                "Unable to record payment. Please try again."
+                            );
+
+
+                            confirmPayment.disabled =
+                                false;
+
+
+                            confirmPayment.textContent =
+                                "✓ Confirm Payment";
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           ESCAPE KEY
+        ================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    modal &&
+                    !modal.classList.contains(
+                        "hidden"
+                    )
+                ) {
+
+                    hideModal();
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL FILTER
+        ================================================= */
+
+        filterPayments();
+
+    }
+);
+
+</script>
+
+{% endblock %}

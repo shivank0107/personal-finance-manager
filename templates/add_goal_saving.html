@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Goal Saving - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Goal Saving
+{% endblock %}
+
+{% block page_subtitle %}
+Add money towards an existing savings goal
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add Goal Saving
+            </h2>
+
+            <p>
+                Add a contribution to your savings goal.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GOAL SAVING FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_goal_saving', goal_id=goal.id) }}"
+        id="goalSavingForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- GOAL -->
+
+            <div class="form-group">
+
+                <label>
+                    Savings Goal
+                </label>
+
+                <div class="form-readonly">
+
+                    <strong>
+                        {{ goal.name }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT SAVED -->
+
+            <div class="form-group">
+
+                <label>
+                    Current Saved
+                </label>
+
+                <div class="form-readonly">
+
+                    ₹{{ "%.2f"|format(
+                        goal.saved_amount or 0
+                    ) }}
+
+                </div>
+
+            </div>
+
+
+            <!-- TARGET -->
+
+            <div class="form-group">
+
+                <label>
+                    Target Amount
+                </label>
+
+                <div class="form-readonly">
+
+                    ₹{{ "%.2f"|format(
+                        goal.target_amount or 0
+                    ) }}
+
+                </div>
+
+            </div>
+
+
+            <!-- REMAINING -->
+
+            <div class="form-group">
+
+                <label>
+                    Remaining
+                </label>
+
+                <div class="form-readonly">
+
+                    ₹{{ "%.2f"|format(
+                        (goal.target_amount or 0)
+                        - (goal.saved_amount or 0)
+                    ) }}
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTRIBUTION -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Saving Amount
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter the amount you want to add to this goal.
+                </small>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="date">
+                    Saving Date
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                >
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group full-width">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional note..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PREVIEW
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="savingPreview"
+        >
+
+            <div>
+
+                <strong>
+                    New Savings Balance
+                </strong>
+
+                <p id="newBalance">
+                    ₹{{ "%.2f"|format(
+                        goal.saved_amount or 0
+                    ) }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Saving
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "goalSavingForm"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const date =
+            document.getElementById(
+                "date"
+            );
+
+        const newBalance =
+            document.getElementById(
+                "newBalance"
+            );
+
+
+        /*
+         * Read current saved amount from
+         * a data attribute instead of putting
+         * Jinja directly inside JavaScript.
+         */
+
+        const currentSaved =
+            parseFloat(
+                newBalance.dataset.currentSaved || "0"
+            );
+
+
+        /* =================================================
+           DEFAULT DATE
+        ================================================= */
+
+        if (!date.value) {
+
+            const today =
+                new Date();
+
+            const year =
+                today.getFullYear();
+
+            const month =
+                String(
+                    today.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            const day =
+                String(
+                    today.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+            date.value =
+                year +
+                "-" +
+                month +
+                "-" +
+                day;
+
+        }
+
+
+        /* =================================================
+           BALANCE PREVIEW
+        ================================================= */
+
+        amount.addEventListener(
+            "input",
+            function () {
+
+                const saving =
+                    parseFloat(
+                        this.value
+                    ) || 0;
+
+                const balance =
+                    currentSaved +
+                    saving;
+
+                newBalance.textContent =
+                    "₹" +
+                    balance.toFixed(2);
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const saving =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                if (
+                    Number.isNaN(
+                        saving
+                    ) ||
+                    saving <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid saving amount."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

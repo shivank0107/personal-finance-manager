@@ -1,0 +1,2447 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reports - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Reports
+{% endblock %}
+
+{% block page_subtitle %}
+Analyze your income, expenses, savings and investments
+{% endblock %}
+
+
+{% block content %}
+
+<div class="reports-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div class="page-header-content">
+
+            <h2>
+                Financial Reports
+            </h2>
+
+            <p>
+                Review your financial performance and spending patterns.
+            </p>
+
+        </div>
+
+        <div class="page-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="printReport"
+            >
+                🖨 Print
+            </button>
+
+            <button
+                type="button"
+                class="primary-button"
+                id="exportReport"
+            >
+                📥 Export CSV
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+
+    <div class="card filter-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Report Filters
+                </h3>
+
+                <p>
+                    Select the period and report type.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-body">
+
+            <div class="filter-grid">
+
+                <div class="form-group">
+
+                    <label for="reportPeriod">
+                        Period
+                    </label>
+
+                    <select id="reportPeriod">
+
+                        <option value="month">
+                            This Month
+                        </option>
+
+                        <option value="quarter">
+                            This Quarter
+                        </option>
+
+                        <option value="year" selected>
+                            This Year
+                        </option>
+
+                        <option value="all">
+                            All Time
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reportMonth">
+                        Month
+                    </label>
+
+                    <input
+                        type="month"
+                        id="reportMonth"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reportStartDate">
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="reportStartDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reportEndDate">
+                        End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="reportEndDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reportCategory">
+                        Category
+                    </label>
+
+                    <select id="reportCategory">
+
+                        <option value="all">
+                            All Categories
+                        </option>
+
+                        {% if categories %}
+
+                            {% for category in categories %}
+
+                                <option value="{{ category }}">
+                                    {{ category }}
+                                </option>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-action">
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="applyFilters"
+                    >
+                        Apply Filters
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Total Income
+                </span>
+
+                <strong id="totalIncome">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💸
+            </div>
+
+            <div>
+
+                <span>
+                    Total Expenses
+                </span>
+
+                <strong id="totalExpenses">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📈
+            </div>
+
+            <div>
+
+                <span>
+                    Net Savings
+                </span>
+
+                <strong id="netSavings">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📊
+            </div>
+
+            <div>
+
+                <span>
+                    Savings Rate
+                </span>
+
+                <strong id="savingsRate">
+                    0%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN REPORT GRID
+    ====================================================== -->
+
+    <div class="reports-grid">
+
+        <!-- =================================================
+             INCOME VS EXPENSE
+        ================================================== -->
+
+        <div class="card report-card large-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Income vs Expenses
+                    </h3>
+
+                    <p>
+                        Compare your income and spending.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas
+                    id="incomeExpenseChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             EXPENSE BREAKDOWN
+        ================================================== -->
+
+        <div class="card report-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Expense Breakdown
+                    </h3>
+
+                    <p>
+                        Spending by category.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container small-chart">
+
+                <canvas
+                    id="expenseCategoryChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SAVINGS
+        ================================================== -->
+
+        <div class="card report-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Savings Trend
+                    </h3>
+
+                    <p>
+                        Track your savings over time.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas
+                    id="savingsTrendChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTHLY SUMMARY
+    ====================================================== -->
+
+    <div class="card table-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Monthly Summary
+                </h3>
+
+                <p>
+                    Month-by-month financial performance.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table id="monthlySummaryTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Month
+                        </th>
+
+                        <th>
+                            Income
+                        </th>
+
+                        <th>
+                            Expenses
+                        </th>
+
+                        <th>
+                            Savings
+                        </th>
+
+                        <th>
+                            Savings Rate
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="monthlySummaryBody">
+
+                    {% if monthly_summary %}
+
+                        {% for row in monthly_summary %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.month|default('-') }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    row.income|default(0)|float
+                                ) }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    row.expenses|default(0)|float
+                                ) }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    row.savings|default(0)|float
+                                ) }}
+                            </td>
+
+                            <td>
+
+                                {% if row.income|default(0)|float > 0 %}
+
+                                    {{
+                                        "%.1f"|format(
+                                            (
+                                                row.savings|default(0)|float
+                                                /
+                                                row.income|float
+                                            ) * 100
+                                        )
+                                    }}%
+
+                                {% else %}
+
+                                    0%
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty-cell"
+                            >
+                                No monthly data available.
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPENSE CATEGORY TABLE
+    ====================================================== -->
+
+    <div class="card table-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Expense Category Report
+                </h3>
+
+                <p>
+                    Detailed spending by category.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table id="expenseCategoryTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Transactions
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Percentage
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% if expense_categories %}
+
+                        {% for row in expense_categories %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.category|default('Other') }}
+                            </td>
+
+                            <td>
+                                {{ row.transactions|default(0) }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    row.amount|default(0)|float
+                                ) }}
+                            </td>
+
+                            <td>
+
+                                {% if row.percentage is defined %}
+
+                                    {{ "%.1f"|format(
+                                        row.percentage|float
+                                    ) }}%
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="empty-cell"
+                            >
+                                No expense category data available.
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INCOME TABLE
+    ====================================================== -->
+
+    <div class="card table-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Income Sources
+                </h3>
+
+                <p>
+                    Breakdown of your income sources.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table id="incomeSourcesTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Source
+                        </th>
+
+                        <th>
+                            Transactions
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% if income_sources %}
+
+                        {% for row in income_sources %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.source|default('Other') }}
+                            </td>
+
+                            <td>
+                                {{ row.transactions|default(0) }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    row.amount|default(0)|float
+                                ) }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="empty-cell"
+                            >
+                                No income data available.
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOP EXPENSES
+    ====================================================== -->
+
+    <div class="card table-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Top Expenses
+                </h3>
+
+                <p>
+                    Your highest individual expenses.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table id="topExpensesTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% if top_expenses %}
+
+                        {% for expense in top_expenses %}
+
+                        <tr>
+
+                            <td>
+                                {{ expense.date|default('-') }}
+                            </td>
+
+                            <td>
+                                {{ expense.description|default('-') }}
+                            </td>
+
+                            <td>
+                                {{ expense.category|default('Other') }}
+                            </td>
+
+                            <td>
+                                ₹{{ "%.2f"|format(
+                                    expense.amount|default(0)|float
+                                ) }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="empty-cell"
+                            >
+                                No expense records available.
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FINANCIAL HEALTH
+    ====================================================== -->
+
+    <div class="card health-card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h3>
+                    Financial Health
+                </h3>
+
+                <p>
+                    Basic indicators based on your report.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="health-grid">
+
+            <div class="health-item">
+
+                <span>
+                    Savings Rate
+                </span>
+
+                <strong id="healthSavingsRate">
+                    0%
+                </strong>
+
+                <div class="health-progress">
+
+                    <div
+                        class="health-progress-fill"
+                        id="healthSavingsProgress"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="health-item">
+
+                <span>
+                    Expense Ratio
+                </span>
+
+                <strong id="expenseRatio">
+                    0%
+                </strong>
+
+                <div class="health-progress">
+
+                    <div
+                        class="health-progress-fill"
+                        id="expenseRatioProgress"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="health-item">
+
+                <span>
+                    Net Cash Flow
+                </span>
+
+                <strong id="healthCashFlow">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DISCLAIMER
+    ====================================================== -->
+
+    <div class="report-note">
+
+        <strong>
+            Report Note
+        </strong>
+
+        <p>
+            These reports are based on the financial data available
+            in your Personal Finance Manager.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block styles %}
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.reports-page {
+    width: 100%;
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+
+.page-header-content h2 {
+    margin: 0 0 6px;
+}
+
+
+.page-header-content p {
+    margin: 0;
+    opacity: 0.65;
+}
+
+
+.page-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    margin-bottom: 22px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.card-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+
+.card-header h3 {
+    margin: 0 0 5px;
+}
+
+
+.card-header p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.filter-body {
+    padding: 20px;
+}
+
+
+.filter-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    background: var(--input-bg, #ffffff);
+    color: inherit;
+    font-family: inherit;
+    outline: none;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #64748b;
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.1);
+}
+
+
+.filter-action {
+    display: flex;
+    align-items: flex-end;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--card-bg, #ffffff);
+}
+
+
+.summary-icon {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(100, 116, 139, 0.1);
+    font-size: 20px;
+}
+
+
+.summary-card span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.summary-card strong {
+    display: block;
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   REPORT GRID
+========================================================= */
+
+.reports-grid {
+    display: grid;
+    grid-template-columns:
+        2fr
+        1fr;
+    gap: 20px;
+}
+
+
+.large-card {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   CHARTS
+========================================================= */
+
+.chart-container {
+    position: relative;
+    height: 330px;
+    padding: 20px;
+}
+
+
+.small-chart {
+    height: 330px;
+}
+
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-card {
+    margin-top: 0;
+}
+
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.table-wrapper th,
+.table-wrapper td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    text-align: left;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+
+.table-wrapper th {
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.7;
+    background: rgba(100, 116, 139, 0.04);
+}
+
+
+.table-wrapper tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+.table-wrapper tbody tr:hover {
+    background: rgba(100, 116, 139, 0.03);
+}
+
+
+.empty-cell {
+    padding: 35px !important;
+    text-align: center !important;
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   HEALTH
+========================================================= */
+
+.health-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+
+.health-item {
+    padding: 18px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 11px;
+}
+
+
+.health-item > span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.health-item > strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 21px;
+}
+
+
+.health-progress {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.12);
+}
+
+
+.health-progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #64748b;
+    transition: width 0.4s ease;
+}
+
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.report-note {
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(100, 116, 139, 0.06);
+}
+
+
+.report-note strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+
+.report-note p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.6;
+    opacity: 0.65;
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    .page-actions,
+    .filter-card {
+        display: none !important;
+    }
+
+
+    .card {
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+
+
+    .reports-grid {
+        display: block;
+    }
+
+
+    .chart-container {
+        height: 300px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .health-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .page-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .page-actions {
+        flex-direction: column;
+    }
+
+
+    .page-actions button {
+        width: 100%;
+    }
+
+
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .filter-action {
+        align-items: stretch;
+    }
+
+
+    .filter-action button {
+        width: 100%;
+    }
+
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .health-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script id="reportData" type="application/json">
+{
+    "monthly": {{ monthly_summary|default([])|tojson }},
+    "categories": {{ expense_categories|default([])|tojson }},
+    "totalIncome": {{ total_income|default(0)|float|tojson }},
+    "totalExpenses": {{ total_expenses|default(0)|float|tojson }}
+}
+</script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =================================================
+           HELPERS
+        ================================================= */
+
+        function numberValue(
+            value
+        ) {
+
+            const number =
+                parseFloat(value);
+
+
+            if (
+                Number.isNaN(number)
+            ) {
+
+                return 0;
+
+            }
+
+
+            return number;
+
+        }
+
+
+        function currency(
+            value
+        ) {
+
+            return (
+                "₹" +
+                numberValue(value)
+                    .toLocaleString(
+                        "en-IN",
+                        {
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 0
+                        }
+                    )
+            );
+
+        }
+
+
+        function setText(
+            id,
+            value
+        ) {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    value;
+
+            }
+
+        }
+
+
+        /* =================================================
+           INITIAL DATA FROM JINJA
+        ================================================= */
+
+        const reportDataElement = document.getElementById("reportData");
+
+        let reportData = {
+            monthly: [],
+            categories: [],
+            totalIncome: 0,
+            totalExpenses: 0
+        };
+
+        if (reportDataElement) {
+            try {
+                reportData = JSON.parse(reportDataElement.textContent || "{}");
+
+                reportData.monthly = Array.isArray(reportData.monthly)
+                    ? reportData.monthly
+                    : [];
+
+                reportData.categories = Array.isArray(reportData.categories)
+                    ? reportData.categories
+                    : [];
+
+                reportData.totalIncome = numberValue(reportData.totalIncome);
+                reportData.totalExpenses = numberValue(reportData.totalExpenses);
+            } catch (error) {
+                console.error("Unable to parse report data:", error);
+            }
+        }
+
+
+        /* =================================================
+           CALCULATE TOTALS
+        ================================================= */
+
+        function calculateTotals() {
+
+            let income = 0;
+
+            let expenses = 0;
+
+            let savings = 0;
+
+
+            reportData.monthly.forEach(
+                function (row) {
+
+                    income +=
+                        numberValue(
+                            row.income
+                        );
+
+
+                    expenses +=
+                        numberValue(
+                            row.expenses
+                        );
+
+
+                    savings +=
+                        numberValue(
+                            row.savings
+                        );
+
+                }
+            );
+
+
+            if (reportData.monthly.length === 0) {
+                income = numberValue(reportData.totalIncome);
+                expenses = numberValue(reportData.totalExpenses);
+            }
+
+            savings =
+                income -
+                expenses;
+
+
+            if (
+                savings === 0 &&
+                income !== 0
+            ) {
+
+                savings =
+                    income -
+                    expenses;
+
+            }
+
+
+            const savingsRate =
+                income > 0
+                    ? (
+                        savings /
+                        income
+                    ) * 100
+                    : 0;
+
+
+            const expenseRatio =
+                income > 0
+                    ? (
+                        expenses /
+                        income
+                    ) * 100
+                    : 0;
+
+
+            setText(
+                "totalIncome",
+                currency(income)
+            );
+
+
+            setText(
+                "totalExpenses",
+                currency(expenses)
+            );
+
+
+            setText(
+                "netSavings",
+                currency(savings)
+            );
+
+
+            setText(
+                "savingsRate",
+                savingsRate.toFixed(1) +
+                "%"
+            );
+
+
+            setText(
+                "healthSavingsRate",
+                savingsRate.toFixed(1) +
+                "%"
+            );
+
+
+            setText(
+                "expenseRatio",
+                expenseRatio.toFixed(1) +
+                "%"
+            );
+
+
+            setText(
+                "healthCashFlow",
+                currency(savings)
+            );
+
+
+            const savingsProgress =
+                document.getElementById(
+                    "healthSavingsProgress"
+                );
+
+
+            if (savingsProgress) {
+
+                let progress =
+                    savingsRate;
+
+
+                if (progress < 0) {
+                    progress = 0;
+                }
+
+
+                if (progress > 100) {
+                    progress = 100;
+                }
+
+
+                savingsProgress.style.width =
+                    progress + "%";
+
+            }
+
+
+            const expenseProgress =
+                document.getElementById(
+                    "expenseRatioProgress"
+                );
+
+
+            if (expenseProgress) {
+
+                let progress =
+                    expenseRatio;
+
+
+                if (progress < 0) {
+                    progress = 0;
+                }
+
+
+                if (progress > 100) {
+                    progress = 100;
+                }
+
+
+                expenseProgress.style.width =
+                    progress + "%";
+
+            }
+
+        }
+
+
+        /* =================================================
+           INCOME / EXPENSE CHART
+        ================================================= */
+
+        let incomeExpenseChart =
+            null;
+
+
+        function createIncomeExpenseChart() {
+
+            const canvas =
+                document.getElementById(
+                    "incomeExpenseChart"
+                );
+
+
+            if (!canvas) {
+                return;
+            }
+
+
+            const labels =
+                reportData.monthly.map(
+                    function (row) {
+                        return row.month;
+                    }
+                );
+
+
+            const incomeData =
+                reportData.monthly.map(
+                    function (row) {
+                        return numberValue(
+                            row.income
+                        );
+                    }
+                );
+
+
+            const expenseData =
+                reportData.monthly.map(
+                    function (row) {
+                        return numberValue(
+                            row.expenses
+                        );
+                    }
+                );
+
+
+            if (
+                incomeExpenseChart
+            ) {
+
+                incomeExpenseChart.destroy();
+
+            }
+
+
+            incomeExpenseChart =
+                new Chart(
+                    canvas,
+                    {
+                        type: "bar",
+
+                        data: {
+
+                            labels: labels,
+
+                            datasets: [
+
+                                {
+                                    label:
+                                        "Income",
+
+                                    data:
+                                        incomeData,
+
+                                    borderWidth:
+                                        1
+                                },
+
+                                {
+                                    label:
+                                        "Expenses",
+
+                                    data:
+                                        expenseData,
+
+                                    borderWidth:
+                                        1
+                                }
+
+                            ]
+
+                        },
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio:
+                                false,
+
+                            plugins: {
+
+                                legend: {
+                                    display: true
+                                }
+
+                            },
+
+                            scales: {
+
+                                y: {
+
+                                    beginAtZero:
+                                        true
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           EXPENSE CATEGORY CHART
+        ================================================= */
+
+        let expenseCategoryChart =
+            null;
+
+
+        function createExpenseCategoryChart() {
+
+            const canvas =
+                document.getElementById(
+                    "expenseCategoryChart"
+                );
+
+
+            if (!canvas) {
+                return;
+            }
+
+
+            const labels =
+                reportData.categories.map(
+                    function (row) {
+                        return row.category;
+                    }
+                );
+
+
+            const values =
+                reportData.categories.map(
+                    function (row) {
+                        return numberValue(
+                            row.amount
+                        );
+                    }
+                );
+
+
+            if (
+                expenseCategoryChart
+            ) {
+
+                expenseCategoryChart.destroy();
+
+            }
+
+
+            expenseCategoryChart =
+                new Chart(
+                    canvas,
+                    {
+                        type: "doughnut",
+
+                        data: {
+
+                            labels: labels,
+
+                            datasets: [
+
+                                {
+                                    data:
+                                        values,
+
+                                    borderWidth:
+                                        1
+                                }
+
+                            ]
+
+                        },
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio:
+                                false,
+
+                            plugins: {
+
+                                legend: {
+
+                                    position:
+                                        "bottom"
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           SAVINGS TREND
+        ================================================= */
+
+        let savingsTrendChart =
+            null;
+
+
+        function createSavingsChart() {
+
+            const canvas =
+                document.getElementById(
+                    "savingsTrendChart"
+                );
+
+
+            if (!canvas) {
+                return;
+            }
+
+
+            const labels =
+                reportData.monthly.map(
+                    function (row) {
+                        return row.month;
+                    }
+                );
+
+
+            const values =
+                reportData.monthly.map(
+                    function (row) {
+                        return numberValue(
+                            row.savings
+                        );
+                    }
+                );
+
+
+            if (
+                savingsTrendChart
+            ) {
+
+                savingsTrendChart.destroy();
+
+            }
+
+
+            savingsTrendChart =
+                new Chart(
+                    canvas,
+                    {
+                        type: "line",
+
+                        data: {
+
+                            labels: labels,
+
+                            datasets: [
+
+                                {
+                                    label:
+                                        "Savings",
+
+                                    data:
+                                        values,
+
+                                    borderWidth:
+                                        2,
+
+                                    tension:
+                                        0.3,
+
+                                    fill:
+                                        false
+                                }
+
+                            ]
+
+                        },
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio:
+                                false,
+
+                            plugins: {
+
+                                legend: {
+
+                                    display:
+                                        true
+
+                                }
+
+                            },
+
+                            scales: {
+
+                                y: {
+
+                                    beginAtZero:
+                                        true
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* =================================================
+           FILTER
+        ================================================= */
+
+        const applyFilters =
+            document.getElementById(
+                "applyFilters"
+            );
+
+
+        if (applyFilters) {
+
+            applyFilters.addEventListener(
+                "click",
+                function () {
+
+                    const period =
+                        document.getElementById(
+                            "reportPeriod"
+                        )?.value || "year";
+
+
+                    const month =
+                        document.getElementById(
+                            "reportMonth"
+                        )?.value || "";
+
+
+                    const startDate =
+                        document.getElementById(
+                            "reportStartDate"
+                        )?.value || "";
+
+
+                    const endDate =
+                        document.getElementById(
+                            "reportEndDate"
+                        )?.value || "";
+
+
+                    const category =
+                        document.getElementById(
+                            "reportCategory"
+                        )?.value || "all";
+
+
+                    /*
+                     * If your Flask backend supports
+                     * query parameters, reload the
+                     * report with selected filters.
+                     */
+
+                    const params =
+                        new URLSearchParams();
+
+
+                    if (period) {
+
+                        params.set(
+                            "period",
+                            period
+                        );
+
+                    }
+
+
+                    if (month) {
+
+                        params.set(
+                            "month",
+                            month
+                        );
+
+                    }
+
+
+                    if (startDate) {
+
+                        params.set(
+                            "start_date",
+                            startDate
+                        );
+
+                    }
+
+
+                    if (endDate) {
+
+                        params.set(
+                            "end_date",
+                            endDate
+                        );
+
+                    }
+
+
+                    if (
+                        category &&
+                        category !== "all"
+                    ) {
+
+                        params.set(
+                            "category",
+                            category
+                        );
+
+                    }
+
+
+                    const query =
+                        params.toString();
+
+
+                    const currentUrl =
+                        window.location.pathname;
+
+
+                    window.location.href =
+                        query
+                            ? currentUrl +
+                              "?" +
+                              query
+                            : currentUrl;
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           PRINT
+        ================================================= */
+
+        const printButton =
+            document.getElementById(
+                "printReport"
+            );
+
+
+        if (printButton) {
+
+            printButton.addEventListener(
+                "click",
+                function () {
+
+                    window.print();
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           EXPORT CSV
+        ================================================= */
+
+        const exportButton =
+            document.getElementById(
+                "exportReport"
+            );
+
+
+        if (exportButton) {
+
+            exportButton.addEventListener(
+                "click",
+                function () {
+
+                    const tables =
+                        document.querySelectorAll(
+                            "table"
+                        );
+
+
+                    if (
+                        tables.length === 0
+                    ) {
+
+                        alert(
+                            "No report data available to export."
+                        );
+
+                        return;
+
+                    }
+
+
+                    let csv =
+                        "";
+
+
+                    tables.forEach(
+                        function (
+                            table
+                        ) {
+
+                            const parentCard =
+                                table.closest(
+                                    ".table-card"
+                                );
+
+
+                            const heading =
+                                parentCard
+                                    ? parentCard.querySelector(
+                                        ".card-header h3"
+                                    )
+                                    : null;
+
+
+                            if (heading) {
+
+                                const title =
+                                    heading
+                                        .textContent
+                                        .trim()
+                                        .replace(
+                                            /"/g,
+                                            '""'
+                                        );
+
+
+                                csv +=
+                                    '"' +
+                                    title +
+                                    '"\n';
+
+                            }
+
+
+                            const rows =
+                                table.querySelectorAll(
+                                    "tr"
+                                );
+
+
+                            rows.forEach(
+                                function (
+                                    row
+                                ) {
+
+                                    const cells =
+                                        row.querySelectorAll(
+                                            "th, td"
+                                        );
+
+
+                                    const values =
+                                        [];
+
+
+                                    cells.forEach(
+                                        function (
+                                            cell
+                                        ) {
+
+                                            const value =
+                                                cell
+                                                    .textContent
+                                                    .trim()
+                                                    .replace(
+                                                        /"/g,
+                                                        '""'
+                                                    );
+
+
+                                            values.push(
+                                                '"' +
+                                                value +
+                                                '"'
+                                            );
+
+                                        }
+                                    );
+
+
+                                    csv +=
+                                        values.join(
+                                            ","
+                                        ) +
+                                        "\n";
+
+                                }
+                            );
+
+
+                            csv +=
+                                "\n";
+
+                        }
+                    );
+
+
+                    const blob =
+                        new Blob(
+                            [csv],
+                            {
+                                type:
+                                    "text/csv;charset=utf-8;"
+                            }
+                        );
+
+
+                    const url =
+                        URL.createObjectURL(
+                            blob
+                        );
+
+
+                    const link =
+                        document.createElement(
+                            "a"
+                        );
+
+
+                    link.href =
+                        url;
+
+
+                    link.download =
+                        "financial_report.csv";
+
+
+                    document.body.appendChild(
+                        link
+                    );
+
+
+                    link.click();
+
+
+                    document.body.removeChild(
+                        link
+                    );
+
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           INITIALIZE
+        ================================================= */
+
+        calculateTotals();
+
+        createIncomeExpenseChart();
+
+        createExpenseCategoryChart();
+
+        createSavingsChart();
+
+    }
+);
+
+</script>
+
+{% endblock %}

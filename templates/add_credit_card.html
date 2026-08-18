@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Credit Card - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Add Credit Card
+{% endblock %}
+
+{% block page_subtitle %}
+Add a credit card and track its limit and outstanding balance
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         FORM HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Add New Credit Card
+            </h2>
+
+            <p>
+                Enter your credit card details below.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CREDIT CARD FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('add_credit_card') }}"
+        id="creditCardForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- CARD NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Card Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="e.g. HDFC Millennia"
+                    maxlength="100"
+                    required
+                    autocomplete="off"
+                >
+
+                <small class="form-help">
+                    Enter a name to identify this card.
+                </small>
+
+            </div>
+
+
+            <!-- BANK NAME -->
+
+            <div class="form-group">
+
+                <label for="bank_name">
+                    Bank / Issuer
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="bank_name"
+                    name="bank_name"
+                    placeholder="e.g. HDFC Bank"
+                    maxlength="100"
+                    required
+                    autocomplete="organization"
+                >
+
+            </div>
+
+
+            <!-- LAST FOUR DIGITS -->
+
+            <div class="form-group">
+
+                <label for="last_four">
+                    Last 4 Digits
+                </label>
+
+                <input
+                    type="text"
+                    id="last_four"
+                    name="last_four"
+                    placeholder="e.g. 1234"
+                    maxlength="4"
+                    minlength="4"
+                    inputmode="numeric"
+                    autocomplete="off"
+                >
+
+                <small class="form-help">
+                    Only the last four digits are stored for identification.
+                </small>
+
+            </div>
+
+
+            <!-- CREDIT LIMIT -->
+
+            <div class="form-group">
+
+                <label for="credit_limit">
+                    Credit Limit
+                    <span class="required">*</span>
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="credit_limit"
+                        name="credit_limit"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Enter the total credit limit available on the card.
+                </small>
+
+            </div>
+
+
+            <!-- BILLING DAY -->
+
+            <div class="form-group">
+
+                <label for="billing_day">
+                    Billing Day
+                </label>
+
+                <select
+                    id="billing_day"
+                    name="billing_day"
+                >
+
+                    <option value="">
+                        Select billing day
+                    </option>
+
+                    {% for day in range(1, 32) %}
+
+                    <option value="{{ day }}">
+                        {{ day }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <small class="form-help">
+                    The day of the month when your statement is generated.
+                </small>
+
+            </div>
+
+
+            <!-- DUE DAY -->
+
+            <div class="form-group">
+
+                <label for="due_day">
+                    Payment Due Day
+                </label>
+
+                <select
+                    id="due_day"
+                    name="due_day"
+                >
+
+                    <option value="">
+                        Select due day
+                    </option>
+
+                    {% for day in range(1, 32) %}
+
+                    <option value="{{ day }}">
+                        {{ day }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <small class="form-help">
+                    The day of the month when payment is due.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    +
+                </span>
+
+                Add Credit Card
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "creditCardForm"
+            );
+
+        const lastFour =
+            document.getElementById(
+                "last_four"
+            );
+
+        const creditLimit =
+            document.getElementById(
+                "credit_limit"
+            );
+
+        const billingDay =
+            document.getElementById(
+                "billing_day"
+            );
+
+        const dueDay =
+            document.getElementById(
+                "due_day"
+            );
+
+
+        /* =================================================
+           LAST 4 DIGITS
+        ================================================= */
+
+        lastFour.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(
+                            /[^0-9]/g,
+                            ""
+                        )
+                        .slice(
+                            0,
+                            4
+                        );
+
+            }
+        );
+
+
+        /* =================================================
+           CREDIT LIMIT
+        ================================================= */
+
+        creditLimit.addEventListener(
+            "input",
+            function () {
+
+                if (
+                    parseFloat(
+                        this.value
+                    ) < 0
+                ) {
+
+                    this.value = "";
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const name =
+                    document
+                        .getElementById(
+                            "name"
+                        )
+                        .value
+                        .trim();
+
+                const bankName =
+                    document
+                        .getElementById(
+                            "bank_name"
+                        )
+                        .value
+                        .trim();
+
+                const limit =
+                    parseFloat(
+                        creditLimit.value
+                    );
+
+                const lastFourValue =
+                    lastFour.value.trim();
+
+
+                if (!name) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter the card name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!bankName) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter the bank or card issuer."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    lastFourValue &&
+                    !/^\d{4}$/.test(
+                        lastFourValue
+                    )
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Last 4 digits must contain exactly 4 numbers."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    Number.isNaN(limit) ||
+                    limit <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid credit limit."
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * If both billing and due dates
+                 * are selected, due day should not
+                 * be the same as billing day.
+                 */
+
+                if (
+                    billingDay.value &&
+                    dueDay.value &&
+                    billingDay.value ===
+                    dueDay.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Billing day and payment due day should normally be different."
+                    );
+
+                    return;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

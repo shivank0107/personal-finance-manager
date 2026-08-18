@@ -1,0 +1,1364 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block page_subtitle %}
+Your complete financial overview
+{% endblock %}
+
+
+{% block content %}
+
+<!-- =====================================================
+     TOP ACTIONS
+====================================================== -->
+
+<div class="section-header">
+
+    <div>
+
+        <h2>
+            Financial Overview
+        </h2>
+
+        <p>
+            Monitor your income, expenses, savings and investments.
+        </p>
+
+    </div>
+
+
+    <div class="dashboard-actions">
+
+        <a
+            href="{{ url_for('add_income') }}"
+            class="secondary-button"
+        >
+            + Income
+        </a>
+
+        <a
+            href="{{ url_for('add_expense') }}"
+            class="primary-button"
+        >
+            + Expense
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SUMMARY CARDS
+====================================================== -->
+
+<div class="summary-grid">
+
+
+    <!-- TOTAL BALANCE -->
+
+    <div class="summary-card">
+
+        <div class="summary-icon">
+            💰
+        </div>
+
+        <div>
+
+            <span class="summary-label">
+                Total Balance
+            </span>
+
+            <h2>
+                ₹{{ "%.2f"|format(total_balance or 0) }}
+            </h2>
+
+            {% if balance_change is defined %}
+
+            <small>
+                {{ balance_change }}%
+                from previous period
+            </small>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL INCOME -->
+
+    <div class="summary-card">
+
+        <div class="summary-icon">
+            📈
+        </div>
+
+        <div>
+
+            <span class="summary-label">
+                Total Income
+            </span>
+
+            <h2>
+                ₹{{ "%.2f"|format(total_income or 0) }}
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL EXPENSE -->
+
+    <div class="summary-card">
+
+        <div class="summary-icon">
+            📉
+        </div>
+
+        <div>
+
+            <span class="summary-label">
+                Total Expenses
+            </span>
+
+            <h2>
+                ₹{{ "%.2f"|format(total_expenses or 0) }}
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <!-- SAVINGS -->
+
+    <div class="summary-card">
+
+        <div class="summary-icon">
+            🏦
+        </div>
+
+        <div>
+
+            <span class="summary-label">
+                Net Savings
+            </span>
+
+            <h2>
+                ₹{{ "%.2f"|format(
+                    (total_income or 0) -
+                    (total_expenses or 0)
+                ) }}
+            </h2>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN DASHBOARD GRID
+====================================================== -->
+
+<div class="dashboard-grid">
+
+
+    <!-- =================================================
+         INCOME VS EXPENSE CHART
+    ================================================== -->
+
+    <div class="dashboard-card chart-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Income vs Expenses
+                </h3>
+
+                <p>
+                    Monthly financial trend
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas
+                id="incomeExpenseChart"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         EXPENSE CATEGORY CHART
+    ================================================== -->
+
+    <div class="dashboard-card chart-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Expense Breakdown
+                </h3>
+
+                <p>
+                    Spending by category
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas
+                id="expenseCategoryChart"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SECOND DASHBOARD ROW
+====================================================== -->
+
+<div class="dashboard-grid">
+
+
+    <!-- =================================================
+         RECENT TRANSACTIONS
+    ================================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Recent Transactions
+                </h3>
+
+                <p>
+                    Latest income and expenses
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('expenses') }}"
+                class="view-all-link"
+            >
+                View All
+            </a>
+
+        </div>
+
+
+        {% if recent_transactions %}
+
+        <div class="transaction-list">
+
+            {% for transaction in recent_transactions %}
+
+            <div class="transaction-item">
+
+
+                <div class="transaction-icon">
+
+                    {% if transaction.type == "Income" %}
+                        ↑
+                    {% else %}
+                        ↓
+                    {% endif %}
+
+                </div>
+
+
+                <div class="transaction-info">
+
+                    <strong>
+                        {{ transaction.description or
+                           transaction.category or
+                           "Transaction" }}
+                    </strong>
+
+                    <span>
+
+                        {% if transaction.category %}
+                            {{ transaction.category }}
+                        {% endif %}
+
+                        {% if transaction.date %}
+                            • {{ transaction.date }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="
+                        transaction-amount
+                        {% if transaction.type == 'Income' %}
+                            income-amount
+                        {% else %}
+                            expense-amount
+                        {% endif %}
+                    "
+                >
+
+                    {% if transaction.type == "Income" %}
+                        +
+                    {% else %}
+                        -
+                    {% endif %}
+
+                    ₹{{ "%.2f"|format(
+                        transaction.amount or 0
+                    ) }}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-small">
+
+            <span>
+                💸
+            </span>
+
+            <p>
+                No recent transactions.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================================
+         UPCOMING PAYMENTS
+    ================================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Upcoming Payments
+                </h3>
+
+                <p>
+                    Recurring payments and bills
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('recurring_payments') }}"
+                class="view-all-link"
+            >
+                View All
+            </a>
+
+        </div>
+
+
+        {% if upcoming_payments %}
+
+        <div class="payment-list">
+
+            {% for payment in upcoming_payments %}
+
+            <div class="payment-item">
+
+
+                <div class="payment-icon">
+                    📅
+                </div>
+
+
+                <div class="payment-info">
+
+                    <strong>
+                        {{ payment.name or
+                           payment.description or
+                           "Recurring Payment" }}
+                    </strong>
+
+                    <span>
+
+                        {% if payment.next_date %}
+                            {{ payment.next_date }}
+                        {% elif payment.due_date %}
+                            {{ payment.due_date }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <strong class="payment-amount">
+
+                    ₹{{ "%.2f"|format(
+                        payment.amount or 0
+                    ) }}
+
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-small">
+
+            <span>
+                📅
+            </span>
+
+            <p>
+                No upcoming payments.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     THIRD DASHBOARD ROW
+====================================================== -->
+
+<div class="dashboard-grid">
+
+
+    <!-- =================================================
+         BUDGET OVERVIEW
+    ================================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Budget Overview
+                </h3>
+
+                <p>
+                    Current budget usage
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('budgets') }}"
+                class="view-all-link"
+            >
+                View Budgets
+            </a>
+
+        </div>
+
+
+        {% if budget_overview %}
+
+        <div class="dashboard-budget-list">
+
+            {% for budget in budget_overview %}
+
+            {% set budget_amount =
+                budget.amount or 0
+            %}
+
+            {% set spent_amount =
+                budget.spent or 0
+            %}
+
+
+            {% if budget_amount > 0 %}
+
+                {% set budget_percentage =
+                    (spent_amount / budget_amount) * 100
+                %}
+
+            {% else %}
+
+                {% set budget_percentage = 0 %}
+
+            {% endif %}
+
+
+            {% if budget_percentage > 100 %}
+
+                {% set display_percentage = 100 %}
+
+            {% elif budget_percentage < 0 %}
+
+                {% set display_percentage = 0 %}
+
+            {% else %}
+
+                {% set display_percentage =
+                    budget_percentage
+                %}
+
+            {% endif %}
+
+
+            <div class="dashboard-budget-item">
+
+
+                <div class="budget-item-header">
+
+                    <div>
+
+                        <strong>
+                            {{ budget.name }}
+                        </strong>
+
+                        {% if budget.category %}
+
+                        <span>
+                            {{ budget.category }}
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <strong>
+
+                        {{ "%.1f"|format(
+                            budget_percentage
+                        ) }}%
+
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="
+                            progress-fill
+                            dashboard-budget-progress
+                        "
+                        data-progress="{{ display_percentage }}"
+                    ></div>
+
+                </div>
+
+
+                <div class="budget-item-footer">
+
+                    <span>
+                        ₹{{ "%.2f"|format(
+                            spent_amount
+                        ) }}
+                        spent
+                    </span>
+
+                    <span>
+                        ₹{{ "%.2f"|format(
+                            budget_amount
+                        ) }}
+                        budget
+                    </span>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-small">
+
+            <span>
+                🎯
+            </span>
+
+            <p>
+                No budgets available.
+            </p>
+
+            <a
+                href="{{ url_for('add_budget') }}"
+                class="view-all-link"
+            >
+                Create Budget
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================================
+         SAVINGS GOALS
+    ================================================== -->
+
+    <div class="dashboard-card">
+
+        <div class="dashboard-card-header">
+
+            <div>
+
+                <h3>
+                    Savings Goals
+                </h3>
+
+                <p>
+                    Track your financial goals
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="view-all-link"
+            >
+                View Goals
+            </a>
+
+        </div>
+
+
+        {% if savings_goals %}
+
+        <div class="dashboard-goals-list">
+
+            {% for goal in savings_goals %}
+
+            {% set goal_target =
+                goal.target_amount or 0
+            %}
+
+            {% set goal_saved =
+                goal.saved_amount or 0
+            %}
+
+
+            {% if goal_target > 0 %}
+
+                {% set goal_percentage =
+                    (goal_saved / goal_target) * 100
+                %}
+
+            {% else %}
+
+                {% set goal_percentage = 0 %}
+
+            {% endif %}
+
+
+            {% if goal_percentage > 100 %}
+
+                {% set goal_display_percentage = 100 %}
+
+            {% elif goal_percentage < 0 %}
+
+                {% set goal_display_percentage = 0 %}
+
+            {% else %}
+
+                {% set goal_display_percentage =
+                    goal_percentage
+                %}
+
+            {% endif %}
+
+
+            <div class="dashboard-goal-item">
+
+
+                <div class="goal-item-header">
+
+                    <div>
+
+                        <strong>
+                            {{ goal.name }}
+                        </strong>
+
+                        {% if goal.target_date %}
+
+                        <span>
+                            Target:
+                            {{ goal.target_date }}
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <strong>
+                        {{ "%.1f"|format(
+                            goal_percentage
+                        ) }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="
+                            progress-fill
+                            dashboard-goal-progress
+                        "
+                        data-progress="{{ goal_display_percentage }}"
+                    ></div>
+
+                </div>
+
+
+                <div class="goal-item-footer">
+
+                    <span>
+                        ₹{{ "%.2f"|format(
+                            goal_saved
+                        ) }}
+                        saved
+                    </span>
+
+                    <span>
+                        ₹{{ "%.2f"|format(
+                            goal_target
+                        ) }}
+                        target
+                    </span>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-small">
+
+            <span>
+                🎯
+            </span>
+
+            <p>
+                No savings goals available.
+            </p>
+
+            <a
+                href="{{ url_for('add_savings_goal') }}"
+                class="view-all-link"
+            >
+                Create Goal
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     QUICK ACTIONS
+====================================================== -->
+
+<div class="dashboard-card quick-actions-card">
+
+    <div class="dashboard-card-header">
+
+        <div>
+
+            <h3>
+                Quick Actions
+            </h3>
+
+            <p>
+                Frequently used financial actions
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="quick-actions-grid">
+
+
+        <a
+            href="{{ url_for('add_income') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                💵
+            </span>
+
+            <strong>
+                Add Income
+            </strong>
+
+            <small>
+                Record new income
+            </small>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('add_expense') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                💸
+            </span>
+
+            <strong>
+                Add Expense
+            </strong>
+
+            <small>
+                Record an expense
+            </small>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('add_investment') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                📈
+            </span>
+
+            <strong>
+                Add Investment
+            </strong>
+
+            <small>
+                Track an investment
+            </small>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('add_budget') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                🎯
+            </span>
+
+            <strong>
+                Add Budget
+            </strong>
+
+            <small>
+                Create spending limit
+            </small>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('add_savings_goal') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                🏦
+            </span>
+
+            <strong>
+                Savings Goal
+            </strong>
+
+            <small>
+                Create a savings target
+            </small>
+
+        </a>
+
+
+        <a
+            href="{{ url_for('calculators') }}"
+            class="quick-action"
+        >
+
+            <span class="quick-action-icon">
+                🧮
+            </span>
+
+            <strong>
+                Calculators
+            </strong>
+
+            <small>
+                Calculate EMI, SIP and more
+            </small>
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<!-- =====================================================
+     CHART.JS
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js"
+></script>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           PROGRESS BARS
+        ================================================= */
+
+        const progressBars =
+            document.querySelectorAll(
+                ".progress-fill"
+            );
+
+
+        progressBars.forEach(
+            function (bar) {
+
+                let progress =
+                    parseFloat(
+                        bar.dataset.progress
+                    ) || 0;
+
+
+                progress =
+                    Math.max(
+                        0,
+                        Math.min(
+                            progress,
+                            100
+                        )
+                    );
+
+
+                bar.style.width =
+                    progress + "%";
+
+            }
+        );
+
+
+        /* =================================================
+           CHART DATA
+        ================================================= */
+
+        const chartData =
+            document.getElementById(
+                "dashboardChartData"
+            );
+
+
+        /*
+         * The backend can optionally provide chart data
+         * through data attributes.
+         *
+         * If data is not provided, default values are used.
+         */
+
+        let months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun"
+        ];
+
+
+        let incomeData = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ];
+
+
+        let expenseData = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ];
+
+
+        let categoryLabels = [
+            "Food",
+            "Shopping",
+            "Bills",
+            "Transport",
+            "Other"
+        ];
+
+
+        let categoryData = [
+            0,
+            0,
+            0,
+            0,
+            0
+        ];
+
+
+        /*
+         * Read optional JSON data from backend.
+         *
+         * This keeps Jinja completely outside JavaScript.
+         */
+
+        if (chartData) {
+
+            try {
+
+                const parsed =
+                    JSON.parse(
+                        chartData.textContent
+                    );
+
+
+                if (
+                    Array.isArray(
+                        parsed.months
+                    )
+                ) {
+
+                    months =
+                        parsed.months;
+
+                }
+
+
+                if (
+                    Array.isArray(
+                        parsed.income
+                    )
+                ) {
+
+                    incomeData =
+                        parsed.income;
+
+                }
+
+
+                if (
+                    Array.isArray(
+                        parsed.expenses
+                    )
+                ) {
+
+                    expenseData =
+                        parsed.expenses;
+
+                }
+
+
+                if (
+                    Array.isArray(
+                        parsed.categories
+                    )
+                ) {
+
+                    categoryLabels =
+                        parsed.categories;
+
+                }
+
+
+                if (
+                    Array.isArray(
+                        parsed.category_values
+                    )
+                ) {
+
+                    categoryData =
+                        parsed.category_values;
+
+                }
+
+            } catch (error) {
+
+                console.warn(
+                    "Unable to read dashboard chart data.",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           INCOME VS EXPENSE CHART
+        ================================================= */
+
+        const incomeExpenseCanvas =
+            document.getElementById(
+                "incomeExpenseChart"
+            );
+
+
+        if (
+            incomeExpenseCanvas &&
+            typeof Chart !== "undefined"
+        ) {
+
+            new Chart(
+                incomeExpenseCanvas,
+                {
+                    type: "bar",
+
+                    data: {
+
+                        labels: months,
+
+                        datasets: [
+
+                            {
+                                label: "Income",
+
+                                data: incomeData
+                            },
+
+                            {
+                                label: "Expenses",
+
+                                data: expenseData
+                            }
+
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        interaction: {
+
+                            mode: "index",
+
+                            intersect: false
+
+                        },
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+
+                                    callback:
+                                        function (
+                                            value
+                                        ) {
+
+                                            return "₹" +
+                                                Number(
+                                                    value
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                );
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           EXPENSE CATEGORY CHART
+        ================================================= */
+
+        const expenseCategoryCanvas =
+            document.getElementById(
+                "expenseCategoryChart"
+            );
+
+
+        if (
+            expenseCategoryCanvas &&
+            typeof Chart !== "undefined"
+        ) {
+
+            new Chart(
+                expenseCategoryCanvas,
+                {
+                    type: "doughnut",
+
+                    data: {
+
+                        labels:
+                            categoryLabels,
+
+                        datasets: [
+
+                            {
+                                label:
+                                    "Expenses",
+
+                                data:
+                                    categoryData
+                            }
+
+                        ]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: {
+
+                                position:
+                                    "bottom"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+
+<!-- =====================================================
+     OPTIONAL CHART DATA
+====================================================== -->
+
+{% if chart_data is defined %}
+
+<script
+    type="application/json"
+    id="dashboardChartData"
+>
+{{ chart_data | tojson }}
+</script>
+
+{% endif %}
+
+{% endblock %}

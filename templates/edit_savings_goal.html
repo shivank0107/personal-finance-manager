@@ -1,0 +1,1041 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Savings Goal - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Savings Goal
+{% endblock %}
+
+{% block page_subtitle %}
+Update your savings goal and target details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Savings Goal
+            </h2>
+
+            <p>
+                Update the details of your existing savings goal.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if goal %}
+
+    <!-- =====================================================
+         GOAL DATA
+    ====================================================== -->
+
+    <div
+        id="goalData"
+        data-goal-id="{{ goal.id }}"
+        data-target="{{ goal.target_amount or 0 }}"
+        data-saved="{{ goal.saved_amount or 0 }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_savings_goal',
+            goal_id=goal.id
+        ) }}"
+        id="editSavingsGoalForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- GOAL NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+
+                    Goal Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ goal.name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Emergency Fund"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- TARGET AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="target_amount">
+
+                    Target Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="target_amount"
+                        name="target_amount"
+                        value="{{ goal.target_amount or 0 }}"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT SAVINGS -->
+
+            <div class="form-group">
+
+                <label for="saved_amount">
+                    Current Savings
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="saved_amount"
+                        name="saved_amount"
+                        value="{{ goal.saved_amount or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Amount already saved towards this goal.
+                </small>
+
+            </div>
+
+
+            <!-- TARGET DATE -->
+
+            <div class="form-group">
+
+                <label for="target_date">
+                    Target Date
+                </label>
+
+                <input
+                    type="date"
+                    id="target_date"
+                    name="target_date"
+                    value="{{ goal.target_date or '' }}"
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option
+                        value="Emergency Fund"
+                        {% if goal.category == "Emergency Fund" %}
+                            selected
+                        {% endif %}
+                    >
+                        Emergency Fund
+                    </option>
+
+                    <option
+                        value="Travel"
+                        {% if goal.category == "Travel" %}
+                            selected
+                        {% endif %}
+                    >
+                        Travel
+                    </option>
+
+                    <option
+                        value="Home"
+                        {% if goal.category == "Home" %}
+                            selected
+                        {% endif %}
+                    >
+                        Home
+                    </option>
+
+                    <option
+                        value="Car"
+                        {% if goal.category == "Car" %}
+                            selected
+                        {% endif %}
+                    >
+                        Car
+                    </option>
+
+                    <option
+                        value="Education"
+                        {% if goal.category == "Education" %}
+                            selected
+                        {% endif %}
+                    >
+                        Education
+                    </option>
+
+                    <option
+                        value="Wedding"
+                        {% if goal.category == "Wedding" %}
+                            selected
+                        {% endif %}
+                    >
+                        Wedding
+                    </option>
+
+                    <option
+                        value="Retirement"
+                        {% if goal.category == "Retirement" %}
+                            selected
+                        {% endif %}
+                    >
+                        Retirement
+                    </option>
+
+                    <option
+                        value="Investment"
+                        {% if goal.category == "Investment" %}
+                            selected
+                        {% endif %}
+                    >
+                        Investment
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if goal.category == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PRIORITY -->
+
+            <div class="form-group">
+
+                <label for="priority">
+                    Priority
+                </label>
+
+                <select
+                    id="priority"
+                    name="priority"
+                >
+
+                    <option
+                        value="High"
+                        {% if goal.priority == "High" %}
+                            selected
+                        {% endif %}
+                    >
+                        High
+                    </option>
+
+                    <option
+                        value="Medium"
+                        {% if goal.priority == "Medium" or not goal.priority %}
+                            selected
+                        {% endif %}
+                    >
+                        Medium
+                    </option>
+
+                    <option
+                        value="Low"
+                        {% if goal.priority == "Low" %}
+                            selected
+                        {% endif %}
+                    >
+                        Low
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- MONTHLY CONTRIBUTION -->
+
+            <div class="form-group">
+
+                <label for="monthly_contribution">
+                    Planned Monthly Contribution
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="monthly_contribution"
+                        name="monthly_contribution"
+                        value="{{ goal.monthly_contribution or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- LINKED ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Linked Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                        {% if goal.account_id == account.id %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="status">
+                    Status
+                </label>
+
+                <select
+                    id="status"
+                    name="status"
+                >
+
+                    <option
+                        value="Active"
+                        {% if goal.status == "Active" or not goal.status %}
+                            selected
+                        {% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="Completed"
+                        {% if goal.status == "Completed" %}
+                            selected
+                        {% endif %}
+                    >
+                        Completed
+                    </option>
+
+                    <option
+                        value="Paused"
+                        {% if goal.status == "Paused" %}
+                            selected
+                        {% endif %}
+                    >
+                        Paused
+                    </option>
+
+                    <option
+                        value="Cancelled"
+                        {% if goal.status == "Cancelled" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cancelled
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ goal.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GOAL SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="goalPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Savings Goal Summary
+                </strong>
+
+                <p id="goalSummaryText">
+                    Review the goal details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('savings_goals') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         GOAL NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            🎯
+        </div>
+
+        <h2>
+            Savings Goal Not Found
+        </h2>
+
+        <p>
+            The requested savings goal could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('savings_goals') }}"
+            class="primary-button"
+        >
+            Back to Savings Goals
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editSavingsGoalForm"
+            );
+
+        const name =
+            document.getElementById(
+                "name"
+            );
+
+        const targetAmount =
+            document.getElementById(
+                "target_amount"
+            );
+
+        const savedAmount =
+            document.getElementById(
+                "saved_amount"
+            );
+
+        const targetDate =
+            document.getElementById(
+                "target_date"
+            );
+
+        const monthlyContribution =
+            document.getElementById(
+                "monthly_contribution"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const summary =
+            document.getElementById(
+                "goalSummaryText"
+            );
+
+
+        /*
+         * Stop if form is unavailable.
+         */
+
+        if (
+            !form ||
+            !name ||
+            !targetAmount ||
+            !savedAmount ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const target =
+                parseFloat(
+                    targetAmount.value
+                ) || 0;
+
+
+            const saved =
+                parseFloat(
+                    savedAmount.value
+                ) || 0;
+
+
+            const remaining =
+                Math.max(
+                    target - saved,
+                    0
+                );
+
+
+            let percentage =
+                0;
+
+
+            if (
+                target > 0
+            ) {
+
+                percentage =
+                    (
+                        saved /
+                        target
+                    ) *
+                    100;
+
+            }
+
+
+            const goalName =
+                name.value.trim();
+
+
+            let text =
+                "Target: ₹" +
+                target.toFixed(2) +
+                " | Saved: ₹" +
+                saved.toFixed(2) +
+                " | Remaining: ₹" +
+                remaining.toFixed(2) +
+                " | Progress: " +
+                percentage.toFixed(1) +
+                "%";
+
+
+            if (
+                targetDate &&
+                targetDate.value
+            ) {
+
+                text +=
+                    " | Target Date: " +
+                    targetDate.value;
+
+            }
+
+
+            if (
+                monthlyContribution &&
+                monthlyContribution.value
+            ) {
+
+                const monthly =
+                    parseFloat(
+                        monthlyContribution.value
+                    ) || 0;
+
+
+                if (
+                    monthly > 0
+                ) {
+
+                    const monthsNeeded =
+                        Math.ceil(
+                            remaining /
+                            monthly
+                        );
+
+
+                    if (
+                        remaining > 0
+                    ) {
+
+                        text +=
+                            " | Approx. " +
+                            monthsNeeded +
+                            " month(s) remaining";
+
+                    }
+
+                }
+
+            }
+
+
+            if (
+                category &&
+                category.value
+            ) {
+
+                text +=
+                    " | Category: " +
+                    category.value;
+
+            }
+
+
+            if (
+                goalName
+            ) {
+
+                text =
+                    goalName +
+                    " • " +
+                    text;
+
+            }
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        name.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        targetAmount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        savedAmount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        if (targetDate) {
+
+            targetDate.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        if (monthlyContribution) {
+
+            monthlyContribution.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        if (category) {
+
+            category.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const goalName =
+                    name.value.trim();
+
+
+                const target =
+                    parseFloat(
+                        targetAmount.value
+                    );
+
+
+                const saved =
+                    parseFloat(
+                        savedAmount.value
+                    );
+
+
+                /* -----------------------------------------
+                   NAME
+                ------------------------------------------ */
+
+                if (
+                    !goalName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a savings goal name."
+                    );
+
+                    name.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   TARGET AMOUNT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(
+                        target
+                    ) ||
+                    target <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid target amount."
+                    );
+
+                    targetAmount.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   SAVED AMOUNT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(
+                        saved
+                    ) ||
+                    saved < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid saved amount."
+                    );
+
+                    savedAmount.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   SAVED > TARGET
+                ------------------------------------------ */
+
+                if (
+                    saved > target
+                ) {
+
+                    const continueAnyway =
+                        window.confirm(
+                            "The saved amount is greater than the target amount. Do you want to continue?"
+                        );
+
+
+                    if (
+                        !continueAnyway
+                    ) {
+
+                        event.preventDefault();
+
+                        savedAmount.focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* -----------------------------------------
+                   MONTHLY CONTRIBUTION
+                ------------------------------------------ */
+
+                if (
+                    monthlyContribution &&
+                    monthlyContribution.value
+                ) {
+
+                    const monthly =
+                        parseFloat(
+                            monthlyContribution.value
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            monthly
+                        ) ||
+                        monthly < 0
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a valid monthly contribution."
+                        );
+
+                        monthlyContribution.focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* -----------------------------------------
+                   TARGET DATE
+                ------------------------------------------ */
+
+                if (
+                    targetDate &&
+                    targetDate.value
+                ) {
+
+                    const selectedDate =
+                        new Date(
+                            targetDate.value
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            selectedDate.getTime()
+                        )
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a valid target date."
+                        );
+
+                        targetDate.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

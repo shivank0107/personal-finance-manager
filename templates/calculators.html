@@ -1,0 +1,1845 @@
+{% extends "base.html" %}
+
+{% block title %}
+Financial Calculators - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Financial Calculators
+{% endblock %}
+
+{% block page_subtitle %}
+Calculate EMI, SIP, FD, RD, returns and investment growth
+{% endblock %}
+
+
+{% block content %}
+
+<!-- =====================================================
+     CALCULATOR TABS
+====================================================== -->
+
+<div class="calculator-tabs">
+
+    <button
+        type="button"
+        class="calculator-tab active"
+        data-calculator="emi"
+    >
+        🏠 EMI
+    </button>
+
+    <button
+        type="button"
+        class="calculator-tab"
+        data-calculator="sip"
+    >
+        📈 SIP
+    </button>
+
+    <button
+        type="button"
+        class="calculator-tab"
+        data-calculator="fd"
+    >
+        🏦 FD
+    </button>
+
+    <button
+        type="button"
+        class="calculator-tab"
+        data-calculator="rd"
+    >
+        💰 RD
+    </button>
+
+    <button
+        type="button"
+        class="calculator-tab"
+        data-calculator="lumpsum"
+    >
+        💵 Lumpsum
+    </button>
+
+    <button
+        type="button"
+        class="calculator-tab"
+        data-calculator="compound"
+    >
+        📊 Compound Interest
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     EMI CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel active"
+    id="calculator-emi"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                EMI Calculator
+            </h2>
+
+            <p>
+                Calculate your monthly loan EMI.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="emi-principal">
+                    Loan Amount
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="emi-principal"
+                        value="5000000"
+                        min="0"
+                        step="1000"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="emi-rate">
+                    Interest Rate (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="emi-rate"
+                        value="7.40"
+                        min="0"
+                        step="0.01"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="emi-tenure">
+                    Loan Tenure
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="emi-tenure"
+                        value="240"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        months
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-emi"
+            >
+                Calculate EMI
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Monthly EMI
+            </span>
+
+            <h2 id="emi-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Principal
+                    </span>
+
+                    <strong id="emi-principal-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Interest
+                    </span>
+
+                    <strong id="emi-interest-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Payment
+                    </span>
+
+                    <strong id="emi-total-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SIP CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel"
+    id="calculator-sip"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                SIP Calculator
+            </h2>
+
+            <p>
+                Estimate the future value of your monthly SIP.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="sip-investment">
+                    Monthly Investment
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="sip-investment"
+                        value="10000"
+                        min="0"
+                        step="500"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="sip-rate">
+                    Expected Return (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="sip-rate"
+                        value="12"
+                        min="0"
+                        step="0.1"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="sip-tenure">
+                    Investment Period
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="sip-tenure"
+                        value="10"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        years
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-sip"
+            >
+                Calculate SIP
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Future Value
+            </span>
+
+            <h2 id="sip-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Invested
+                    </span>
+
+                    <strong id="sip-invested-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Estimated Returns
+                    </span>
+
+                    <strong id="sip-return-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FD CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel"
+    id="calculator-fd"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                Fixed Deposit Calculator
+            </h2>
+
+            <p>
+                Estimate maturity value of your fixed deposit.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="fd-principal">
+                    Deposit Amount
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="fd-principal"
+                        value="100000"
+                        min="0"
+                        step="1000"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="fd-rate">
+                    Interest Rate (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="fd-rate"
+                        value="7"
+                        min="0"
+                        step="0.01"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="fd-tenure">
+                    Tenure
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="fd-tenure"
+                        value="5"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        years
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-fd"
+            >
+                Calculate FD
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Maturity Amount
+            </span>
+
+            <h2 id="fd-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Principal
+                    </span>
+
+                    <strong id="fd-principal-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Interest Earned
+                    </span>
+
+                    <strong id="fd-interest-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RD CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel"
+    id="calculator-rd"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                Recurring Deposit Calculator
+            </h2>
+
+            <p>
+                Estimate your RD maturity amount.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="rd-investment">
+                    Monthly Deposit
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="rd-investment"
+                        value="5000"
+                        min="0"
+                        step="500"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rd-rate">
+                    Interest Rate (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="rd-rate"
+                        value="7"
+                        min="0"
+                        step="0.01"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rd-tenure">
+                    Tenure
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="rd-tenure"
+                        value="5"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        years
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-rd"
+            >
+                Calculate RD
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Maturity Amount
+            </span>
+
+            <h2 id="rd-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Total Deposited
+                    </span>
+
+                    <strong id="rd-invested-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Interest Earned
+                    </span>
+
+                    <strong id="rd-interest-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     LUMPSUM CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel"
+    id="calculator-lumpsum"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                Lumpsum Calculator
+            </h2>
+
+            <p>
+                Calculate the future value of a one-time investment.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="lumpsum-investment">
+                    Investment Amount
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="lumpsum-investment"
+                        value="100000"
+                        min="0"
+                        step="1000"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="lumpsum-rate">
+                    Expected Return (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="lumpsum-rate"
+                        value="12"
+                        min="0"
+                        step="0.1"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="lumpsum-tenure">
+                    Investment Period
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="lumpsum-tenure"
+                        value="10"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        years
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-lumpsum"
+            >
+                Calculate Lumpsum
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Future Value
+            </span>
+
+            <h2 id="lumpsum-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Invested
+                    </span>
+
+                    <strong id="lumpsum-invested-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Estimated Returns
+                    </span>
+
+                    <strong id="lumpsum-return-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     COMPOUND INTEREST CALCULATOR
+====================================================== -->
+
+<section
+    class="calculator-panel"
+    id="calculator-compound"
+>
+
+    <div class="calculator-header">
+
+        <div>
+
+            <h2>
+                Compound Interest Calculator
+            </h2>
+
+            <p>
+                Calculate growth using compound interest.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="calculator-layout">
+
+        <div class="calculator-form">
+
+
+            <div class="form-group">
+
+                <label for="compound-principal">
+                    Principal Amount
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="compound-principal"
+                        value="100000"
+                        min="0"
+                        step="1000"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="compound-rate">
+                    Interest Rate (% p.a.)
+                </label>
+
+                <div class="percentage-input">
+
+                    <input
+                        type="number"
+                        id="compound-rate"
+                        value="10"
+                        min="0"
+                        step="0.1"
+                    >
+
+                    <span class="percentage-symbol">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="compound-tenure">
+                    Time Period
+                </label>
+
+                <div class="number-with-suffix">
+
+                    <input
+                        type="number"
+                        id="compound-tenure"
+                        value="10"
+                        min="1"
+                        step="1"
+                    >
+
+                    <span>
+                        years
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="compound-frequency">
+                    Compounding Frequency
+                </label>
+
+                <select
+                    id="compound-frequency"
+                >
+
+                    <option value="1">
+                        Annually
+                    </option>
+
+                    <option value="2">
+                        Half-Yearly
+                    </option>
+
+                    <option value="4">
+                        Quarterly
+                    </option>
+
+                    <option value="12" selected>
+                        Monthly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="primary-button calculate-button"
+                id="calculate-compound"
+            >
+                Calculate
+            </button>
+
+        </div>
+
+
+        <div class="calculator-result">
+
+            <span class="result-label">
+                Maturity Amount
+            </span>
+
+            <h2 id="compound-result">
+                ₹0.00
+            </h2>
+
+            <div class="result-grid">
+
+                <div>
+
+                    <span>
+                        Principal
+                    </span>
+
+                    <strong id="compound-principal-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Interest Earned
+                    </span>
+
+                    <strong id="compound-interest-result">
+                        ₹0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           HELPERS
+        ================================================= */
+
+        function getNumber(id) {
+
+            const element =
+                document.getElementById(id);
+
+            if (!element) {
+                return 0;
+            }
+
+            const value =
+                parseFloat(element.value);
+
+            return Number.isFinite(value)
+                ? value
+                : 0;
+
+        }
+
+
+        function formatCurrency(value) {
+
+            return "₹" +
+                Number(value).toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        function setText(id, value) {
+
+            const element =
+                document.getElementById(id);
+
+            if (element) {
+
+                element.textContent =
+                    formatCurrency(value);
+
+            }
+
+        }
+
+
+        function validPositive(value) {
+
+            return Number.isFinite(value) &&
+                   value > 0;
+
+        }
+
+
+        /* =================================================
+           CALCULATOR TABS
+        ================================================= */
+
+        const tabs =
+            document.querySelectorAll(
+                ".calculator-tab"
+            );
+
+
+        const panels =
+            document.querySelectorAll(
+                ".calculator-panel"
+            );
+
+
+        tabs.forEach(
+            function (tab) {
+
+                tab.addEventListener(
+                    "click",
+                    function () {
+
+                        const calculator =
+                            this.dataset.calculator;
+
+
+                        tabs.forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        panels.forEach(
+                            function (panel) {
+
+                                panel.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        this.classList.add(
+                            "active"
+                        );
+
+
+                        const selectedPanel =
+                            document.getElementById(
+                                "calculator-" +
+                                calculator
+                            );
+
+
+                        if (selectedPanel) {
+
+                            selectedPanel.classList.add(
+                                "active"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =================================================
+           EMI CALCULATOR
+        ================================================= */
+
+        function calculateEMI() {
+
+            const principal =
+                getNumber(
+                    "emi-principal"
+                );
+
+            const annualRate =
+                getNumber(
+                    "emi-rate"
+                );
+
+            const months =
+                getNumber(
+                    "emi-tenure"
+                );
+
+
+            if (
+                !validPositive(principal) ||
+                !validPositive(months) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid EMI details."
+                );
+
+                return;
+
+            }
+
+
+            const monthlyRate =
+                annualRate / 12 / 100;
+
+
+            let emi;
+
+
+            if (
+                monthlyRate === 0
+            ) {
+
+                emi =
+                    principal /
+                    months;
+
+            } else {
+
+                const factor =
+                    Math.pow(
+                        1 + monthlyRate,
+                        months
+                    );
+
+                emi =
+                    principal *
+                    monthlyRate *
+                    factor /
+                    (factor - 1);
+
+            }
+
+
+            const totalPayment =
+                emi * months;
+
+            const totalInterest =
+                totalPayment -
+                principal;
+
+
+            setText(
+                "emi-result",
+                emi
+            );
+
+            setText(
+                "emi-principal-result",
+                principal
+            );
+
+            setText(
+                "emi-interest-result",
+                totalInterest
+            );
+
+            setText(
+                "emi-total-result",
+                totalPayment
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-emi"
+            )
+            .addEventListener(
+                "click",
+                calculateEMI
+            );
+
+
+        /* =================================================
+           SIP CALCULATOR
+        ================================================= */
+
+        function calculateSIP() {
+
+            const monthlyInvestment =
+                getNumber(
+                    "sip-investment"
+                );
+
+            const annualRate =
+                getNumber(
+                    "sip-rate"
+                );
+
+            const years =
+                getNumber(
+                    "sip-tenure"
+                );
+
+
+            if (
+                !validPositive(
+                    monthlyInvestment
+                ) ||
+                !validPositive(years) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid SIP details."
+                );
+
+                return;
+
+            }
+
+
+            const months =
+                years * 12;
+
+            const monthlyRate =
+                annualRate / 12 / 100;
+
+
+            let futureValue;
+
+
+            if (
+                monthlyRate === 0
+            ) {
+
+                futureValue =
+                    monthlyInvestment *
+                    months;
+
+            } else {
+
+                futureValue =
+                    monthlyInvestment *
+                    (
+                        (
+                            Math.pow(
+                                1 + monthlyRate,
+                                months
+                            ) - 1
+                        ) /
+                        monthlyRate
+                    ) *
+                    (1 + monthlyRate);
+
+            }
+
+
+            const invested =
+                monthlyInvestment *
+                months;
+
+            const returns =
+                futureValue -
+                invested;
+
+
+            setText(
+                "sip-result",
+                futureValue
+            );
+
+            setText(
+                "sip-invested-result",
+                invested
+            );
+
+            setText(
+                "sip-return-result",
+                returns
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-sip"
+            )
+            .addEventListener(
+                "click",
+                calculateSIP
+            );
+
+
+        /* =================================================
+           FD CALCULATOR
+        ================================================= */
+
+        function calculateFD() {
+
+            const principal =
+                getNumber(
+                    "fd-principal"
+                );
+
+            const annualRate =
+                getNumber(
+                    "fd-rate"
+                );
+
+            const years =
+                getNumber(
+                    "fd-tenure"
+                );
+
+
+            if (
+                !validPositive(principal) ||
+                !validPositive(years) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid FD details."
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Quarterly compounding.
+             */
+
+            const frequency = 4;
+
+            const rate =
+                annualRate / 100;
+
+            const maturity =
+                principal *
+                Math.pow(
+                    1 + rate / frequency,
+                    frequency * years
+                );
+
+            const interest =
+                maturity -
+                principal;
+
+
+            setText(
+                "fd-result",
+                maturity
+            );
+
+            setText(
+                "fd-principal-result",
+                principal
+            );
+
+            setText(
+                "fd-interest-result",
+                interest
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-fd"
+            )
+            .addEventListener(
+                "click",
+                calculateFD
+            );
+
+
+        /* =================================================
+           RD CALCULATOR
+        ================================================= */
+
+        function calculateRD() {
+
+            const monthlyDeposit =
+                getNumber(
+                    "rd-investment"
+                );
+
+            const annualRate =
+                getNumber(
+                    "rd-rate"
+                );
+
+            const years =
+                getNumber(
+                    "rd-tenure"
+                );
+
+
+            if (
+                !validPositive(
+                    monthlyDeposit
+                ) ||
+                !validPositive(years) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid RD details."
+                );
+
+                return;
+
+            }
+
+
+            const months =
+                years * 12;
+
+            const monthlyRate =
+                annualRate / 12 / 100;
+
+
+            let maturity;
+
+
+            if (
+                monthlyRate === 0
+            ) {
+
+                maturity =
+                    monthlyDeposit *
+                    months;
+
+            } else {
+
+                maturity =
+                    monthlyDeposit *
+                    (
+                        (
+                            Math.pow(
+                                1 + monthlyRate,
+                                months
+                            ) - 1
+                        ) /
+                        monthlyRate
+                    );
+
+            }
+
+
+            const invested =
+                monthlyDeposit *
+                months;
+
+            const interest =
+                maturity -
+                invested;
+
+
+            setText(
+                "rd-result",
+                maturity
+            );
+
+            setText(
+                "rd-invested-result",
+                invested
+            );
+
+            setText(
+                "rd-interest-result",
+                interest
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-rd"
+            )
+            .addEventListener(
+                "click",
+                calculateRD
+            );
+
+
+        /* =================================================
+           LUMPSUM CALCULATOR
+        ================================================= */
+
+        function calculateLumpsum() {
+
+            const principal =
+                getNumber(
+                    "lumpsum-investment"
+                );
+
+            const annualRate =
+                getNumber(
+                    "lumpsum-rate"
+                );
+
+            const years =
+                getNumber(
+                    "lumpsum-tenure"
+                );
+
+
+            if (
+                !validPositive(principal) ||
+                !validPositive(years) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid lumpsum details."
+                );
+
+                return;
+
+            }
+
+
+            const maturity =
+                principal *
+                Math.pow(
+                    1 +
+                    annualRate / 100,
+                    years
+                );
+
+            const returns =
+                maturity -
+                principal;
+
+
+            setText(
+                "lumpsum-result",
+                maturity
+            );
+
+            setText(
+                "lumpsum-invested-result",
+                principal
+            );
+
+            setText(
+                "lumpsum-return-result",
+                returns
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-lumpsum"
+            )
+            .addEventListener(
+                "click",
+                calculateLumpsum
+            );
+
+
+        /* =================================================
+           COMPOUND INTEREST CALCULATOR
+        ================================================= */
+
+        function calculateCompound() {
+
+            const principal =
+                getNumber(
+                    "compound-principal"
+                );
+
+            const annualRate =
+                getNumber(
+                    "compound-rate"
+                );
+
+            const years =
+                getNumber(
+                    "compound-tenure"
+                );
+
+            const frequency =
+                getNumber(
+                    "compound-frequency"
+                );
+
+
+            if (
+                !validPositive(principal) ||
+                !validPositive(years) ||
+                !validPositive(frequency) ||
+                annualRate < 0
+            ) {
+
+                alert(
+                    "Please enter valid compound interest details."
+                );
+
+                return;
+
+            }
+
+
+            const rate =
+                annualRate / 100;
+
+
+            const maturity =
+                principal *
+                Math.pow(
+                    1 +
+                    rate / frequency,
+                    frequency * years
+                );
+
+
+            const interest =
+                maturity -
+                principal;
+
+
+            setText(
+                "compound-result",
+                maturity
+            );
+
+            setText(
+                "compound-principal-result",
+                principal
+            );
+
+            setText(
+                "compound-interest-result",
+                interest
+            );
+
+        }
+
+
+        document
+            .getElementById(
+                "calculate-compound"
+            )
+            .addEventListener(
+                "click",
+                calculateCompound
+            );
+
+
+        /* =================================================
+           INITIAL CALCULATIONS
+        ================================================= */
+
+        calculateEMI();
+
+        calculateSIP();
+
+        calculateFD();
+
+        calculateRD();
+
+        calculateLumpsum();
+
+        calculateCompound();
+
+    }
+);
+
+</script>
+
+{% endblock %}

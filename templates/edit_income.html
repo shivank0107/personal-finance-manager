@@ -1,0 +1,812 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Income - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Income
+{% endblock %}
+
+{% block page_subtitle %}
+Update your income details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Income
+            </h2>
+
+            <p>
+                Update the details of your existing income.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if income %}
+
+    <!-- =====================================================
+         INCOME DATA
+    ====================================================== -->
+
+    <div
+        id="incomeData"
+        data-income-id="{{ income.id }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_income',
+            income_id=income.id
+        ) }}"
+        id="editIncomeForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- INCOME DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+
+                    Description
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    value="{{ income.description or '' }}"
+                    maxlength="200"
+                    placeholder="e.g. Monthly Salary"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+
+                    Amount
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        value="{{ income.amount or 0 }}"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label for="category">
+
+                    Category
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option
+                        value="Salary"
+                        {% if income.category == "Salary" %}
+                            selected
+                        {% endif %}
+                    >
+                        Salary
+                    </option>
+
+                    <option
+                        value="Business"
+                        {% if income.category == "Business" %}
+                            selected
+                        {% endif %}
+                    >
+                        Business
+                    </option>
+
+                    <option
+                        value="Freelance"
+                        {% if income.category == "Freelance" %}
+                            selected
+                        {% endif %}
+                    >
+                        Freelance
+                    </option>
+
+                    <option
+                        value="Interest"
+                        {% if income.category == "Interest" %}
+                            selected
+                        {% endif %}
+                    >
+                        Interest
+                    </option>
+
+                    <option
+                        value="Dividend"
+                        {% if income.category == "Dividend" %}
+                            selected
+                        {% endif %}
+                    >
+                        Dividend
+                    </option>
+
+                    <option
+                        value="Rental"
+                        {% if income.category == "Rental" %}
+                            selected
+                        {% endif %}
+                    >
+                        Rental Income
+                    </option>
+
+                    <option
+                        value="Bonus"
+                        {% if income.category == "Bonus" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bonus
+                    </option>
+
+                    <option
+                        value="Gift"
+                        {% if income.category == "Gift" %}
+                            selected
+                        {% endif %}
+                    >
+                        Gift
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if income.category == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- INCOME DATE -->
+
+            <div class="form-group">
+
+                <label for="income_date">
+
+                    Income Date
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="date"
+                    id="income_date"
+                    name="income_date"
+                    value="{{ income.income_date or income.date or '' }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="form-group">
+
+                <label for="account_id">
+                    Account
+                </label>
+
+                <select
+                    id="account_id"
+                    name="account_id"
+                >
+
+                    <option value="">
+                        Select account
+                    </option>
+
+                    {% for account in accounts %}
+
+                    <option
+                        value="{{ account.id }}"
+                        {% if income.account_id == account.id %}
+                            selected
+                        {% endif %}
+                    >
+
+                        {{ account.name }}
+
+                        {% if account.bank_name %}
+                            - {{ account.bank_name }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                {% if not accounts %}
+
+                <small class="form-help">
+
+                    No accounts available.
+
+                    <a
+                        href="{{ url_for('add_account') }}"
+                    >
+                        Add an account first.
+                    </a>
+
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PAYMENT METHOD -->
+
+            <div class="form-group">
+
+                <label for="payment_method">
+                    Payment Method
+                </label>
+
+                <select
+                    id="payment_method"
+                    name="payment_method"
+                >
+
+                    <option value="">
+                        Select payment method
+                    </option>
+
+                    <option
+                        value="Bank Transfer"
+                        {% if income.payment_method == "Bank Transfer" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bank Transfer
+                    </option>
+
+                    <option
+                        value="UPI"
+                        {% if income.payment_method == "UPI" %}
+                            selected
+                        {% endif %}
+                    >
+                        UPI
+                    </option>
+
+                    <option
+                        value="Cash"
+                        {% if income.payment_method == "Cash" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cash
+                    </option>
+
+                    <option
+                        value="Cheque"
+                        {% if income.payment_method == "Cheque" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cheque
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if income.payment_method == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SOURCE -->
+
+            <div class="form-group">
+
+                <label for="source">
+                    Income Source
+                </label>
+
+                <input
+                    type="text"
+                    id="source"
+                    name="source"
+                    value="{{ income.source or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Company Name"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- REFERENCE -->
+
+            <div class="form-group">
+
+                <label for="reference">
+                    Transaction Reference
+                </label>
+
+                <input
+                    type="text"
+                    id="reference"
+                    name="reference"
+                    value="{{ income.reference or '' }}"
+                    maxlength="150"
+                    placeholder="Optional reference number"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ income.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             INCOME SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="incomePreview"
+        >
+
+            <div>
+
+                <strong>
+                    Income Summary
+                </strong>
+
+                <p id="incomeSummaryText">
+                    Review the income details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('income') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         INCOME NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            💰
+        </div>
+
+        <h2>
+            Income Not Found
+        </h2>
+
+        <p>
+            The requested income record could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('income') }}"
+            class="primary-button"
+        >
+            Back to Income
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editIncomeForm"
+            );
+
+        const description =
+            document.getElementById(
+                "description"
+            );
+
+        const amount =
+            document.getElementById(
+                "amount"
+            );
+
+        const category =
+            document.getElementById(
+                "category"
+            );
+
+        const incomeDate =
+            document.getElementById(
+                "income_date"
+            );
+
+        const summary =
+            document.getElementById(
+                "incomeSummaryText"
+            );
+
+
+        /*
+         * Stop if form is unavailable.
+         */
+
+        if (
+            !form ||
+            !description ||
+            !amount ||
+            !category ||
+            !incomeDate ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const incomeAmount =
+                parseFloat(
+                    amount.value
+                ) || 0;
+
+
+            const incomeDescription =
+                description.value.trim();
+
+
+            const selectedCategory =
+                category.value ||
+                "Uncategorized";
+
+
+            let text =
+                "Amount: ₹" +
+                incomeAmount.toFixed(2) +
+                " | Category: " +
+                selectedCategory;
+
+
+            if (
+                incomeDescription
+            ) {
+
+                text =
+                    incomeDescription +
+                    " • " +
+                    text;
+
+            }
+
+
+            if (
+                incomeDate.value
+            ) {
+
+                text +=
+                    " | Date: " +
+                    incomeDate.value;
+
+            }
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        description.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        amount.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        category.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        incomeDate.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const incomeDescription =
+                    description.value.trim();
+
+
+                const incomeAmount =
+                    parseFloat(
+                        amount.value
+                    );
+
+
+                /* -----------------------------------------
+                   DESCRIPTION
+                ------------------------------------------ */
+
+                if (
+                    !incomeDescription
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter an income description."
+                    );
+
+                    description.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   AMOUNT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(
+                        incomeAmount
+                    ) ||
+                    incomeAmount <= 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid income amount."
+                    );
+
+                    amount.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   CATEGORY
+                ------------------------------------------ */
+
+                if (
+                    !category.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an income category."
+                    );
+
+                    category.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   DATE
+                ------------------------------------------ */
+
+                if (
+                    !incomeDate.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select the income date."
+                    );
+
+                    incomeDate.focus();
+
+                    return;
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,712 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Account - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Account
+{% endblock %}
+
+{% block page_subtitle %}
+Update your account details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Account
+            </h2>
+
+            <p>
+                Update the details of your financial account.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if account %}
+
+    <!-- =====================================================
+         ACCOUNT DATA
+    ====================================================== -->
+
+    <div
+        id="accountData"
+        data-account-id="{{ account.id }}"
+    ></div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_account',
+            account_id=account.id
+        ) }}"
+        id="editAccountForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- ACCOUNT NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+
+                    Account Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ account.name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. Salary Account"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT TYPE -->
+
+            <div class="form-group">
+
+                <label for="account_type">
+
+                    Account Type
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <select
+                    id="account_type"
+                    name="account_type"
+                    required
+                >
+
+                    <option value="">
+                        Select account type
+                    </option>
+
+                    <option
+                        value="Bank Account"
+                        {% if account.account_type == "Bank Account" %}
+                            selected
+                        {% endif %}
+                    >
+                        Bank Account
+                    </option>
+
+                    <option
+                        value="Savings"
+                        {% if account.account_type == "Savings" %}
+                            selected
+                        {% endif %}
+                    >
+                        Savings
+                    </option>
+
+                    <option
+                        value="Current"
+                        {% if account.account_type == "Current" %}
+                            selected
+                        {% endif %}
+                    >
+                        Current
+                    </option>
+
+                    <option
+                        value="Cash"
+                        {% if account.account_type == "Cash" %}
+                            selected
+                        {% endif %}
+                    >
+                        Cash
+                    </option>
+
+                    <option
+                        value="Wallet"
+                        {% if account.account_type == "Wallet" %}
+                            selected
+                        {% endif %}
+                    >
+                        Wallet
+                    </option>
+
+                    <option
+                        value="Investment"
+                        {% if account.account_type == "Investment" %}
+                            selected
+                        {% endif %}
+                    >
+                        Investment
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if account.account_type == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BANK NAME -->
+
+            <div class="form-group">
+
+                <label for="bank_name">
+                    Bank / Institution
+                </label>
+
+                <input
+                    type="text"
+                    id="bank_name"
+                    name="bank_name"
+                    value="{{ account.bank_name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. HDFC Bank"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- ACCOUNT NUMBER -->
+
+            <div class="form-group">
+
+                <label for="account_number">
+                    Account Number
+                </label>
+
+                <input
+                    type="text"
+                    id="account_number"
+                    name="account_number"
+                    value="{{ account.account_number or '' }}"
+                    maxlength="50"
+                    placeholder="Account number"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- OPENING BALANCE -->
+
+            <div class="form-group">
+
+                <label for="opening_balance">
+                    Opening Balance
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="opening_balance"
+                        name="opening_balance"
+                        value="{{ account.opening_balance or 0 }}"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT BALANCE -->
+
+            <div class="form-group">
+
+                <label for="balance">
+                    Current Balance
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="balance"
+                        name="balance"
+                        value="{{ account.balance or 0 }}"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Update only if you want to manually adjust the balance.
+                </small>
+
+            </div>
+
+
+            <!-- ACCOUNT HOLDER -->
+
+            <div class="form-group">
+
+                <label for="account_holder">
+                    Account Holder
+                </label>
+
+                <input
+                    type="text"
+                    id="account_holder"
+                    name="account_holder"
+                    value="{{ account.account_holder or '' }}"
+                    maxlength="150"
+                    placeholder="Account holder name"
+                    autocomplete="name"
+                >
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="is_active">
+                    Status
+                </label>
+
+                <select
+                    id="is_active"
+                    name="is_active"
+                >
+
+                    <option
+                        value="1"
+                        {% if account.is_active is not defined or account.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="0"
+                        {% if account.is_active is defined and not account.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ account.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACCOUNT SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="accountPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Account Summary
+                </strong>
+
+                <p id="accountSummaryText">
+                    Review the details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('accounts') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         ACCOUNT NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            🏦
+        </div>
+
+        <h2>
+            Account Not Found
+        </h2>
+
+        <p>
+            The requested account could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('accounts') }}"
+            class="primary-button"
+        >
+            Back to Accounts
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editAccountForm"
+            );
+
+        const name =
+            document.getElementById(
+                "name"
+            );
+
+        const accountType =
+            document.getElementById(
+                "account_type"
+            );
+
+        const bankName =
+            document.getElementById(
+                "bank_name"
+            );
+
+        const balance =
+            document.getElementById(
+                "balance"
+            );
+
+        const summary =
+            document.getElementById(
+                "accountSummaryText"
+            );
+
+
+        /*
+         * Stop if form does not exist.
+         */
+
+        if (
+            !form ||
+            !name ||
+            !accountType ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const accountName =
+                name.value.trim();
+
+
+            const type =
+                accountType.value ||
+                "Account";
+
+
+            const bank =
+                bankName
+                    ? bankName.value.trim()
+                    : "";
+
+
+            const currentBalance =
+                balance
+                    ? parseFloat(
+                        balance.value
+                    ) || 0
+                    : 0;
+
+
+            let text =
+                type;
+
+
+            if (
+                accountName
+            ) {
+
+                text =
+                    accountName +
+                    " • " +
+                    type;
+
+            }
+
+
+            if (
+                bank
+            ) {
+
+                text +=
+                    " • " +
+                    bank;
+
+            }
+
+
+            text +=
+                " • Balance: ₹" +
+                currentBalance.toFixed(2);
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        name.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        accountType.addEventListener(
+            "change",
+            updateSummary
+        );
+
+
+        if (bankName) {
+
+            bankName.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        if (balance) {
+
+            balance.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const accountName =
+                    name.value.trim();
+
+
+                if (
+                    !accountName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter an account name."
+                    );
+
+                    name.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !accountType.value
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please select an account type."
+                    );
+
+                    accountType.focus();
+
+                    return;
+
+                }
+
+
+                if (balance) {
+
+                    const currentBalance =
+                        parseFloat(
+                            balance.value
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            currentBalance
+                        )
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a valid current balance."
+                        );
+
+                        balance.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}

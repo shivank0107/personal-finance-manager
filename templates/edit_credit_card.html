@@ -1,0 +1,1101 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Credit Card - Personal Finance Manager
+{% endblock %}
+
+{% block page_title %}
+Edit Credit Card
+{% endblock %}
+
+{% block page_subtitle %}
+Update your credit card details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="form-header">
+
+        <div>
+
+            <h2>
+                Edit Credit Card
+            </h2>
+
+            <p>
+                Update the details of your credit card.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if credit_card %}
+
+    <!-- =====================================================
+         CARD DATA
+    ====================================================== -->
+
+    <div
+        id="cardData"
+        data-card-id="{{ credit_card.id }}"
+        data-balance="{{ credit_card.current_balance or 0 }}"
+        data-limit="{{ credit_card.credit_limit or 0 }}"
+    ></div>
+
+
+    <!-- =====================================================
+         CREDIT CARD FORM
+    ====================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'edit_credit_card',
+            card_id=credit_card.id
+        ) }}"
+        id="editCreditCardForm"
+    >
+
+        <div class="form-grid">
+
+
+            <!-- CARD NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+
+                    Card Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ credit_card.name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. HDFC Regalia"
+                    required
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- BANK NAME -->
+
+            <div class="form-group">
+
+                <label for="bank_name">
+                    Bank / Issuer
+                </label>
+
+                <input
+                    type="text"
+                    id="bank_name"
+                    name="bank_name"
+                    value="{{ credit_card.bank_name or '' }}"
+                    maxlength="150"
+                    placeholder="e.g. HDFC Bank"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- CARD TYPE -->
+
+            <div class="form-group">
+
+                <label for="card_type">
+                    Card Type
+                </label>
+
+                <select
+                    id="card_type"
+                    name="card_type"
+                >
+
+                    <option value="">
+                        Select card type
+                    </option>
+
+                    <option
+                        value="Visa"
+                        {% if credit_card.card_type == "Visa" %}
+                            selected
+                        {% endif %}
+                    >
+                        Visa
+                    </option>
+
+                    <option
+                        value="Mastercard"
+                        {% if credit_card.card_type == "Mastercard" %}
+                            selected
+                        {% endif %}
+                    >
+                        Mastercard
+                    </option>
+
+                    <option
+                        value="RuPay"
+                        {% if credit_card.card_type == "RuPay" %}
+                            selected
+                        {% endif %}
+                    >
+                        RuPay
+                    </option>
+
+                    <option
+                        value="American Express"
+                        {% if credit_card.card_type == "American Express" %}
+                            selected
+                        {% endif %}
+                    >
+                        American Express
+                    </option>
+
+                    <option
+                        value="Other"
+                        {% if credit_card.card_type == "Other" %}
+                            selected
+                        {% endif %}
+                    >
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- CARD HOLDER -->
+
+            <div class="form-group">
+
+                <label for="card_holder_name">
+                    Card Holder Name
+                </label>
+
+                <input
+                    type="text"
+                    id="card_holder_name"
+                    name="card_holder_name"
+                    value="{{ credit_card.card_holder_name or '' }}"
+                    maxlength="150"
+                    placeholder="Name printed on card"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- CARD NUMBER -->
+
+            <div class="form-group">
+
+                <label for="card_number">
+                    Card Number
+                </label>
+
+                <input
+                    type="text"
+                    id="card_number"
+                    name="card_number"
+                    value="{{ credit_card.card_number or '' }}"
+                    maxlength="19"
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    inputmode="numeric"
+                    autocomplete="cc-number"
+                >
+
+                <small class="form-help">
+                    Only enter the card number if your application
+                    stores card numbers.
+                </small>
+
+            </div>
+
+
+            <!-- CREDIT LIMIT -->
+
+            <div class="form-group">
+
+                <label for="credit_limit">
+
+                    Credit Limit
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="credit_limit"
+                        name="credit_limit"
+                        value="{{ credit_card.credit_limit or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT BALANCE -->
+
+            <div class="form-group">
+
+                <label for="current_balance">
+                    Current Balance
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="current_balance"
+                        name="current_balance"
+                        value="{{ credit_card.current_balance or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+                <small class="form-help">
+                    Current outstanding amount on the card.
+                </small>
+
+            </div>
+
+
+            <!-- EXPIRY DATE -->
+
+            <div class="form-group">
+
+                <label for="expiry_date">
+                    Expiry Date
+                </label>
+
+                <input
+                    type="text"
+                    id="expiry_date"
+                    name="expiry_date"
+                    value="{{ credit_card.expiry_date or '' }}"
+                    maxlength="7"
+                    placeholder="MM/YYYY"
+                    autocomplete="cc-exp"
+                >
+
+            </div>
+
+
+            <!-- BILLING DATE -->
+
+            <div class="form-group">
+
+                <label for="billing_date">
+                    Billing Date
+                </label>
+
+                <input
+                    type="number"
+                    id="billing_date"
+                    name="billing_date"
+                    value="{{ credit_card.billing_date or '' }}"
+                    min="1"
+                    max="31"
+                    step="1"
+                    placeholder="e.g. 15"
+                >
+
+            </div>
+
+
+            <!-- DUE DATE -->
+
+            <div class="form-group">
+
+                <label for="due_date">
+                    Payment Due Date
+                </label>
+
+                <input
+                    type="text"
+                    id="due_date"
+                    name="due_date"
+                    value="{{ credit_card.due_date or '' }}"
+                    placeholder="YYYY-MM-DD"
+                >
+
+            </div>
+
+
+            <!-- MINIMUM PAYMENT -->
+
+            <div class="form-group">
+
+                <label for="minimum_payment">
+                    Minimum Payment
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="minimum_payment"
+                        name="minimum_payment"
+                        value="{{ credit_card.minimum_payment or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- ANNUAL FEE -->
+
+            <div class="form-group">
+
+                <label for="annual_fee">
+                    Annual Fee
+                </label>
+
+                <div class="amount-input">
+
+                    <span class="currency-symbol">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="annual_fee"
+                        name="annual_fee"
+                        value="{{ credit_card.annual_fee or 0 }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="is_active">
+                    Status
+                </label>
+
+                <select
+                    id="is_active"
+                    name="is_active"
+                >
+
+                    <option
+                        value="1"
+                        {% if credit_card.is_active is not defined or credit_card.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Active
+                    </option>
+
+                    <option
+                        value="0"
+                        {% if credit_card.is_active is defined and not credit_card.is_active %}
+                            selected
+                        {% endif %}
+                    >
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group full-width">
+
+                <label for="notes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Optional notes..."
+                >{{ credit_card.notes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CARD SUMMARY
+        ================================================== -->
+
+        <div
+            class="form-notice"
+            id="cardPreview"
+        >
+
+            <div>
+
+                <strong>
+                    Credit Card Summary
+                </strong>
+
+                <p id="cardSummaryText">
+                    Review the details before saving.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM ACTIONS
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('credit_cards') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         CARD NOT FOUND
+    ====================================================== -->
+
+    <div class="empty-panel">
+
+        <div class="empty-icon">
+            💳
+        </div>
+
+        <h2>
+            Credit Card Not Found
+        </h2>
+
+        <p>
+            The requested credit card could not be found.
+        </p>
+
+        <a
+            href="{{ url_for('credit_cards') }}"
+            class="primary-button"
+        >
+            Back to Credit Cards
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
+
+        const form =
+            document.getElementById(
+                "editCreditCardForm"
+            );
+
+        const name =
+            document.getElementById(
+                "name"
+            );
+
+        const bankName =
+            document.getElementById(
+                "bank_name"
+            );
+
+        const cardType =
+            document.getElementById(
+                "card_type"
+            );
+
+        const cardNumber =
+            document.getElementById(
+                "card_number"
+            );
+
+        const creditLimit =
+            document.getElementById(
+                "credit_limit"
+            );
+
+        const currentBalance =
+            document.getElementById(
+                "current_balance"
+            );
+
+        const expiryDate =
+            document.getElementById(
+                "expiry_date"
+            );
+
+        const billingDate =
+            document.getElementById(
+                "billing_date"
+            );
+
+        const dueDate =
+            document.getElementById(
+                "due_date"
+            );
+
+        const minimumPayment =
+            document.getElementById(
+                "minimum_payment"
+            );
+
+        const summary =
+            document.getElementById(
+                "cardSummaryText"
+            );
+
+
+        /*
+         * Stop if form is unavailable.
+         */
+
+        if (
+            !form ||
+            !name ||
+            !creditLimit ||
+            !summary
+        ) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           UPDATE CARD SUMMARY
+        ================================================= */
+
+        function updateSummary() {
+
+            const limit =
+                parseFloat(
+                    creditLimit.value
+                ) || 0;
+
+
+            const balance =
+                currentBalance
+                    ? parseFloat(
+                        currentBalance.value
+                    ) || 0
+                    : 0;
+
+
+            const available =
+                Math.max(
+                    limit - balance,
+                    0
+                );
+
+
+            let utilization =
+                0;
+
+
+            if (
+                limit > 0
+            ) {
+
+                utilization =
+                    (
+                        balance /
+                        limit
+                    ) *
+                    100;
+
+            }
+
+
+            let text =
+                "Balance: ₹" +
+                balance.toFixed(2) +
+                " | Limit: ₹" +
+                limit.toFixed(2) +
+                " | Available: ₹" +
+                available.toFixed(2) +
+                " | Utilization: " +
+                utilization.toFixed(1) +
+                "%";
+
+
+            if (
+                name.value.trim()
+            ) {
+
+                text =
+                    name.value.trim() +
+                    " • " +
+                    text;
+
+            }
+
+
+            if (
+                bankName &&
+                bankName.value.trim()
+            ) {
+
+                text +=
+                    " • " +
+                    bankName.value.trim();
+
+            }
+
+
+            summary.textContent =
+                text;
+
+        }
+
+
+        /* =================================================
+           INPUT EVENTS
+        ================================================= */
+
+        name.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        creditLimit.addEventListener(
+            "input",
+            updateSummary
+        );
+
+
+        if (currentBalance) {
+
+            currentBalance.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        if (bankName) {
+
+            bankName.addEventListener(
+                "input",
+                updateSummary
+            );
+
+        }
+
+
+        if (cardType) {
+
+            cardType.addEventListener(
+                "change",
+                updateSummary
+            );
+
+        }
+
+
+        /* =================================================
+           CARD NUMBER FORMATTING
+        ================================================= */
+
+        if (cardNumber) {
+
+            cardNumber.addEventListener(
+                "input",
+                function () {
+
+                    let value =
+                        this.value
+                            .replace(
+                                /\D/g,
+                                ""
+                            )
+                            .substring(
+                                0,
+                                16
+                            );
+
+
+                    const groups =
+                        value.match(
+                            /.{1,4}/g
+                        );
+
+
+                    this.value =
+                        groups
+                            ? groups.join(" ")
+                            : "";
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           EXPIRY DATE FORMATTING
+        ================================================= */
+
+        if (expiryDate) {
+
+            expiryDate.addEventListener(
+                "input",
+                function () {
+
+                    let value =
+                        this.value
+                            .replace(
+                                /\D/g,
+                                ""
+                            )
+                            .substring(
+                                0,
+                                6
+                            );
+
+
+                    if (
+                        value.length > 2
+                    ) {
+
+                        value =
+                            value.substring(
+                                0,
+                                2
+                            ) +
+                            "/" +
+                            value.substring(
+                                2
+                            );
+
+                    }
+
+
+                    this.value =
+                        value;
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           FORM VALIDATION
+        ================================================= */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const cardName =
+                    name.value.trim();
+
+
+                const limit =
+                    parseFloat(
+                        creditLimit.value
+                    );
+
+
+                const balance =
+                    currentBalance
+                        ? parseFloat(
+                            currentBalance.value
+                        )
+                        : 0;
+
+
+                /* -----------------------------------------
+                   NAME
+                ------------------------------------------ */
+
+                if (
+                    !cardName
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a card name."
+                    );
+
+                    name.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   CREDIT LIMIT
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(limit) ||
+                    limit < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid credit limit."
+                    );
+
+                    creditLimit.focus();
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   CURRENT BALANCE
+                ------------------------------------------ */
+
+                if (
+                    Number.isNaN(balance) ||
+                    balance < 0
+                ) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Please enter a valid current balance."
+                    );
+
+                    if (currentBalance) {
+
+                        currentBalance.focus();
+
+                    }
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   BILLING DATE
+                ------------------------------------------ */
+
+                if (
+                    billingDate &&
+                    billingDate.value
+                ) {
+
+                    const billingDay =
+                        parseInt(
+                            billingDate.value,
+                            10
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            billingDay
+                        ) ||
+                        billingDay < 1 ||
+                        billingDay > 31
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Billing date must be between 1 and 31."
+                        );
+
+                        billingDate.focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* -----------------------------------------
+                   MINIMUM PAYMENT
+                ------------------------------------------ */
+
+                if (
+                    minimumPayment &&
+                    minimumPayment.value
+                ) {
+
+                    const minimum =
+                        parseFloat(
+                            minimumPayment.value
+                        );
+
+
+                    if (
+                        Number.isNaN(
+                            minimum
+                        ) ||
+                        minimum < 0
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a valid minimum payment."
+                        );
+
+                        minimumPayment.focus();
+
+                        return;
+
+                    }
+
+                }
+
+
+                /* -----------------------------------------
+                   DUE DATE
+                ------------------------------------------ */
+
+                if (
+                    dueDate &&
+                    dueDate.value
+                ) {
+
+                    const dueDateValue =
+                        dueDate.value.trim();
+
+
+                    if (
+                        !/^\d{4}-\d{2}-\d{2}$/.test(
+                            dueDateValue
+                        )
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Due date must be in YYYY-MM-DD format."
+                        );
+
+                        dueDate.focus();
+
+                        return;
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           INITIAL SUMMARY
+        ================================================= */
+
+        updateSummary();
+
+    }
+);
+
+</script>
+
+{% endblock %}
