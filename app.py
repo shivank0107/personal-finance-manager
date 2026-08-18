@@ -484,6 +484,23 @@ def get_positive_amount(
 
     try:
 
+        # Convert to string safely
+        value = str(
+            value or ""
+        ).strip()
+
+        # Remove currency symbol and commas
+        value = (
+            value
+            .replace("₹", "")
+            .replace(",", "")
+            .strip()
+        )
+
+        # Empty value
+        if not value:
+            raise ValueError
+
         amount = float(value)
 
     except (
@@ -501,8 +518,10 @@ def get_positive_amount(
             f"{field_name} must be greater than zero."
         )
 
-    return round(amount, 2)
-
+    return round(
+        amount,
+        2
+    )
 
 def validate_date(date_value):
 
