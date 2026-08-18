@@ -13,6 +13,9 @@ import json
 from datetime import datetime
 from collections import defaultdict
 
+import psycopg2
+from psycopg2.extras import Json
+
 
 # =========================================================
 # APP CONFIGURATION
@@ -67,6 +70,106 @@ DATA_FILES = {
         "recurring_payments.json"
 }
 
+# =========================================================
+# POSTGRESQL STORAGE
+# =========================================================
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+
+def get_db_connection():
+    if not DATABASE_URL:
+        return None
+
+    return psycopg2.connect(DATABASE_URL)
+
+
+def init_database():
+    if not DATABASE_URL:
+        return
+
+    conn = get_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS finance_data (
+                    collection VARCHAR(100) PRIMARY KEY,
+                    data JSONB NOT NULL DEFAULT '[]'::jsonb
+                )
+            """)
+
+        conn.commit()
+
+    finally:
+        conn.close()
+
+
+def load_database_collection(collection):
+    conn = get_db_connection()
+
+    if conn is None:
+        return None
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT data
+                FROM finance_data
+                WHERE collection = %s
+                """,
+                (collection,)
+            )
+
+            row = cursor.fetchone()
+
+            if row is None:
+                return None
+
+            return row[0]
+
+    finally:
+        conn.close()
+
+
+def save_database_collection(collection, data):
+    conn = get_db_connection()
+
+    if conn is None:
+        return False
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO finance_data
+                    (collection, data)
+                VALUES
+                    (%s, %s)
+                ON CONFLICT (collection)
+                DO UPDATE SET
+                    data = EXCLUDED.data
+                """,
+                (
+                    collection,
+                    Json(data)
+                )
+            )
+
+        conn.commit()
+        return True
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()
+
+
+init_database()
+
 
 # =========================================================
 # JSON HELPERS
@@ -85,6 +188,30 @@ def load_json(filename, default=None):
     if default is None:
         default = []
 
+    # Render/PostgreSQL
+    if DATABASE_URL:
+
+        collection = os.path.splitext(
+            os.path.basename(filename)
+        )[0]
+
+        data = load_database_collection(
+            collection
+        )
+
+        if data is None:
+
+            # First-time initialization
+            save_database_collection(
+                collection,
+                default
+            )
+
+            return default
+
+        return data
+
+    # Local JSON fallback
     filepath = data_path(filename)
 
     if not os.path.exists(filepath):
@@ -118,6 +245,21 @@ def load_json(filename, default=None):
 
 def save_json(filename, data):
 
+    # Render/PostgreSQL
+    if DATABASE_URL:
+
+        collection = os.path.splitext(
+            os.path.basename(filename)
+        )[0]
+
+        save_database_collection(
+            collection,
+            data
+        )
+
+        return
+
+    # Local JSON fallback
     filepath = data_path(filename)
 
     with open(

@@ -27,3 +27,7 @@ Thumbs.db
 
 # Personal finance data
 data/
+
+# Local migration scripts
+migrate_data.py
+verify_data.py
