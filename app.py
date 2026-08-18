@@ -1894,23 +1894,21 @@ def edit_expense(expense_id):
 
     expenses_list = load_expenses()
 
-    expense = next(
-        (
-            item
-            for item in expenses_list
-            if int(
-                item.get("id", 0)
-            ) == expense_id
-        ),
-        None
-    )
+    expense = None
+
+    for item in expenses_list:
+
+        try:
+            item_id = int(item.get("id", 0))
+        except (ValueError, TypeError):
+            continue
+
+        if item_id == expense_id:
+            expense = item
+            break
 
     if expense is None:
-
-        return (
-            "Expense not found.",
-            404
-        )
+        return "Expense not found.", 404
 
     accounts = load_accounts()
 
@@ -1932,6 +1930,7 @@ def edit_expense(expense_id):
             return str(error), 400
 
         expense["date"] = date_value
+
         expense["amount"] = amount
 
         expense["category"] = request.form.get(
@@ -1972,33 +1971,65 @@ def edit_expense(expense_id):
     "/expenses/<int:expense_id>/delete",
     methods=["POST"]
 )
+@app.route(
+    "/expenses/<int:expense_id>/delete",
+    methods=["POST"]
+)
 def delete_expense(expense_id):
 
-    expenses_list = load_expenses()
+    try:
 
-    updated = [
-        item
-        for item in expenses_list
-        if int(
-            item.get("id", 0)
-        ) != expense_id
-    ]
+        expenses_list = load_expenses()
 
-    if len(updated) == len(expenses_list):
+        updated_expenses = []
 
-        return (
-            "Expense not found.",
-            404
+        deleted = False
+
+        for expense in expenses_list:
+
+            try:
+                current_id = int(
+                    expense.get("id", 0)
+                )
+            except (ValueError, TypeError):
+
+                current_id = 0
+
+            if current_id == expense_id:
+
+                deleted = True
+
+                continue
+
+            updated_expenses.append(
+                expense
+            )
+
+        if not deleted:
+
+            return (
+                "Expense not found.",
+                404
+            )
+
+        save_expenses(
+            updated_expenses
         )
 
-    save_expenses(
-        updated
-    )
+        return redirect(
+            url_for("expenses")
+        )
 
-    return redirect(
-        url_for("expenses")
-    )
+    except Exception as error:
 
+        app.logger.exception(
+            "Error deleting expense"
+        )
+
+        return (
+            f"Error deleting expense: {error}",
+            500
+        )
 
 # =========================================================
 # ACCOUNTS

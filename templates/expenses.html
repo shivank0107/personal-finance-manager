@@ -434,7 +434,7 @@ Track and manage your expenses
                         class="expense-row"
                         data-description="{{ (expense.description or '')|lower }}"
                         data-category="{{ (expense.category or '')|lower }}"
-                        data-payment-method="{{ (expense.payment_method or '')|lower }}"
+                        data-payment-method="{{ (expense.payment_mode or expense.payment_method or '')|lower }}"
                         data-date="{{ expense.expense_date or expense.date or '' }}"
                     >
 
@@ -524,9 +524,9 @@ Track and manage your expenses
 
                         <td>
 
-                            {% if expense.payment_method %}
+                            {% if expense.payment_mode or expense.payment_method %}
 
-                            {{ expense.payment_method }}
+                            {{ expense.payment_mode or expense.payment_method }}
 
                             {% else %}
 
@@ -1864,10 +1864,11 @@ document.addEventListener(
              */
 
             deleteForm.action =
-                "/expenses/delete/" +
+                "/expenses/" +
                 encodeURIComponent(
                     expenseId
-                );
+                ) +
+                "/delete";
 
 
             deleteModal.classList.remove(

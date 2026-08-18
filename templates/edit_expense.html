@@ -66,7 +66,9 @@ Update your expense details
         <div class="form-grid">
 
 
-            <!-- DESCRIPTION -->
+            <!-- =================================================
+                 DESCRIPTION
+            ================================================== -->
 
             <div class="form-group">
 
@@ -94,7 +96,9 @@ Update your expense details
             </div>
 
 
-            <!-- AMOUNT -->
+            <!-- =================================================
+                 AMOUNT
+            ================================================== -->
 
             <div class="form-group">
 
@@ -130,7 +134,9 @@ Update your expense details
             </div>
 
 
-            <!-- CATEGORY -->
+            <!-- =================================================
+                 CATEGORY
+            ================================================== -->
 
             <div class="form-group">
 
@@ -144,6 +150,10 @@ Update your expense details
 
                 </label>
 
+                {% set current_category =
+                    expense.category or "Other"
+                %}
+
                 <select
                     id="category"
                     name="category"
@@ -154,108 +164,120 @@ Update your expense details
                         Select category
                     </option>
 
+
                     <option
                         value="Food"
-                        {% if expense.category == "Food" %}
+                        {% if current_category == "Food" %}
                             selected
                         {% endif %}
                     >
                         Food
                     </option>
 
+
                     <option
                         value="Shopping"
-                        {% if expense.category == "Shopping" %}
+                        {% if current_category == "Shopping" %}
                             selected
                         {% endif %}
                     >
                         Shopping
                     </option>
 
+
                     <option
                         value="Transport"
-                        {% if expense.category == "Transport" %}
+                        {% if current_category == "Transport" %}
                             selected
                         {% endif %}
                     >
                         Transport
                     </option>
 
+
                     <option
                         value="Bills"
-                        {% if expense.category == "Bills" %}
+                        {% if current_category == "Bills" %}
                             selected
                         {% endif %}
                     >
                         Bills
                     </option>
 
+
                     <option
                         value="Entertainment"
-                        {% if expense.category == "Entertainment" %}
+                        {% if current_category == "Entertainment" %}
                             selected
                         {% endif %}
                     >
                         Entertainment
                     </option>
 
+
                     <option
                         value="Healthcare"
-                        {% if expense.category == "Healthcare" %}
+                        {% if current_category == "Healthcare" %}
                             selected
                         {% endif %}
                     >
                         Healthcare
                     </option>
 
+
                     <option
                         value="Education"
-                        {% if expense.category == "Education" %}
+                        {% if current_category == "Education" %}
                             selected
                         {% endif %}
                     >
                         Education
                     </option>
 
+
                     <option
                         value="Travel"
-                        {% if expense.category == "Travel" %}
+                        {% if current_category == "Travel" %}
                             selected
                         {% endif %}
                     >
                         Travel
                     </option>
 
+
                     <option
                         value="Utilities"
-                        {% if expense.category == "Utilities" %}
+                        {% if current_category == "Utilities" %}
                             selected
                         {% endif %}
                     >
                         Utilities
                     </option>
 
+
                     <option
                         value="Insurance"
-                        {% if expense.category == "Insurance" %}
+                        {% if current_category == "Insurance" %}
                             selected
                         {% endif %}
                     >
                         Insurance
                     </option>
 
+
                     <option
                         value="Rent"
-                        {% if expense.category == "Rent" %}
+                        {% if current_category == "Rent" %}
                             selected
                         {% endif %}
                     >
                         Rent
                     </option>
 
+
                     <option
                         value="Other"
-                        {% if expense.category == "Other" %}
+                        {% if current_category == "Other" %}
                             selected
                         {% endif %}
                     >
@@ -267,11 +289,13 @@ Update your expense details
             </div>
 
 
-            <!-- DATE -->
+            <!-- =================================================
+                 DATE
+            ================================================== -->
 
             <div class="form-group">
 
-                <label for="expense_date">
+                <label for="date">
 
                     Expense Date
 
@@ -283,16 +307,22 @@ Update your expense details
 
                 <input
                     type="date"
-                    id="expense_date"
-                    name="expense_date"
-                    value="{{ expense.expense_date or expense.date or '' }}"
+                    id="date"
+                    name="date"
+                    value="{{
+                        expense.date
+                        or expense.expense_date
+                        or ''
+                    }}"
                     required
                 >
 
             </div>
 
 
-            <!-- ACCOUNT -->
+            <!-- =================================================
+                 ACCOUNT
+            ================================================== -->
 
             <div class="form-group">
 
@@ -309,11 +339,16 @@ Update your expense details
                         Select account
                     </option>
 
+
                     {% for account in accounts %}
 
                     <option
                         value="{{ account.id }}"
-                        {% if expense.account_id == account.id %}
+                        {% if
+                            expense.account_id|string
+                            ==
+                            account.id|string
+                        %}
                             selected
                         {% endif %}
                     >
@@ -329,6 +364,7 @@ Update your expense details
                     {% endfor %}
 
                 </select>
+
 
                 {% if not accounts %}
 
@@ -349,80 +385,95 @@ Update your expense details
             </div>
 
 
-            <!-- PAYMENT METHOD -->
+            <!-- =================================================
+                 PAYMENT MODE
+            ================================================== -->
 
             <div class="form-group">
 
-                <label for="payment_method">
+                <label for="payment_mode">
                     Payment Method
                 </label>
 
+                {% set current_payment =
+                    expense.payment_mode
+                    or expense.payment_method
+                    or ''
+                %}
+
                 <select
-                    id="payment_method"
-                    name="payment_method"
+                    id="payment_mode"
+                    name="payment_mode"
                 >
 
                     <option value="">
                         Select payment method
                     </option>
 
+
                     <option
                         value="Cash"
-                        {% if expense.payment_method == "Cash" %}
+                        {% if current_payment == "Cash" %}
                             selected
                         {% endif %}
                     >
                         Cash
                     </option>
 
+
                     <option
                         value="UPI"
-                        {% if expense.payment_method == "UPI" %}
+                        {% if current_payment == "UPI" %}
                             selected
                         {% endif %}
                     >
                         UPI
                     </option>
 
+
                     <option
                         value="Debit Card"
-                        {% if expense.payment_method == "Debit Card" %}
+                        {% if current_payment == "Debit Card" %}
                             selected
                         {% endif %}
                     >
                         Debit Card
                     </option>
 
+
                     <option
                         value="Credit Card"
-                        {% if expense.payment_method == "Credit Card" %}
+                        {% if current_payment == "Credit Card" %}
                             selected
                         {% endif %}
                     >
                         Credit Card
                     </option>
 
+
                     <option
                         value="Bank Transfer"
-                        {% if expense.payment_method == "Bank Transfer" %}
+                        {% if current_payment == "Bank Transfer" %}
                             selected
                         {% endif %}
                     >
                         Bank Transfer
                     </option>
 
+
                     <option
                         value="Net Banking"
-                        {% if expense.payment_method == "Net Banking" %}
+                        {% if current_payment == "Net Banking" %}
                             selected
                         {% endif %}
                     >
                         Net Banking
                     </option>
 
+
                     <option
                         value="Other"
-                        {% if expense.payment_method == "Other" %}
+                        {% if current_payment == "Other" %}
                             selected
                         {% endif %}
                     >
@@ -434,7 +485,9 @@ Update your expense details
             </div>
 
 
-            <!-- MERCHANT -->
+            <!-- =================================================
+                 MERCHANT
+            ================================================== -->
 
             <div class="form-group">
 
@@ -455,7 +508,9 @@ Update your expense details
             </div>
 
 
-            <!-- REFERENCE -->
+            <!-- =================================================
+                 REFERENCE
+            ================================================== -->
 
             <div class="form-group">
 
@@ -476,7 +531,9 @@ Update your expense details
             </div>
 
 
-            <!-- NOTES -->
+            <!-- =================================================
+                 NOTES
+            ================================================== -->
 
             <div class="form-group full-width">
 
@@ -534,6 +591,7 @@ Update your expense details
                 Cancel
             </a>
 
+
             <button
                 type="submit"
                 class="primary-button"
@@ -553,6 +611,7 @@ Update your expense details
 
 
     {% else %}
+
 
     <!-- =====================================================
          EXPENSE NOT FOUND
@@ -588,6 +647,7 @@ Update your expense details
 {% endblock %}
 
 
+
 {% block scripts %}
 
 <script>
@@ -595,7 +655,6 @@ Update your expense details
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-
 
         /* =================================================
            ELEMENTS
@@ -623,7 +682,7 @@ document.addEventListener(
 
         const expenseDate =
             document.getElementById(
-                "expense_date"
+                "date"
             );
 
         const summary =
@@ -678,9 +737,7 @@ document.addEventListener(
                 selectedCategory;
 
 
-            if (
-                expenseName
-            ) {
+            if (expenseName) {
 
                 text =
                     expenseName +
@@ -690,9 +747,7 @@ document.addEventListener(
             }
 
 
-            if (
-                expenseDate.value
-            ) {
+            if (expenseDate.value) {
 
                 text +=
                     " | Date: " +
@@ -757,9 +812,7 @@ document.addEventListener(
                    DESCRIPTION
                 ------------------------------------------ */
 
-                if (
-                    !expenseName
-                ) {
+                if (!expenseName) {
 
                     event.preventDefault();
 
