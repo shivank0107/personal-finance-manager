@@ -1422,7 +1422,6 @@ def dashboard():
 
     )
 
-
 # =========================================================
 # INCOME
 # =========================================================
@@ -1430,7 +1429,17 @@ def dashboard():
 @app.route("/income")
 def income():
 
+    # -----------------------------------------------------
+    # LOAD DATA
+    # -----------------------------------------------------
+
     incomes = load_incomes()
+    accounts = load_accounts()
+
+
+    # -----------------------------------------------------
+    # SORT BY DATE - NEWEST FIRST
+    # -----------------------------------------------------
 
     incomes.sort(
         key=lambda x: x.get(
@@ -1439,6 +1448,57 @@ def income():
         ),
         reverse=True
     )
+
+
+    # -----------------------------------------------------
+    # ACCOUNT MAPPING
+    # -----------------------------------------------------
+
+    account_map = {}
+
+    for account in accounts:
+
+        account_id = str(
+            account.get(
+                "id",
+                ""
+            )
+        )
+
+        account_name = account.get(
+            "name",
+            ""
+        )
+
+        if account_id:
+
+            account_map[
+                account_id
+            ] = account_name
+
+
+    # -----------------------------------------------------
+    # ADD ACCOUNT NAME TO INCOME RECORDS
+    # -----------------------------------------------------
+
+    for item in incomes:
+
+        account_id = str(
+            item.get(
+                "account_id",
+                ""
+            )
+        )
+
+        item["account_name"] = account_map.get(
+            account_id,
+            ""
+        )
+
+
+    # -----------------------------------------------------
+    # TOTAL INCOME
+    # -----------------------------------------------------
 
     total_income = sum(
         float(
@@ -1450,11 +1510,68 @@ def income():
         for item in incomes
     )
 
+
+    # -----------------------------------------------------
+    # CURRENT MONTH INCOME
+    # -----------------------------------------------------
+
+    current_month = datetime.now().strftime(
+        "%Y-%m"
+    )
+
+    monthly_income = sum(
+        float(
+            item.get(
+                "amount",
+                0
+            ) or 0
+        )
+        for item in incomes
+        if str(
+            item.get(
+                "date",
+                ""
+            )
+        ).startswith(
+            current_month
+        )
+    )
+
+
+    # -----------------------------------------------------
+    # AVERAGE INCOME
+    # -----------------------------------------------------
+
+    average_income = (
+        total_income / len(incomes)
+        if incomes
+        else 0
+    )
+
+
+    # -----------------------------------------------------
+    # RENDER PAGE
+    # -----------------------------------------------------
+
     return render_template(
         "income.html",
+
         incomes=incomes,
+
+        accounts=accounts,
+
         total_income=round(
             total_income,
+            2
+        ),
+
+        monthly_income=round(
+            monthly_income,
+            2
+        ),
+
+        average_income=round(
+            average_income,
             2
         )
     )
@@ -1585,6 +1702,7 @@ def edit_income(income_id):
             return str(error), 400
 
         income_item["date"] = date_value
+
         income_item["amount"] = amount
 
         income_item["category"] = request.form.get(
@@ -1651,7 +1769,6 @@ def delete_income(income_id):
     return redirect(
         url_for("income")
     )
-
 
 # =========================================================
 # EXPENSES
