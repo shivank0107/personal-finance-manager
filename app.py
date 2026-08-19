@@ -1,5 +1,6 @@
-from flask import (Flask,render_template,request,redirect,url_for,jsonify,send_file)
+from flask import (Flask,render_template,request,redirect,url_for,jsonify,send_file,session)
 
+from functools import wraps
 import os
 import json
 from datetime import datetime
@@ -14,6 +15,11 @@ from psycopg2.extras import Json
 # =========================================================
 
 app = Flask(__name__)
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "dev-secret-key-change-this"
+)
 
 BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
@@ -161,6 +167,50 @@ def save_database_collection(collection, data):
 
 
 init_database()
+
+# =========================================================
+# Login
+# =========================================================
+
+@app.route(
+    "/login",
+    methods=["GET", "POST"]
+)
+def login():
+
+    if request.method == "POST":
+
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        # Temporary login credentials
+        if (
+            username == "admin"
+            and password == "admin123"
+        ):
+
+            session["logged_in"] = True
+            session["username"] = username
+
+            return redirect(
+                url_for("home")
+            )
+
+        return render_template(
+            "login.html",
+            error="Invalid username or password."
+        )
+
+    return render_template(
+        "login.html"
+    )
 
 
 # =========================================================
