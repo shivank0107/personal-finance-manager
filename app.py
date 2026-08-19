@@ -5467,13 +5467,215 @@ def financial_calendar():
 # SETTINGS
 # =========================================================
 
-@app.route("/settings")
+@app.route(
+    "/settings",
+    methods=["GET", "POST"]
+)
 def settings():
 
-    return render_template(
-        "settings.html"
-    )
+    # =========================================================
+    # DEFAULT SETTINGS
+    # =========================================================
 
+    user = {
+        "first_name": "",
+        "last_name": "",
+        "email": ""
+    }
+
+    currency = "INR"
+    theme = "light"
+
+    payment_reminders = True
+    budget_alerts = True
+    savings_reminders = True
+
+    date_format = "DD-MM-YYYY"
+    number_format = "indian"
+
+
+    # =========================================================
+    # POST
+    # =========================================================
+
+    if request.method == "POST":
+
+        action = request.form.get(
+            "action",
+            ""
+        )
+
+
+        # =====================================================
+        # PROFILE
+        # =====================================================
+
+        if action == "profile":
+
+            user["first_name"] = request.form.get(
+                "first_name",
+                ""
+            ).strip()
+
+            user["last_name"] = request.form.get(
+                "last_name",
+                ""
+            ).strip()
+
+            user["email"] = request.form.get(
+                "email",
+                ""
+            ).strip()
+
+
+        # =====================================================
+        # CURRENCY
+        # =====================================================
+
+        elif action == "currency":
+
+            currency = request.form.get(
+                "currency",
+                "INR"
+            )
+
+
+        # =====================================================
+        # APPEARANCE
+        # =====================================================
+
+        elif action == "appearance":
+
+            theme = request.form.get(
+                "theme",
+                "light"
+            )
+
+
+        # =====================================================
+        # NOTIFICATIONS
+        # =====================================================
+
+        elif action == "notifications":
+
+            payment_reminders = (
+                request.form.get(
+                    "payment_reminders"
+                ) == "1"
+            )
+
+            budget_alerts = (
+                request.form.get(
+                    "budget_alerts"
+                ) == "1"
+            )
+
+            savings_reminders = (
+                request.form.get(
+                    "savings_reminders"
+                ) == "1"
+            )
+
+
+        # =====================================================
+        # DATE / NUMBER FORMAT
+        # =====================================================
+
+        elif action == "format":
+
+            date_format = request.form.get(
+                "date_format",
+                "DD-MM-YYYY"
+            )
+
+            number_format = request.form.get(
+                "number_format",
+                "indian"
+            )
+
+
+        # =====================================================
+        # PASSWORD
+        # =====================================================
+
+        elif action == "password":
+
+            current_password = request.form.get(
+                "current_password",
+                ""
+            )
+
+            new_password = request.form.get(
+                "new_password",
+                ""
+            )
+
+            confirm_password = request.form.get(
+                "confirm_password",
+                ""
+            )
+
+            if not current_password:
+
+                return (
+                    "Please enter your current password.",
+                    400
+                )
+
+            if not new_password:
+
+                return (
+                    "Please enter a new password.",
+                    400
+                )
+
+            if len(new_password) < 6:
+
+                return (
+                    "Password must contain at least 6 characters.",
+                    400
+                )
+
+            if new_password != confirm_password:
+
+                return (
+                    "Passwords do not match.",
+                    400
+                )
+
+
+        # =====================================================
+        # REDIRECT AFTER POST
+        # =====================================================
+
+        return redirect(
+            url_for("settings")
+        )
+
+
+    # =========================================================
+    # GET / RENDER
+    # =========================================================
+
+    return render_template(
+        "settings.html",
+
+        user=user,
+
+        currency=currency,
+
+        theme=theme,
+
+        payment_reminders=payment_reminders,
+
+        budget_alerts=budget_alerts,
+
+        savings_reminders=savings_reminders,
+
+        date_format=date_format,
+
+        number_format=number_format
+    )
 
 # =========================================================
 # BACKUP
