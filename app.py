@@ -1162,8 +1162,8 @@ def calculate_investment_holdings(
 # =========================================================
 
 @app.route("/")
+def dashboard():
 
-def home():
     accounts = load_accounts()
     incomes = load_incomes()
     expenses = load_expenses()
