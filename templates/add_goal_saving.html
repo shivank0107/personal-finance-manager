@@ -50,7 +50,6 @@ Add money towards an existing savings goal
 
         <div class="form-grid">
 
-
             <!-- GOAL -->
 
             <div class="form-group">
@@ -133,8 +132,13 @@ Add money towards an existing savings goal
             <div class="form-group">
 
                 <label for="amount">
+
                     Saving Amount
-                    <span class="required">*</span>
+
+                    <span class="required">
+                        *
+                    </span>
+
                 </label>
 
                 <div class="amount-input">
@@ -215,7 +219,10 @@ Add money towards an existing savings goal
                     New Savings Balance
                 </strong>
 
-                <p id="newBalance">
+                <p
+                    id="newBalance"
+                    data-current-saved="{{ goal.saved_amount or 0 }}"
+                >
                     ₹{{ "%.2f"|format(
                         goal.saved_amount or 0
                     ) }}
@@ -290,16 +297,14 @@ document.addEventListener(
             );
 
 
-        /*
-         * Read current saved amount from
-         * a data attribute instead of putting
-         * Jinja directly inside JavaScript.
-         */
+        /* =================================================
+           CURRENT SAVED AMOUNT
+        ================================================= */
 
         const currentSaved =
             parseFloat(
                 newBalance.dataset.currentSaved || "0"
-            );
+            ) || 0;
 
 
         /* =================================================
