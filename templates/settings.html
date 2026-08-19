@@ -1,42 +1,89 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - Personal Finance Manager{% endblock %}
+{% block title %}
+Settings - Personal Finance Manager
+{% endblock %}
 
-{% block page_title %}Settings{% endblock %}
+{% block page_title %}
+Settings
+{% endblock %}
 
 {% block page_subtitle %}
 Manage your account and application preferences
 {% endblock %}
+
 
 {% block content %}
 
 <div class="settings-page">
 
     <div class="page-header">
+
         <div>
-            <h2>Settings</h2>
-            <p>Manage your profile, preferences, notifications and security.</p>
+
+            <h2>
+                Settings
+            </h2>
+
+            <p>
+                Manage your profile, preferences, notifications and security.
+            </p>
+
         </div>
+
     </div>
+
 
     <div class="settings-grid">
 
-        <!-- Profile -->
+
+        <!-- =====================================================
+             PROFILE
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">👤</div>
-                <div>
-                    <h3>Profile</h3>
-                    <p>Manage your personal information.</p>
+
+                <div class="card-icon">
+                    👤
                 </div>
+
+                <div>
+
+                    <h3>
+                        Profile
+                    </h3>
+
+                    <p>
+                        Manage your personal information.
+                    </p>
+
+                </div>
+
             </div>
 
-            <form method="POST" action="{{ url_for('settings') }}">
-                <input type="hidden" name="action" value="profile">
+
+            <form
+                method="POST"
+                action="{{ url_for('settings') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="profile"
+                >
+
 
                 <div class="form-row">
+
                     <div class="form-group">
-                        <label for="first_name">First Name</label>
+
+                        <label for="first_name">
+                            First Name
+                        </label>
+
                         <input
                             id="first_name"
                             name="first_name"
@@ -44,10 +91,16 @@ Manage your account and application preferences
                             value="{{ user.first_name|default('') }}"
                             placeholder="First name"
                         >
+
                     </div>
 
+
                     <div class="form-group">
-                        <label for="last_name">Last Name</label>
+
+                        <label for="last_name">
+                            Last Name
+                        </label>
+
                         <input
                             id="last_name"
                             name="last_name"
@@ -55,11 +108,18 @@ Manage your account and application preferences
                             value="{{ user.last_name|default('') }}"
                             placeholder="Last name"
                         >
+
                     </div>
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
                     <input
                         id="email"
                         name="email"
@@ -67,248 +127,591 @@ Manage your account and application preferences
                         value="{{ user.email|default('') }}"
                         placeholder="Email address"
                     >
+
                 </div>
 
+
                 <div class="actions">
-                    <button type="submit" class="primary-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
                         Save Profile
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Currency -->
+
+        <!-- =====================================================
+             CURRENCY
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">💰</div>
-                <div>
-                    <h3>Currency</h3>
-                    <p>Choose your default currency.</p>
+
+                <div class="card-icon">
+                    💰
                 </div>
+
+                <div>
+
+                    <h3>
+                        Currency
+                    </h3>
+
+                    <p>
+                        Choose your default currency.
+                    </p>
+
+                </div>
+
             </div>
 
-            <form method="POST" action="{{ url_for('settings') }}">
-                <input type="hidden" name="action" value="currency">
+
+            <form
+                method="POST"
+                action="{{ url_for('settings') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="currency"
+                >
+
 
                 <div class="form-group">
-                    <label for="currency">Default Currency</label>
 
-                    <select id="currency" name="currency">
-                        <option value="INR" {% if currency|default('INR') == 'INR' %}selected{% endif %}>
+                    <label for="currency">
+                        Default Currency
+                    </label>
+
+
+                    <select
+                        id="currency"
+                        name="currency"
+                    >
+
+                        <option
+                            value="INR"
+                            {% if currency|default('INR') == 'INR' %}
+                            selected
+                            {% endif %}
+                        >
                             ₹ Indian Rupee (INR)
                         </option>
-                        <option value="USD" {% if currency|default('') == 'USD' %}selected{% endif %}>
+
+
+                        <option
+                            value="USD"
+                            {% if currency|default('') == 'USD' %}
+                            selected
+                            {% endif %}
+                        >
                             $ US Dollar (USD)
                         </option>
-                        <option value="EUR" {% if currency|default('') == 'EUR' %}selected{% endif %}>
+
+
+                        <option
+                            value="EUR"
+                            {% if currency|default('') == 'EUR' %}
+                            selected
+                            {% endif %}
+                        >
                             € Euro (EUR)
                         </option>
-                        <option value="GBP" {% if currency|default('') == 'GBP' %}selected{% endif %}>
+
+
+                        <option
+                            value="GBP"
+                            {% if currency|default('') == 'GBP' %}
+                            selected
+                            {% endif %}
+                        >
                             £ British Pound (GBP)
                         </option>
-                        <option value="AED" {% if currency|default('') == 'AED' %}selected{% endif %}>
+
+
+                        <option
+                            value="AED"
+                            {% if currency|default('') == 'AED' %}
+                            selected
+                            {% endif %}
+                        >
                             د.إ UAE Dirham (AED)
                         </option>
+
                     </select>
+
                 </div>
 
+
                 <div class="actions">
-                    <button type="submit" class="primary-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
                         Save Currency
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Appearance -->
+
+        <!-- =====================================================
+             APPEARANCE
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">🎨</div>
-                <div>
-                    <h3>Appearance</h3>
-                    <p>Customize the application theme.</p>
+
+                <div class="card-icon">
+                    🎨
                 </div>
+
+                <div>
+
+                    <h3>
+                        Appearance
+                    </h3>
+
+                    <p>
+                        Customize the application theme.
+                    </p>
+
+                </div>
+
             </div>
 
-            <form method="POST" action="{{ url_for('settings') }}">
-                <input type="hidden" name="action" value="appearance">
+
+            <form
+                method="POST"
+                action="{{ url_for('settings') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="appearance"
+                >
+
 
                 <div class="form-group">
-                    <label>Theme</label>
+
+                    <label>
+                        Theme
+                    </label>
+
 
                     <div class="theme-options">
 
+
                         <label class="theme-option">
+
                             <input
                                 type="radio"
                                 name="theme"
                                 value="light"
-                                {% if theme|default('light') == 'light' %}checked{% endif %}
+                                {% if theme|default('light') == 'light' %}
+                                checked
+                                {% endif %}
                             >
-                            <span>☀️ Light</span>
+
+                            <span>
+                                ☀️ Light
+                            </span>
+
                         </label>
 
+
                         <label class="theme-option">
+
                             <input
                                 type="radio"
                                 name="theme"
                                 value="dark"
-                                {% if theme|default('light') == 'dark' %}checked{% endif %}
+                                {% if theme|default('light') == 'dark' %}
+                                checked
+                                {% endif %}
                             >
-                            <span>🌙 Dark</span>
+
+                            <span>
+                                🌙 Dark
+                            </span>
+
                         </label>
 
+
                         <label class="theme-option">
+
                             <input
                                 type="radio"
                                 name="theme"
                                 value="system"
-                                {% if theme|default('light') == 'system' %}checked{% endif %}
+                                {% if theme|default('light') == 'system' %}
+                                checked
+                                {% endif %}
                             >
-                            <span>💻 System</span>
+
+                            <span>
+                                💻 System
+                            </span>
+
                         </label>
 
+
                     </div>
+
                 </div>
 
+
                 <div class="actions">
-                    <button type="submit" class="primary-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
                         Save Appearance
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Notifications -->
+
+        <!-- =====================================================
+             NOTIFICATIONS
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">🔔</div>
-                <div>
-                    <h3>Notifications</h3>
-                    <p>Control financial reminders and alerts.</p>
+
+                <div class="card-icon">
+                    🔔
                 </div>
+
+                <div>
+
+                    <h3>
+                        Notifications
+                    </h3>
+
+                    <p>
+                        Control financial reminders and alerts.
+                    </p>
+
+                </div>
+
             </div>
 
-            <form method="POST" action="{{ url_for('settings') }}">
-                <input type="hidden" name="action" value="notifications">
+
+            <form
+                method="POST"
+                action="{{ url_for('settings') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="notifications"
+                >
+
 
                 <label class="toggle-row">
+
                     <span>
-                        <strong>Payment Reminders</strong>
-                        <small>Reminders for upcoming payments.</small>
+
+                        <strong>
+                            Payment Reminders
+                        </strong>
+
+                        <small>
+                            Reminders for upcoming payments.
+                        </small>
+
                     </span>
+
+
                     <input
                         type="checkbox"
                         name="payment_reminders"
                         value="1"
-                        {% if payment_reminders|default(true) %}checked{% endif %}
+                        {% if payment_reminders|default(true) %}
+                        checked
+                        {% endif %}
                     >
+
                     <span class="toggle"></span>
+
                 </label>
 
+
                 <label class="toggle-row">
+
                     <span>
-                        <strong>Budget Alerts</strong>
-                        <small>Alerts when spending approaches your budget.</small>
+
+                        <strong>
+                            Budget Alerts
+                        </strong>
+
+                        <small>
+                            Alerts when spending approaches your budget.
+                        </small>
+
                     </span>
+
+
                     <input
                         type="checkbox"
                         name="budget_alerts"
                         value="1"
-                        {% if budget_alerts|default(true) %}checked{% endif %}
+                        {% if budget_alerts|default(true) %}
+                        checked
+                        {% endif %}
                     >
+
                     <span class="toggle"></span>
+
                 </label>
 
+
                 <label class="toggle-row">
+
                     <span>
-                        <strong>Savings Goal Reminders</strong>
-                        <small>Reminders about your savings goals.</small>
+
+                        <strong>
+                            Savings Goal Reminders
+                        </strong>
+
+                        <small>
+                            Reminders about your savings goals.
+                        </small>
+
                     </span>
+
+
                     <input
                         type="checkbox"
                         name="savings_reminders"
                         value="1"
-                        {% if savings_reminders|default(true) %}checked{% endif %}
+                        {% if savings_reminders|default(true) %}
+                        checked
+                        {% endif %}
                     >
+
                     <span class="toggle"></span>
+
                 </label>
 
+
                 <div class="actions">
-                    <button type="submit" class="primary-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
                         Save Notifications
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Date and Number Format -->
+
+        <!-- =====================================================
+             DATE & NUMBER FORMAT
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">📅</div>
-                <div>
-                    <h3>Date & Number Format</h3>
-                    <p>Customize how dates and numbers are displayed.</p>
+
+                <div class="card-icon">
+                    📅
                 </div>
+
+                <div>
+
+                    <h3>
+                        Date & Number Format
+                    </h3>
+
+                    <p>
+                        Customize how dates and numbers are displayed.
+                    </p>
+
+                </div>
+
             </div>
 
-            <form method="POST" action="{{ url_for('settings') }}">
-                <input type="hidden" name="action" value="format">
+
+            <form
+                method="POST"
+                action="{{ url_for('settings') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="format"
+                >
+
 
                 <div class="form-group">
-                    <label for="date_format">Date Format</label>
 
-                    <select id="date_format" name="date_format">
-                        <option value="DD-MM-YYYY" {% if date_format|default('DD-MM-YYYY') == 'DD-MM-YYYY' %}selected{% endif %}>
+                    <label for="date_format">
+                        Date Format
+                    </label>
+
+
+                    <select
+                        id="date_format"
+                        name="date_format"
+                    >
+
+                        <option
+                            value="DD-MM-YYYY"
+                            {% if date_format|default('DD-MM-YYYY') == 'DD-MM-YYYY' %}
+                            selected
+                            {% endif %}
+                        >
                             DD-MM-YYYY
                         </option>
-                        <option value="DD/MM/YYYY" {% if date_format|default('') == 'DD/MM/YYYY' %}selected{% endif %}>
+
+
+                        <option
+                            value="DD/MM/YYYY"
+                            {% if date_format|default('') == 'DD/MM/YYYY' %}
+                            selected
+                            {% endif %}
+                        >
                             DD/MM/YYYY
                         </option>
-                        <option value="YYYY-MM-DD" {% if date_format|default('') == 'YYYY-MM-DD' %}selected{% endif %}>
+
+
+                        <option
+                            value="YYYY-MM-DD"
+                            {% if date_format|default('') == 'YYYY-MM-DD' %}
+                            selected
+                            {% endif %}
+                        >
                             YYYY-MM-DD
                         </option>
-                        <option value="MM/DD/YYYY" {% if date_format|default('') == 'MM/DD/YYYY' %}selected{% endif %}>
+
+
+                        <option
+                            value="MM/DD/YYYY"
+                            {% if date_format|default('') == 'MM/DD/YYYY' %}
+                            selected
+                            {% endif %}
+                        >
                             MM/DD/YYYY
                         </option>
+
                     </select>
+
                 </div>
+
 
                 <div class="form-group">
-                    <label for="number_format">Number Format</label>
 
-                    <select id="number_format" name="number_format">
-                        <option value="indian" {% if number_format|default('indian') == 'indian' %}selected{% endif %}>
+                    <label for="number_format">
+                        Number Format
+                    </label>
+
+
+                    <select
+                        id="number_format"
+                        name="number_format"
+                    >
+
+                        <option
+                            value="indian"
+                            {% if number_format|default('indian') == 'indian' %}
+                            selected
+                            {% endif %}
+                        >
                             Indian - 1,00,000.00
                         </option>
-                        <option value="international" {% if number_format|default('') == 'international' %}selected{% endif %}>
+
+
+                        <option
+                            value="international"
+                            {% if number_format|default('') == 'international' %}
+                            selected
+                            {% endif %}
+                        >
                             International - 100,000.00
                         </option>
+
                     </select>
+
                 </div>
 
+
                 <div class="actions">
-                    <button type="submit" class="primary-button">
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
                         Save Format
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Security -->
+
+        <!-- =====================================================
+             SECURITY
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">🔐</div>
-                <div>
-                    <h3>Security</h3>
-                    <p>Change your account password.</p>
+
+                <div class="card-icon">
+                    🔐
                 </div>
+
+                <div>
+
+                    <h3>
+                        Security
+                    </h3>
+
+                    <p>
+                        Change your account password.
+                    </p>
+
+                </div>
+
             </div>
+
 
             <form
                 method="POST"
@@ -316,40 +719,69 @@ Manage your account and application preferences
                 id="passwordForm"
                 novalidate
             >
-                <input type="hidden" name="action" value="password">
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="password"
+                >
+
 
                 <div class="form-group">
-                    <label for="current_password">Current Password</label>
+
+                    <label for="current_password">
+                        Current Password
+                    </label>
+
                     <input
                         id="current_password"
                         name="current_password"
                         type="password"
                         autocomplete="current-password"
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="new_password">New Password</label>
+
+                    <label for="new_password">
+                        New Password
+                    </label>
+
                     <input
                         id="new_password"
                         name="new_password"
                         type="password"
                         autocomplete="new-password"
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="confirm_password">Confirm New Password</label>
+
+                    <label for="confirm_password">
+                        Confirm New Password
+                    </label>
+
                     <input
                         id="confirm_password"
                         name="confirm_password"
                         type="password"
                         autocomplete="new-password"
                     >
-                    <small id="passwordMessage" class="field-message"></small>
+
+                    <small
+                        id="passwordMessage"
+                        class="field-message"
+                    ></small>
+
                 </div>
 
+
                 <div class="actions">
+
                     <button
                         type="submit"
                         class="primary-button"
@@ -357,20 +789,41 @@ Manage your account and application preferences
                     >
                         Change Password
                     </button>
+
                 </div>
+
             </form>
+
         </section>
 
 
-        <!-- Data Management -->
+
+        <!-- =====================================================
+             DATA MANAGEMENT
+        ====================================================== -->
+
         <section class="settings-card">
+
             <div class="card-heading">
-                <div class="card-icon">🗄️</div>
-                <div>
-                    <h3>Data Management</h3>
-                    <p>Export or clear your financial data.</p>
+
+                <div class="card-icon">
+                    🗄️
                 </div>
+
+                <div>
+
+                    <h3>
+                        Data Management
+                    </h3>
+
+                    <p>
+                        Export or clear your financial data.
+                    </p>
+
+                </div>
+
             </div>
+
 
             <div class="data-actions">
 
@@ -382,6 +835,7 @@ Manage your account and application preferences
                     📥 Export Data
                 </button>
 
+
                 <button
                     type="button"
                     class="danger-button"
@@ -392,20 +846,85 @@ Manage your account and application preferences
 
             </div>
 
+
             <div class="warning-box">
-                <strong>⚠ Important</strong>
+
+                <strong>
+                    ⚠ Important
+                </strong>
+
                 <p>
                     Clearing financial data is a destructive action.
                     Create a backup before deleting records.
                 </p>
+
             </div>
+
         </section>
+
+
+
+        <!-- =====================================================
+             LOGOUT
+        ====================================================== -->
+
+        <section class="settings-card logout-card">
+
+            <div class="card-heading">
+
+                <div class="card-icon">
+                    🚪
+                </div>
+
+                <div>
+
+                    <h3>
+                        Logout
+                    </h3>
+
+                    <p>
+                        Sign out of your Personal Finance Manager account.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="logout-content">
+
+                <div>
+
+                    <strong>
+                        Current User
+                    </strong>
+
+                    <p>
+                        {{ session.get("username", "User") }}
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="logout-button"
+                    onclick="return confirm('Are you sure you want to logout?');"
+                >
+                    🚪 Logout
+                </a>
+
+            </div>
+
+        </section>
+
 
     </div>
 
 </div>
 
 {% endblock %}
+
 
 
 {% block styles %}
@@ -437,14 +956,24 @@ Manage your account and application preferences
 
 .settings-card {
     padding: 22px;
-    border: 1px solid var(--border-color, #e5e7eb);
+
+    border: 1px solid var(
+        --border-color,
+        #e5e7eb
+    );
+
     border-radius: 14px;
-    background: var(--card-bg, #ffffff);
+
+    background: var(
+        --card-bg,
+        #ffffff
+    );
 }
 
 .card-heading {
     display: flex;
     align-items: center;
+
     gap: 13px;
     margin-bottom: 22px;
 }
@@ -455,6 +984,7 @@ Manage your account and application preferences
 
 .card-heading p {
     margin: 0;
+
     font-size: 12px;
     opacity: 0.65;
 }
@@ -462,18 +992,35 @@ Manage your account and application preferences
 .card-icon {
     width: 44px;
     height: 44px;
+
     flex-shrink: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border-radius: 10px;
-    background: rgba(100, 116, 139, 0.1);
+
+    background:
+        rgba(
+            100,
+            116,
+            139,
+            0.1
+        );
+
     font-size: 20px;
 }
 
 .form-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
     gap: 14px;
 }
 
@@ -483,7 +1030,9 @@ Manage your account and application preferences
 
 .form-group label {
     display: block;
+
     margin-bottom: 7px;
+
     font-size: 12px;
     font-weight: 600;
 }
@@ -491,31 +1040,61 @@ Manage your account and application preferences
 .form-group input,
 .form-group select {
     width: 100%;
+
     box-sizing: border-box;
+
     padding: 11px 13px;
-    border: 1px solid var(--border-color, #e5e7eb);
+
+    border: 1px solid var(
+        --border-color,
+        #e5e7eb
+    );
+
     border-radius: 8px;
-    background: var(--input-bg, #ffffff);
+
+    background: var(
+        --input-bg,
+        #ffffff
+    );
+
     color: inherit;
+
     font: inherit;
+
     outline: none;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     border-color: #64748b;
-    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            100,
+            116,
+            139,
+            0.1
+        );
 }
 
 .actions {
     display: flex;
+
     justify-content: flex-end;
+
     margin-top: 5px;
 }
 
 .theme-options {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
     gap: 10px;
 }
 
@@ -525,33 +1104,57 @@ Manage your account and application preferences
 
 .theme-option input {
     position: absolute;
+
     opacity: 0;
     pointer-events: none;
 }
 
 .theme-option span {
     min-height: 50px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border-color, #e5e7eb);
+
+    border: 1px solid var(
+        --border-color,
+        #e5e7eb
+    );
+
     border-radius: 9px;
+
     transition: 0.2s ease;
 }
 
 .theme-option input:checked + span {
     border-color: #64748b;
-    background: rgba(100, 116, 139, 0.08);
+
+    background:
+        rgba(
+            100,
+            116,
+            139,
+            0.08
+        );
 }
 
 .toggle-row {
     position: relative;
+
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 15px;
+
     min-height: 58px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
+
+    border-bottom: 1px solid var(
+        --border-color,
+        #e5e7eb
+    );
+
     cursor: pointer;
 }
 
@@ -565,41 +1168,57 @@ Manage your account and application preferences
 
 .toggle-row strong {
     display: block;
+
     margin-bottom: 3px;
+
     font-size: 13px;
 }
 
 .toggle-row small {
     display: block;
+
     font-size: 11px;
+
     opacity: 0.6;
 }
 
 .toggle-row input {
     position: absolute;
+
     opacity: 0;
     pointer-events: none;
 }
 
 .toggle {
     position: relative;
+
     width: 42px;
     height: 23px;
+
     flex-shrink: 0;
+
     border-radius: 999px;
+
     background: #cbd5e1;
+
     transition: 0.2s ease;
 }
 
 .toggle::after {
     content: "";
+
     position: absolute;
+
     top: 3px;
     left: 3px;
+
     width: 17px;
     height: 17px;
+
     border-radius: 50%;
+
     background: #ffffff;
+
     transition: 0.2s ease;
 }
 
@@ -608,13 +1227,17 @@ Manage your account and application preferences
 }
 
 .toggle-row input:checked + .toggle::after {
-    transform: translateX(19px);
+    transform:
+        translateX(19px);
 }
 
 .field-message {
     display: block;
+
     min-height: 16px;
+
     margin-top: 6px;
+
     font-size: 11px;
 }
 
@@ -628,53 +1251,159 @@ Manage your account and application preferences
 
 .data-actions {
     display: flex;
+
     gap: 10px;
+
     flex-wrap: wrap;
 }
 
 .warning-box {
     margin-top: 18px;
+
     padding: 13px 14px;
+
     border-radius: 9px;
-    background: rgba(245, 158, 11, 0.08);
+
+    background:
+        rgba(
+            245,
+            158,
+            11,
+            0.08
+        );
 }
 
 .warning-box strong {
     display: block;
+
     margin-bottom: 5px;
+
     font-size: 12px;
 }
 
 .warning-box p {
     margin: 0;
+
     font-size: 11px;
+
     line-height: 1.6;
+
     opacity: 0.7;
 }
 
-.danger-button {
-    padding: 10px 15px;
-    border: 1px solid rgba(220, 38, 38, 0.25);
-    border-radius: 8px;
-    background: rgba(220, 38, 38, 0.08);
-    color: #dc2626;
-    cursor: pointer;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+.logout-card {
+    grid-column: 1 / -1;
 }
 
-.danger-button:hover {
-    background: rgba(220, 38, 38, 0.14);
+.logout-content {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 16px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(
+            220,
+            38,
+            38,
+            0.04
+        );
 }
+
+.logout-content strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 13px;
+}
+
+.logout-content p {
+    margin: 0;
+
+    font-size: 12px;
+
+    opacity: 0.65;
+}
+
+.logout-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 18px;
+
+    border: 1px solid
+        rgba(
+            220,
+            38,
+            38,
+            0.25
+        );
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            220,
+            38,
+            38,
+            0.08
+        );
+
+    color: #dc2626;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.logout-button:hover {
+    background:
+        rgba(
+            220,
+            38,
+            38,
+            0.14
+        );
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
 @media (max-width: 900px) {
+
     .settings-grid {
         grid-template-columns: 1fr;
     }
+
+    .logout-card {
+        grid-column: auto;
+    }
+
 }
 
+
 @media (max-width: 600px) {
+
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -698,6 +1427,21 @@ Manage your account and application preferences
     .data-actions button {
         width: 100%;
     }
+
+    .data-actions button {
+        width: 100%;
+    }
+
+    .logout-content {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .logout-button {
+        width: 100%;
+    }
+
 }
 
 </style>
@@ -705,341 +1449,410 @@ Manage your account and application preferences
 {% endblock %}
 
 
+
 {% block scripts %}
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    /* =====================================================
-       PASSWORD VALIDATION
-    ====================================================== */
-
-    const passwordForm =
-        document.getElementById("passwordForm");
-
-    const currentPassword =
-        document.getElementById("current_password");
-
-    const newPassword =
-        document.getElementById("new_password");
-
-    const confirmPassword =
-        document.getElementById("confirm_password");
-
-    const passwordMessage =
-        document.getElementById("passwordMessage");
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
 
-    function validatePassword(showEmptyMessage) {
+        /* =====================================================
+           PASSWORD VALIDATION
+        ====================================================== */
 
-        if (!newPassword || !confirmPassword) {
-            return true;
-        }
+        const passwordForm =
+            document.getElementById(
+                "passwordForm"
+            );
 
-        const password =
-            newPassword.value;
+        const currentPassword =
+            document.getElementById(
+                "current_password"
+            );
 
-        const confirmation =
-            confirmPassword.value;
+        const newPassword =
+            document.getElementById(
+                "new_password"
+            );
 
+        const confirmPassword =
+            document.getElementById(
+                "confirm_password"
+            );
 
-        if (
-            password === "" &&
-            confirmation === ""
-        ) {
-            if (showEmptyMessage) {
-                passwordMessage.textContent = "";
-                passwordMessage.className = "field-message";
-            }
-
-            return true;
-        }
-
-
-        if (password.length > 0 && password.length < 6) {
-
-            passwordMessage.textContent =
-                "Password must contain at least 6 characters.";
-
-            passwordMessage.className =
-                "field-message error";
-
-            return false;
-        }
+        const passwordMessage =
+            document.getElementById(
+                "passwordMessage"
+            );
 
 
-        if (
-            confirmation !== "" &&
-            password !== confirmation
+        function validatePassword(
+            showEmptyMessage
         ) {
 
-            passwordMessage.textContent =
-                "Passwords do not match.";
+            if (
+                !newPassword ||
+                !confirmPassword
+            ) {
 
-            passwordMessage.className =
-                "field-message error";
+                return true;
 
-            return false;
-        }
-
-
-        if (
-            password !== "" &&
-            password === confirmation
-        ) {
-
-            passwordMessage.textContent =
-                "Passwords match.";
-
-            passwordMessage.className =
-                "field-message success";
-
-            return true;
-        }
-
-
-        passwordMessage.textContent = "";
-        passwordMessage.className = "field-message";
-
-        return true;
-    }
-
-
-    if (newPassword) {
-        newPassword.addEventListener(
-            "input",
-            function () {
-                validatePassword(true);
             }
-        );
-    }
 
 
-    if (confirmPassword) {
-        confirmPassword.addEventListener(
-            "input",
-            function () {
-                validatePassword(true);
-            }
-        );
-    }
+            const password =
+                newPassword.value;
+
+            const confirmation =
+                confirmPassword.value;
 
 
-    if (passwordForm) {
-
-        passwordForm.addEventListener(
-            "submit",
-            function (event) {
+            if (
+                password === "" &&
+                confirmation === ""
+            ) {
 
                 if (
-                    !currentPassword ||
-                    currentPassword.value.trim() === ""
+                    showEmptyMessage &&
+                    passwordMessage
                 ) {
 
-                    event.preventDefault();
+                    passwordMessage.textContent =
+                        "";
 
-                    alert(
-                        "Please enter your current password."
-                    );
+                    passwordMessage.className =
+                        "field-message";
 
-                    return;
                 }
 
-
-                if (
-                    !newPassword ||
-                    newPassword.value.trim() === ""
-                ) {
-
-                    event.preventDefault();
-
-                    alert(
-                        "Please enter a new password."
-                    );
-
-                    return;
-                }
-
-
-                if (!validatePassword(true)) {
-                    event.preventDefault();
-                }
+                return true;
 
             }
-        );
-    }
 
 
-    /* =====================================================
-       THEME PREVIEW
-    ====================================================== */
+            if (
+                password.length > 0 &&
+                password.length < 6
+            ) {
 
-    const themeInputs =
-        document.querySelectorAll(
-            'input[name="theme"]'
-        );
+                passwordMessage.textContent =
+                    "Password must contain at least 6 characters.";
+
+                passwordMessage.className =
+                    "field-message error";
+
+                return false;
+
+            }
 
 
-    themeInputs.forEach(
-        function (input) {
+            if (
+                confirmation !== "" &&
+                password !== confirmation
+            ) {
 
-            input.addEventListener(
-                "change",
+                passwordMessage.textContent =
+                    "Passwords do not match.";
+
+                passwordMessage.className =
+                    "field-message error";
+
+                return false;
+
+            }
+
+
+            if (
+                password !== "" &&
+                password === confirmation
+            ) {
+
+                passwordMessage.textContent =
+                    "Passwords match.";
+
+                passwordMessage.className =
+                    "field-message success";
+
+                return true;
+
+            }
+
+
+            passwordMessage.textContent =
+                "";
+
+            passwordMessage.className =
+                "field-message";
+
+            return true;
+
+        }
+
+
+        if (newPassword) {
+
+            newPassword.addEventListener(
+                "input",
                 function () {
 
-                    const theme =
-                        input.value;
+                    validatePassword(true);
+
+                }
+            );
+
+        }
 
 
-                    if (theme === "dark") {
+        if (confirmPassword) {
 
-                        document.documentElement
-                            .setAttribute(
-                                "data-theme",
-                                "dark"
-                            );
+            confirmPassword.addEventListener(
+                "input",
+                function () {
 
-                    } else if (theme === "light") {
+                    validatePassword(true);
 
-                        document.documentElement
-                            .setAttribute(
-                                "data-theme",
-                                "light"
-                            );
+                }
+            );
 
-                    } else {
+        }
 
-                        document.documentElement
-                            .removeAttribute(
-                                "data-theme"
-                            );
+
+        if (passwordForm) {
+
+            passwordForm.addEventListener(
+                "submit",
+                function (event) {
+
+                    if (
+                        !currentPassword ||
+                        currentPassword.value.trim() === ""
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter your current password."
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        !newPassword ||
+                        newPassword.value.trim() === ""
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a new password."
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        !validatePassword(true)
+                    ) {
+
+                        event.preventDefault();
+
                     }
 
                 }
             );
 
         }
-    );
 
 
-    /* =====================================================
-       EXPORT DATA
-    ====================================================== */
+        /* =====================================================
+           THEME PREVIEW
+        ====================================================== */
 
-    const exportButton =
-        document.getElementById("exportData");
+        const themeInputs =
+            document.querySelectorAll(
+                'input[name="theme"]'
+            );
 
 
-    if (exportButton) {
+        themeInputs.forEach(
+            function (input) {
 
-        exportButton.addEventListener(
-            "click",
-            function () {
+                input.addEventListener(
+                    "change",
+                    function () {
 
-                /*
-                 * Change this URL only if your Flask
-                 * export route uses a different endpoint.
-                 */
+                        const theme =
+                            input.value;
 
-                window.location.href =
-                    "/export-data";
+
+                        if (
+                            theme === "dark"
+                        ) {
+
+                            document.documentElement
+                                .setAttribute(
+                                    "data-theme",
+                                    "dark"
+                                );
+
+                        } else if (
+                            theme === "light"
+                        ) {
+
+                            document.documentElement
+                                .setAttribute(
+                                    "data-theme",
+                                    "light"
+                                );
+
+                        } else {
+
+                            document.documentElement
+                                .removeAttribute(
+                                    "data-theme"
+                                );
+
+                        }
+
+                    }
+                );
 
             }
         );
 
-    }
+
+        /* =====================================================
+           EXPORT DATA
+        ====================================================== */
+
+        const exportButton =
+            document.getElementById(
+                "exportData"
+            );
 
 
-    /* =====================================================
-       CLEAR DATA
-    ====================================================== */
+        if (exportButton) {
 
-    const clearButton =
-        document.getElementById("clearData");
+            exportButton.addEventListener(
+                "click",
+                function () {
 
+                    window.location.href =
+                        "/export-data";
 
-    if (clearButton) {
-
-        clearButton.addEventListener(
-            "click",
-            async function () {
-
-                const firstConfirm =
-                    window.confirm(
-                        "Are you sure you want to clear your financial data?"
-                    );
-
-
-                if (!firstConfirm) {
-                    return;
                 }
+            );
+
+        }
 
 
-                const secondConfirm =
-                    window.confirm(
-                        "This action may permanently delete financial records. Continue?"
-                    );
+        /* =====================================================
+           CLEAR DATA
+        ====================================================== */
+
+        const clearButton =
+            document.getElementById(
+                "clearData"
+            );
 
 
-                if (!secondConfirm) {
-                    return;
-                }
+        if (clearButton) {
 
+            clearButton.addEventListener(
+                "click",
+                async function () {
 
-                try {
-
-                    const response =
-                        await fetch(
-                            "/clear-data",
-                            {
-                                method: "POST",
-
-                                headers: {
-                                    "Content-Type":
-                                        "application/json",
-
-                                    "X-Requested-With":
-                                        "XMLHttpRequest"
-                                }
-                            }
+                    const firstConfirm =
+                        window.confirm(
+                            "Are you sure you want to clear your financial data?"
                         );
 
 
-                    if (!response.ok) {
-                        throw new Error(
-                            "Request failed"
-                        );
+                    if (!firstConfirm) {
+
+                        return;
+
                     }
 
 
-                    alert(
-                        "Financial data has been cleared."
-                    );
+                    const secondConfirm =
+                        window.confirm(
+                            "This action may permanently delete financial records. Continue?"
+                        );
 
 
-                    window.location.reload();
+                    if (!secondConfirm) {
 
-                } catch (error) {
+                        return;
 
-                    console.error(
-                        "Clear data error:",
-                        error
-                    );
+                    }
 
 
-                    alert(
-                        "Unable to clear data. Please try again."
-                    );
+                    try {
+
+                        const response =
+                            await fetch(
+                                "/clear-data",
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json",
+
+                                        "X-Requested-With":
+                                            "XMLHttpRequest"
+                                    }
+                                }
+                            );
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "Request failed"
+                            );
+
+                        }
+
+
+                        alert(
+                            "Financial data has been cleared."
+                        );
+
+
+                        window.location.reload();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Clear data error:",
+                            error
+                        );
+
+
+                        alert(
+                            "Unable to clear data. Please try again."
+                        );
+
+                    }
 
                 }
+            );
 
-            }
-        );
+        }
 
     }
-
-});
+);
 
 </script>
 

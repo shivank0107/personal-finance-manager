@@ -200,7 +200,7 @@ def login():
             session["username"] = username
 
             return redirect(
-                url_for("home")
+                url_for("dashboard")
             )
 
         return render_template(
@@ -228,6 +228,16 @@ def login_required(view):
         )
 
     return wrapped_view
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(
+        url_for("login")
+    )
+
 # =========================================================
 # JSON HELPERS
 # =========================================================
@@ -1162,6 +1172,7 @@ def calculate_investment_holdings(
 # =========================================================
 
 @app.route("/")
+@login_required
 def dashboard():
 
     accounts = load_accounts()
