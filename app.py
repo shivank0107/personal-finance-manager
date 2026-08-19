@@ -3705,11 +3705,64 @@ def investments():
 
     for investment in investments_list:
 
-        holdings = (
-            calculate_investment_holdings(
-                investment["id"]
-            )
+        # =====================================================
+        # TRANSACTION-BASED HOLDINGS
+        # =====================================================
+
+        holdings = calculate_investment_holdings(
+            investment["id"]
         )
+
+        transaction_units = float(
+            holdings.get(
+                "units",
+                0
+            ) or 0
+        )
+
+        transaction_invested = float(
+            holdings.get(
+                "invested",
+                0
+            ) or 0
+        )
+
+        # =====================================================
+        # FALLBACK TO INVESTMENT MASTER DATA
+        #
+        # This handles investments created directly from
+        # Add Investment without transactions.
+        # =====================================================
+
+        if transaction_units > 0:
+
+            units = transaction_units
+
+        else:
+
+            units = float(
+                investment.get(
+                    "quantity",
+                    0
+                ) or 0
+            )
+
+        if transaction_invested > 0:
+
+            invested = transaction_invested
+
+        else:
+
+            invested = float(
+                investment.get(
+                    "invested_amount",
+                    0
+                ) or 0
+            )
+
+        # =====================================================
+        # CURRENT PRICE
+        # =====================================================
 
         current_price = float(
             investment.get(
@@ -3718,26 +3771,134 @@ def investments():
             ) or 0
         )
 
-        current_value = (
-            holdings["units"]
-            * current_price
+        # If current price is missing,
+        # use purchase price.
+
+        if current_price <= 0:
+
+            current_price = float(
+                investment.get(
+                    "purchase_price",
+                    0
+                ) or 0
+            )
+
+        # If still missing and units exist,
+        # calculate from current value.
+
+        if (
+            current_price <= 0
+            and units > 0
+        ):
+
+            stored_current_value = float(
+                investment.get(
+                    "current_value",
+                    0
+                ) or 0
+            )
+
+            if stored_current_value > 0:
+
+                current_price = (
+                    stored_current_value
+                    / units
+                )
+
+        # =====================================================
+        # CURRENT VALUE
+        # =====================================================
+
+        stored_current_value = float(
+            investment.get(
+                "current_value",
+                0
+            ) or 0
         )
 
-        investment.update(
-            holdings
-        )
+        if (
+            current_price > 0
+            and units > 0
+        ):
 
-        investment[
-            "current_value"
-        ] = round(
+            current_value = (
+                units
+                * current_price
+            )
+
+        else:
+
+            current_value = (
+                stored_current_value
+            )
+
+        current_value = round(
             current_value,
             2
         )
 
+        # =====================================================
+        # AVERAGE PRICE
+        # =====================================================
+
+        if units > 0:
+
+            average_price = (
+                invested / units
+            )
+
+        else:
+
+            average_price = float(
+                investment.get(
+                    "purchase_price",
+                    0
+                ) or 0
+            )
+
+        # =====================================================
+        # UPDATE VALUES FOR TEMPLATE
+        # =====================================================
+
+        investment["units"] = round(
+            units,
+            6
+        )
+
+        investment["invested"] = round(
+            invested,
+            2
+        )
+
+        investment["current_price"] = round(
+            current_price,
+            2
+        )
+
+        investment["current_value"] = (
+            current_value
+        )
+
+        investment["average_price"] = round(
+            average_price,
+            2
+        )
+
+        # =====================================================
+        # PROFIT / LOSS
+        # =====================================================
+
+        investment["profit_loss"] = round(
+            current_value - invested,
+            2
+        )
+
         total_value += current_value
-        total_invested += holdings[
-            "invested"
-        ]
+        total_invested += invested
+
+    # =========================================================
+    # RENDER
+    # =========================================================
 
     return render_template(
         "investments.html",
@@ -3761,64 +3922,326 @@ def investments():
         )
     )
 
-
 @app.route(
     "/investments/add",
     methods=["GET", "POST"]
 )
 def add_investment():
 
+    # =========================================================
+    # LOAD ACCOUNTS
+    # =========================================================
+
     accounts = load_accounts()
+
+    # =========================================================
+    # POST
+    # =========================================================
 
     if request.method == "POST":
 
-        investments_list = (
-            load_investments()
+        # -----------------------------------------------------
+        # Investment Name
+        # -----------------------------------------------------
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        if not name:
+
+            return (
+                "Investment name is required.",
+                400
+            )
+
+        # -----------------------------------------------------
+        # Investment Type
+        # -----------------------------------------------------
+
+        investment_type = request.form.get(
+            "investment_type",
+            "Other"
+        )
+
+        # -----------------------------------------------------
+        # Platform
+        # -----------------------------------------------------
+
+        platform = request.form.get(
+            "platform",
+            ""
+        ).strip()
+
+        # -----------------------------------------------------
+        # Funding Account
+        # -----------------------------------------------------
+
+        account_id = request.form.get(
+            "account_id"
+        )
+
+        # -----------------------------------------------------
+        # Investment Date
+        # -----------------------------------------------------
+
+        investment_date = request.form.get(
+            "investment_date",
+            ""
+        )
+
+        try:
+
+            investment_date = validate_date(
+                investment_date,
+                "Investment Date"
+            )
+
+        except ValueError as error:
+
+            return str(error), 400
+
+        # -----------------------------------------------------
+        # Invested Amount
+        # -----------------------------------------------------
+
+        try:
+
+            invested_amount = get_positive_amount(
+                request.form.get(
+                    "invested_amount"
+                ),
+                "Invested Amount"
+            )
+
+        except ValueError as error:
+
+            return str(error), 400
+
+        # -----------------------------------------------------
+        # Quantity
+        # -----------------------------------------------------
+
+        try:
+
+            quantity = float(
+                request.form.get(
+                    "quantity",
+                    0
+                ) or 0
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            return (
+                "Quantity must be a valid number.",
+                400
+            )
+
+        if quantity < 0:
+
+            return (
+                "Quantity cannot be negative.",
+                400
+            )
+
+        # -----------------------------------------------------
+        # Purchase Price
+        # -----------------------------------------------------
+
+        try:
+
+            purchase_price = float(
+                request.form.get(
+                    "purchase_price",
+                    0
+                ) or 0
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            return (
+                "Purchase price must be a valid number.",
+                400
+            )
+
+        if purchase_price < 0:
+
+            return (
+                "Purchase price cannot be negative.",
+                400
+            )
+
+        # -----------------------------------------------------
+        # Current Value
+        # -----------------------------------------------------
+
+        try:
+
+            current_value = float(
+                request.form.get(
+                    "current_value",
+                    0
+                ) or 0
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            return (
+                "Current value must be a valid number.",
+                400
+            )
+
+        if current_value < 0:
+
+            return (
+                "Current value cannot be negative.",
+                400
+            )
+
+        # -----------------------------------------------------
+        # Calculate purchase price if not entered
+        # -----------------------------------------------------
+
+        if (
+            purchase_price <= 0
+            and quantity > 0
+        ):
+
+            purchase_price = round(
+                invested_amount / quantity,
+                2
+            )
+
+        # -----------------------------------------------------
+        # Current value
+        # -----------------------------------------------------
+
+        if current_value <= 0:
+
+            current_value = invested_amount
+
+        # -----------------------------------------------------
+        # Current price
+        #
+        # If user entered purchase price, use it.
+        # Otherwise use current value when quantity exists.
+        # -----------------------------------------------------
+
+        if purchase_price > 0:
+
+            current_price = purchase_price
+
+        elif quantity > 0:
+
+            current_price = round(
+                current_value / quantity,
+                2
+            )
+
+        else:
+
+            current_price = 0.0
+
+        # -----------------------------------------------------
+        # Description
+        # -----------------------------------------------------
+
+        description = request.form.get(
+            "description",
+            ""
+        ).strip()
+
+        # =====================================================
+        # CREATE INVESTMENT
+        # =====================================================
+
+        investments_list = load_investments()
+
+        investment_id = get_next_id(
+            investments_list
         )
 
         investment = {
 
             "id":
-                get_next_id(
-                    investments_list
-                ),
+                investment_id,
 
             "name":
-                request.form.get(
-                    "name",
-                    ""
-                ).strip(),
+                name,
 
             "type":
-                request.form.get(
-                    "type",
-                    "Stocks"
-                ),
+                investment_type,
+
+            "investment_type":
+                investment_type,
+
+            "platform":
+                platform,
 
             "symbol":
-                request.form.get(
-                    "symbol",
-                    ""
-                ).strip(),
+                "",
+
+            "account_id":
+                account_id,
+
+            "investment_date":
+                investment_date,
+
+            "date":
+                investment_date,
+
+            "invested_amount":
+                round(
+                    invested_amount,
+                    2
+                ),
+
+            "quantity":
+                round(
+                    quantity,
+                    6
+                ),
+
+            "purchase_price":
+                round(
+                    purchase_price,
+                    2
+                ),
 
             "current_price":
-                float(
-                    request.form.get(
-                        "current_price",
-                        0
-                    ) or 0
+                round(
+                    current_price,
+                    2
+                ),
+
+            "current_value":
+                round(
+                    current_value,
+                    2
                 ),
 
             "description":
-                request.form.get(
-                    "description",
-                    ""
-                ).strip(),
+                description,
 
             "created_at":
                 datetime.now().isoformat()
 
         }
+
+        # -----------------------------------------------------
+        # Save investment
+        # -----------------------------------------------------
 
         investments_list.append(
             investment
@@ -3828,15 +4251,93 @@ def add_investment():
             investments_list
         )
 
+        # =====================================================
+        # CREATE INITIAL BUY TRANSACTION
+        #
+        # Only when quantity and price are available.
+        # =====================================================
+
+        if (
+            quantity > 0
+            and purchase_price > 0
+        ):
+
+            transactions = (
+                load_investment_transactions()
+            )
+
+            transaction = {
+
+                "id":
+                    get_next_id(
+                        transactions
+                    ),
+
+                "investment_id":
+                    investment_id,
+
+                "account_id":
+                    account_id,
+
+                "type":
+                    "buy",
+
+                "units":
+                    round(
+                        quantity,
+                        6
+                    ),
+
+                "price":
+                    round(
+                        purchase_price,
+                        2
+                    ),
+
+                "amount":
+                    round(
+                        quantity
+                        * purchase_price,
+                        2
+                    ),
+
+                "date":
+                    investment_date,
+
+                "description":
+                    "Initial investment",
+
+                "created_at":
+                    datetime.now().isoformat()
+
+            }
+
+            transactions.append(
+                transaction
+            )
+
+            save_investment_transactions(
+                transactions
+            )
+
+        # =====================================================
+        # REDIRECT
+        # =====================================================
+
         return redirect(
-            url_for("investments")
+            url_for(
+                "investments"
+            )
         )
+
+    # =========================================================
+    # GET
+    # =========================================================
 
     return render_template(
         "add_investment.html",
         accounts=accounts
     )
-
 
 @app.route(
     "/investments/<int:investment_id>/edit",
