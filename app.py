@@ -481,23 +481,21 @@ def get_positive_amount(
     value,
     field_name="Amount"
 ):
-
     try:
 
-        # Convert to string safely
-        value = str(
-            value or ""
-        ).strip()
+        if value is None:
+            raise ValueError
 
-        # Remove currency symbol and commas
-        value = (
-            value
-            .replace("₹", "")
-            .replace(",", "")
-            .strip()
-        )
+        value = str(value).strip()
 
-        # Empty value
+        # Remove currency symbol
+        value = value.replace("₹", "")
+
+        # Remove comma formatting
+        value = value.replace(",", "")
+
+        value = value.strip()
+
         if not value:
             raise ValueError
 
@@ -522,45 +520,6 @@ def get_positive_amount(
         amount,
         2
     )
-
-def validate_date(date_value):
-
-    if not date_value:
-
-        raise ValueError(
-            "Date is required."
-        )
-
-    try:
-
-        datetime.strptime(
-            date_value,
-            "%Y-%m-%d"
-        )
-
-    except ValueError:
-
-        raise ValueError(
-            "Invalid date format."
-        )
-
-    return date_value
-
-
-def validate_date_range(
-    start_date,
-    end_date
-):
-
-    validate_date(start_date)
-    validate_date(end_date)
-
-    if end_date < start_date:
-
-        raise ValueError(
-            "End date cannot be before start date."
-        )
-
 
 # =========================================================
 # ACCOUNT BALANCE
