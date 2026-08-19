@@ -1,12 +1,4 @@
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    jsonify,
-    send_file
-)
+from flask import (Flask,render_template,request,redirect,url_for,jsonify,send_file)
 
 import os
 import json
@@ -3776,6 +3768,8 @@ def investments():
 )
 def add_investment():
 
+    accounts = load_accounts()
+
     if request.method == "POST":
 
         investments_list = (
@@ -3839,7 +3833,8 @@ def add_investment():
         )
 
     return render_template(
-        "add_investment.html"
+        "add_investment.html",
+        accounts=accounts
     )
 
 
