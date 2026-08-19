@@ -521,6 +521,59 @@ def get_positive_amount(
         2
     )
 
+
+def validate_date(
+    value,
+    field_name="Date"
+):
+    value = str(
+        value or ""
+    ).strip()
+
+    if not value:
+        raise ValueError(
+            f"{field_name} is required."
+        )
+
+    try:
+        datetime.strptime(
+            value,
+            "%Y-%m-%d"
+        )
+
+    except ValueError:
+
+        raise ValueError(
+            f"{field_name} must be a valid date."
+        )
+
+    return value
+
+
+def validate_date_range(
+    start_date,
+    end_date
+):
+    start_date = validate_date(
+        start_date,
+        "Start Date"
+    )
+
+    end_date = validate_date(
+        end_date,
+        "End Date"
+    )
+
+    if start_date > end_date:
+
+        raise ValueError(
+            "Start Date cannot be after End Date."
+        )
+
+    return (
+        start_date,
+        end_date
+    )
 # =========================================================
 # ACCOUNT BALANCE
 # =========================================================
