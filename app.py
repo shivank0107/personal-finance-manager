@@ -4492,28 +4492,39 @@ def edit_investment(investment_id):
 )
 def delete_investment(investment_id):
 
-    investments_list = (
-        load_investments()
+    # ---------------------------------------------------------
+    # LOAD INVESTMENTS
+    # ---------------------------------------------------------
+
+    investments_list = load_investments()
+
+    # ---------------------------------------------------------
+    # CHECK INVESTMENT EXISTS
+    # ---------------------------------------------------------
+
+    investment = next(
+        (
+            item
+            for item in investments_list
+            if int(
+                item.get("id", 0)
+            ) == investment_id
+        ),
+        None
     )
 
-    transactions = (
-        load_investment_transactions()
-    )
-
-    if any(
-        str(
-            item.get("investment_id")
-        ) == str(investment_id)
-        for item in transactions
-    ):
+    if investment is None:
 
         return (
-            "This investment has transactions. "
-            "Delete those transactions first.",
-            400
+            "Investment not found.",
+            404
         )
 
-    updated = [
+    # ---------------------------------------------------------
+    # DELETE INVESTMENT
+    # ---------------------------------------------------------
+
+    updated_investments = [
         item
         for item in investments_list
         if int(
@@ -4521,23 +4532,35 @@ def delete_investment(investment_id):
         ) != investment_id
     ]
 
-    if len(updated) == len(
-        investments_list
-    ):
-
-        return (
-            "Investment not found.",
-            404
-        )
-
     save_investments(
-        updated
+        updated_investments
     )
+
+    # ---------------------------------------------------------
+    # DELETE RELATED TRANSACTIONS
+    # ---------------------------------------------------------
+
+    transactions = load_investment_transactions()
+
+    updated_transactions = [
+        item
+        for item in transactions
+        if str(
+            item.get("investment_id")
+        ) != str(investment_id)
+    ]
+
+    save_investment_transactions(
+        updated_transactions
+    )
+
+    # ---------------------------------------------------------
+    # REDIRECT
+    # ---------------------------------------------------------
 
     return redirect(
         url_for("investments")
     )
-
 
 # =========================================================
 # INVESTMENT TRANSACTIONS
