@@ -1828,13 +1828,18 @@ def edit_income(income_id):
         try:
 
             amount = get_positive_amount(
-                request.form.get("amount"),
+                request.form.get(
+                    "amount"
+                ),
                 "Amount"
             )
 
             date_value = validate_date(
                 request.form.get(
-                    "date"
+                    "income_date"
+                )
+                or income_item.get(
+                    "income_date"
                 )
                 or income_item.get(
                     "date",
@@ -1853,19 +1858,35 @@ def edit_income(income_id):
         income_item["category"] = request.form.get(
             "category",
             ""
-        )
+        ).strip()
 
         income_item["account_id"] = request.form.get(
-            "account_id"
-        )
-
-        income_item["payment_mode"] = request.form.get(
-            "payment_mode",
+            "account_id",
             ""
         )
 
+        income_item["payment_method"] = request.form.get(
+            "payment_method",
+            ""
+        ).strip()
+
         income_item["description"] = request.form.get(
             "description",
+            ""
+        ).strip()
+
+        income_item["source"] = request.form.get(
+            "source",
+            ""
+        ).strip()
+
+        income_item["reference"] = request.form.get(
+            "reference",
+            ""
+        ).strip()
+
+        income_item["notes"] = request.form.get(
+            "notes",
             ""
         ).strip()
 
@@ -1882,37 +1903,6 @@ def edit_income(income_id):
         income=income_item,
         accounts=accounts
     )
-@app.route(
-    "/income/<int:income_id>/delete",
-    methods=["POST"]
-)
-def delete_income(income_id):
-
-    incomes = load_incomes()
-
-    updated = [
-        item
-        for item in incomes
-        if int(
-            item.get("id", 0)
-        ) != income_id
-    ]
-
-    if len(updated) == len(incomes):
-
-        return (
-            "Income not found.",
-            404
-        )
-
-    save_incomes(
-        updated
-    )
-
-    return redirect(
-        url_for("income")
-    )
-
 # =========================================================
 # EXPENSES
 # =========================================================
