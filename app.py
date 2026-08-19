@@ -4492,76 +4492,77 @@ def edit_investment(investment_id):
 )
 def delete_investment(investment_id):
 
-    # ---------------------------------------------------------
-    # LOAD INVESTMENTS
-    # ---------------------------------------------------------
+    try:
 
-    investments_list = load_investments()
+        # Load investments
+        investments_list = load_investments()
 
-    # ---------------------------------------------------------
-    # CHECK INVESTMENT EXISTS
-    # ---------------------------------------------------------
+        # Check investment exists
+        investment = next(
+            (
+                item
+                for item in investments_list
+                if int(
+                    item.get("id", 0)
+                ) == investment_id
+            ),
+            None
+        )
 
-    investment = next(
-        (
+        if investment is None:
+
+            return (
+                "Investment not found.",
+                404
+            )
+
+        # Remove investment
+        updated_investments = [
             item
             for item in investments_list
             if int(
                 item.get("id", 0)
-            ) == investment_id
-        ),
-        None
-    )
+            ) != investment_id
+        ]
 
-    if investment is None:
-
-        return (
-            "Investment not found.",
-            404
+        # Save investments
+        save_investments(
+            updated_investments
         )
 
-    # ---------------------------------------------------------
-    # DELETE INVESTMENT
-    # ---------------------------------------------------------
+        # Load transactions
+        transactions = load_investment_transactions()
 
-    updated_investments = [
-        item
-        for item in investments_list
-        if int(
-            item.get("id", 0)
-        ) != investment_id
-    ]
+        # Remove related transactions
+        updated_transactions = [
+            item
+            for item in transactions
+            if str(
+                item.get("investment_id")
+            ) != str(investment_id)
+        ]
 
-    save_investments(
-        updated_investments
-    )
+        # Save transactions
+        save_investment_transactions(
+            updated_transactions
+        )
 
-    # ---------------------------------------------------------
-    # DELETE RELATED TRANSACTIONS
-    # ---------------------------------------------------------
+        # Back to investments
+        return redirect(
+            url_for("investments")
+        )
 
-    transactions = load_investment_transactions()
+    except Exception as error:
 
-    updated_transactions = [
-        item
-        for item in transactions
-        if str(
-            item.get("investment_id")
-        ) != str(investment_id)
-    ]
+        print(
+            "DELETE INVESTMENT ERROR:",
+            repr(error)
+        )
 
-    save_investment_transactions(
-        updated_transactions
-    )
-
-    # ---------------------------------------------------------
-    # REDIRECT
-    # ---------------------------------------------------------
-
-    return redirect(
-        url_for("investments")
-    )
-
+        return (
+            f"Delete failed: {error}",
+            500
+        )
 # =========================================================
 # INVESTMENT TRANSACTIONS
 # =========================================================

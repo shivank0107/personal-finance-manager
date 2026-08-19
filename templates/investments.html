@@ -1858,50 +1858,45 @@ document.addEventListener(
         ================================================= */
 
         function openDeleteModal(
-            investmentId,
-            investmentName
-        ) {
+    investmentId,
+    investmentName
+) {
 
-            if (
-                !deleteModal ||
-                !deleteForm
-            ) {
+    if (
+        !deleteModal ||
+        !deleteForm
+    ) {
 
-                return;
+        return;
 
-            }
+    }
 
+    if (
+        deleteName
+    ) {
 
-            if (
-                deleteName
-            ) {
+        deleteName.textContent =
+            investmentName ||
+            "this investment";
 
-                deleteName.textContent =
-                    investmentName ||
-                    "this investment";
+    }
 
-            }
+    deleteForm.action =
+        "/investments/" +
+        encodeURIComponent(
+            investmentId
+        ) +
+        "/delete";
 
+    deleteModal.classList.remove(
+        "hidden"
+    );
 
-            deleteForm.action =
-                "/investments/delete/" +
-                encodeURIComponent(
-                    investmentId
-                );
-
-
-            deleteModal.classList.remove(
-                "hidden"
-            );
-
-
-            deleteModal.setAttribute(
-                "aria-hidden",
-                "false"
-            );
-
-        }
-
+    deleteModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+}
 
         /* =================================================
            CLOSE DELETE MODAL
