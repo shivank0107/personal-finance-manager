@@ -212,7 +212,22 @@ def login():
         "login.html"
     )
 
+def login_required(view):
 
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+
+        if not session.get("logged_in"):
+            return redirect(
+                url_for("login")
+            )
+
+        return view(
+            *args,
+            **kwargs
+        )
+
+    return wrapped_view
 # =========================================================
 # JSON HELPERS
 # =========================================================
@@ -1147,8 +1162,8 @@ def calculate_investment_holdings(
 # =========================================================
 
 @app.route("/")
-def dashboard():
 
+def home():
     accounts = load_accounts()
     incomes = load_incomes()
     expenses = load_expenses()
