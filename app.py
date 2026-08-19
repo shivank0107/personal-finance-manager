@@ -1833,7 +1833,13 @@ def edit_income(income_id):
             )
 
             date_value = validate_date(
-                request.form.get("date")
+                request.form.get(
+                    "date"
+                )
+                or income_item.get(
+                    "date",
+                    ""
+                )
             )
 
         except ValueError as error:
@@ -1876,8 +1882,6 @@ def edit_income(income_id):
         income=income_item,
         accounts=accounts
     )
-
-
 @app.route(
     "/income/<int:income_id>/delete",
     methods=["POST"]
